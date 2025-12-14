@@ -54,7 +54,7 @@ Falls Python noch nicht installiert ist:
 ```bash
 curl -L https://maat-research.com/data/downloads/MAAT-RPG.zip -o MAAT-RPG.zip
 unzip MAAT-RPG.zip---
-
+```
 ## 🔐 macOS Sicherheit (Gatekeeper)
 
 Beim ersten Start kann macOS eine Warnung anzeigen, da MAAT-RPG lokal & unsigniert ist.
