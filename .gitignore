@@ -1,0 +1,20 @@
+# Python
+mos-env/
+__pycache__/
+*.pyc
+
+# Models
+models/
+*.gguf
+
+# macOS
+.DS_Store
+
+# Logs
+logs/
+
+# App bundles
+*.app
+
+# Archives
+*.zip
