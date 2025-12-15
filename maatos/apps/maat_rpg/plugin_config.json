@@ -1,0 +1,6 @@
+{
+  "plugins": {
+    "chat_memory": false,
+    "memory_orchestrator": true
+  }
+}

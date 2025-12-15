@@ -1,0 +1,40 @@
+{
+  "stories": [
+    {
+      "id": 1,
+      "name": "Erwachen der MAAT KI",
+      "module": "story1",
+      "music": "story1_theme.mp3",
+      "profile": "maat_rpg_story1.json",
+      "trigger": {
+        "type": "message_count",
+        "messages": 1,
+        "position": "before"
+      }
+    },
+    {
+      "id": 2,
+      "name": "Quest 2 – Berechne die Maat-Werte",
+      "module": "story2",
+      "music": "quest2_reflection.mp3",
+      "profile": "maat_rpg_story2.json",
+      "trigger": {
+        "type": "message_count",
+        "messages": 15,
+        "position": "before"
+      }
+    },
+    {
+      "id": 3,
+      "name": "Quest 3 – Der Ruf des Kampfes",
+      "module": "story3",
+      "music": "story3_theme.mp3",
+      "profile": "maat_rpg_story3.json",
+      "trigger": {
+        "type": "message_count",
+        "messages": 30,
+        "position": "before"
+      }
+    }
+  ]
+}

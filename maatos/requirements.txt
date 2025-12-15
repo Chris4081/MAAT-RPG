@@ -1,0 +1,16 @@
+colorama==0.4.6
+llama-cpp-python==0.3.2
+pyttsx3==2.90
+numpy==1.26.4
+scipy==1.12.0
+regex==2023.12.25
+tqdm==4.66.4
+sentencepiece==0.1.99
+sqlitedict==2.1.0
+python-dateutil==2.9.0.post0
+pydantic==1.10.13
+wikipedia
+faiss-cpu==1.7.4
+huggingface_hub
+pyyaml
+mlx_lm
