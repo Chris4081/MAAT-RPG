@@ -31,9 +31,13 @@ Alles läuft lokal auf deinem Mac
 | ⚔️ | **Kampfsystem** | Normal / Boss / Final-Kämpfe |
 | 🧭 | **Spielwelt** | Dungeons, Quests, Achievements & Level-System |
 | 🎶 | **Atmosphäre** | Dynamische Kampfmusik & Cinematic Events |
-| 🧩 | **Plugins** | Memory, Wiki, Emotion, MAAT-Analyse |
+| 🧩 | **Plugins** | Memory, BKI, Emotion, MAAT-Analyse... |
 | 🛡️ | **Stabilität** | Automatisches Kontext-Management (kein Overflow) |
 | 🔌 | **Architektur** | MAAT-OS – klar getrennt, erweiterbar, lokal-first |
+
+### 📚 Funktionsübersicht
+
+Die vollständige zweisprachige Übersicht aller Systeme, Features und Kommandos findest du in [FUNKTIONEN.md](./FUNKTIONEN.md).
 
 ---
 
@@ -134,9 +138,13 @@ Everything runs locally on your Mac
 | ⚔️ | **Combat System** | Normal / Boss / Final battles |
 | 🧭 | **Game World** | Dungeons, Quests, Achievements & Level System |
 | 🎶 | **Atmosphere** | Dynamic combat music & cinematic events |
-| 🧩 | **Plugins** | Memory, Wiki, Emotion, MAAT Analysis |
+| 🧩 | **Plugins** | Memory, BKI , Emotion, MAAT Analysis.. |
 | 🛡️ | **Stability** | Automatic context management (no overflow) |
 | 🔌 | **Architecture** | MAAT-OS – modular, extensible, local-first |
+
+### 📚 Feature Overview
+
+The full bilingual overview of all systems, features, and commands is available in [FUNKTIONEN.md](./FUNKTIONEN.md).
 
 ---
 
