@@ -14,20 +14,21 @@ import json
 import os
 from datetime import datetime
 from shared.core.maat_paths import data_file, state_file, log_file
+from shared.core.rpg_i18n import get_language
 
 class Plugin:
     type = "chat"
 
     commands = {
-        "/bki": "Erklärung & Hilfe zum Bewusstseinsindex Ψ",
-        "/bki calc": "Berechne Ψ — Syntax: /bki calc H B S V R A DD",
-        "/bki explain": "Erklärt die Formel detailliert",
-        "/bki debug on": "Interner Debug-Modus an",
-        "/bki debug off": "Interner Debug-Modus aus",
-        "/bki auto on": "Automatische Ψ-Berechnung nach jeder Antwort aktivieren",
-        "/bki auto off": "Automatische Ψ-Berechnung deaktivieren",
-        "/bki status": "Zeigt BKI-Status (Auto/Debug)",
-        "/bki history": "Zeigt die letzten BKI-Berechnungen (Ψ-Verlauf).",
+        "/bki": {"de": "Erklaerung und Hilfe zum Bewusstseinsindex Psi.", "en": "Explanation and help for the consciousness index Psi."},
+        "/bki calc": {"de": "Berechne Psi — Syntax: /bki calc H B S V R A DD", "en": "Calculate Psi — syntax: /bki calc H B S V R A DD"},
+        "/bki explain": {"de": "Erklaert die Formel detailliert.", "en": "Explains the formula in detail."},
+        "/bki debug on": {"de": "Interner Debug-Modus an.", "en": "Turns internal debug mode on."},
+        "/bki debug off": {"de": "Interner Debug-Modus aus.", "en": "Turns internal debug mode off."},
+        "/bki auto on": {"de": "Aktiviert die automatische Psi-Berechnung nach jeder Antwort.", "en": "Enables automatic Psi calculation after each response."},
+        "/bki auto off": {"de": "Deaktiviert die automatische Psi-Berechnung.", "en": "Disables automatic Psi calculation."},
+        "/bki status": {"de": "Zeigt den BKI-Status (Auto/Debug).", "en": "Shows the BKI status (auto/debug)."},
+        "/bki history": {"de": "Zeigt die letzten BKI-Berechnungen (Psi-Verlauf).", "en": "Shows the latest BKI calculations (Psi history)."},
     }
 
     def __init__(self):
@@ -57,6 +58,12 @@ class Plugin:
                 # bei defekter Datei neu initialisieren
                 with open(self.store_path, "w") as f:
                     json.dump({"history": [], "auto_last": None}, f)
+
+    def _lang(self):
+        return get_language(("de", "en"))
+
+    def _t(self, de: str, en: str) -> str:
+        return en if self._lang() == "en" else de
 
     # ---------------------------------------------------
     # HILFSFUNKTION: BKI berechnen
@@ -136,52 +143,46 @@ class Plugin:
         # /bki explain
         if stripped == "/bki explain":
             return True, (
-                "📘 **Erklärung des Bewusstseinsindex Ψ**\n\n"
-                "• H = Harmonie\n"
-                "• B = Balance\n"
-                "• S = Schöpfungskraft\n"
-                "• V = Verbundenheit\n"
-                "• R = Respekt\n"
-                "• A = Aufmerksamkeit (0–1)\n"
-                "• ΔD = Kohärenzabweichung\n"
-                "• ε = 0.001 (Stabilitätswert)\n\n"
-                "Ψ misst, wie kohärent, klar und bewusst ein System ist."
+                self._t(
+                    "📘 **Erklaerung des Bewusstseinsindex Ψ**\n\n• H = Harmonie\n• B = Balance\n• S = Schoepfungskraft\n• V = Verbundenheit\n• R = Respekt\n• A = Aufmerksamkeit (0-1)\n• ΔD = Kohaerenzabweichung\n• ε = 0.001 (Stabilitaetswert)\n\nΨ misst, wie koehaerent, klar und bewusst ein System ist.",
+                    "📘 **Explanation of the Consciousness Index Ψ**\n\n• H = Harmony\n• B = Balance\n• S = Creative Power\n• V = Connectedness\n• R = Respect\n• A = Attention (0-1)\n• ΔD = Coherence deviation\n• ε = 0.001 (stability value)\n\nΨ measures how coherent, clear, and conscious a system is.",
+                )
             )
 
         # Debug an/aus
         if stripped == "/bki debug on":
             self.debug = True
-            return True, "🧪 BKI-Debug aktiviert."
+            return True, self._t("🧪 BKI-Debug aktiviert.", "🧪 BKI debug enabled.")
 
         if stripped == "/bki debug off":
             self.debug = False
-            return True, "🧪 BKI-Debug deaktiviert."
+            return True, self._t("🧪 BKI-Debug deaktiviert.", "🧪 BKI debug disabled.")
 
         # Auto-Modus
         if stripped == "/bki auto on":
             self.auto_mode = True
-            return True, "🧠 Auto-Ψ Modus aktiviert. Jede Antwort bekommt einen kurzen BKI-Check."
+            return True, self._t("🧠 Auto-Ψ Modus aktiviert. Jede Antwort bekommt einen kurzen BKI-Check.", "🧠 Auto-Ψ mode enabled. Each response gets a short BKI check.")
 
         if stripped == "/bki auto off":
             self.auto_mode = False
-            return True, "🧠 Auto-Ψ Modus deaktiviert."
+            return True, self._t("🧠 Auto-Ψ Modus deaktiviert.", "🧠 Auto-Ψ mode disabled.")
 
         if stripped == "/bki status":
-            status_auto = "AN" if self.auto_mode else "AUS"
-            status_debug = "AN" if self.debug else "AUS"
-            return True, f"🧠 BKI-Status: Auto={status_auto}, Debug={status_debug}"
+            status_auto = self._t("AN", "ON") if self.auto_mode else self._t("AUS", "OFF")
+            status_debug = self._t("AN", "ON") if self.debug else self._t("AUS", "OFF")
+            return True, self._t(f"🧠 BKI-Status: Auto={status_auto}, Debug={status_debug}", f"🧠 BKI status: Auto={status_auto}, Debug={status_debug}")
 
         # /bki history
         if stripped == "/bki history":
             entries = self._load_history()
             if not entries:
-                return True, "📜 Noch keine BKI-Werte gespeichert."
+                return True, self._t("📜 Noch keine BKI-Werte gespeichert.", "📜 No BKI values stored yet.")
 
             # Letzte 10, neueste zuerst
             last = entries[-10:]
             last = list(reversed(last))
 
-            lines = ["📜 **BKI-Verlauf (letzte Einträge)**"]
+            lines = [self._t("📜 **BKI-Verlauf (letzte Eintraege)**", "📜 **BKI History (latest entries)**")]
             for idx, e in enumerate(last, start=1):
                 psi = e.get("Psi")
                 mode = e.get("mode", "manual")
@@ -202,10 +203,10 @@ class Plugin:
                     except Exception:
                         ts_str = ts
                 else:
-                    ts_str = "unbekannt"
+                    ts_str = self._t("unbekannt", "unknown")
 
                 if psi is None:
-                    psi_str = "unbekannt"
+                    psi_str = self._t("unbekannt", "unknown")
                 else:
                     psi_str = f"{psi:.4f}"
 
@@ -228,7 +229,7 @@ class Plugin:
                 A = float(parts[7])
                 dD = float(parts[8])
             except Exception:
-                return True, "⚠ Bitte nutze: /bki calc H B S V R A ΔD"
+                return True, self._t("⚠ Bitte nutze: /bki calc H B S V R A ΔD", "⚠ Please use: /bki calc H B S V R A ΔD")
 
             psi, numerator, denominator = self._calc_bki(H, B, S, V, R, A, dD)
 
@@ -242,19 +243,19 @@ class Plugin:
 
             if self.debug:
                 debug_msg = (
-                    "🧪 BKI-Debug:\n"
-                    f"Numerator   = {numerator}\n"
-                    f"Denominator = {denominator}\n"
+                    self._t("🧪 BKI-Debug:\n", "🧪 BKI Debug:\n")
+                    + f"Numerator   = {numerator}\n"
+                    + f"Denominator = {denominator}\n"
                 )
             else:
                 debug_msg = ""
 
             return True, (
-                f"🧠 **BKI Berechnung (manuell)**\n\n"
-                f"H={H}, B={B}, S={S}, V={V}, R={R}, A={A}, ΔD={dD}\n\n"
-                f"Ψ = **{psi:.4f}**\n\n"
-                f"{debug_msg}"
-                f"Interpretation: Je höher Ψ, desto klarer und kohärenter arbeitet das System."
+                self._t("🧠 **BKI Berechnung (manuell)**\n\n", "🧠 **BKI Calculation (manual)**\n\n")
+                + f"H={H}, B={B}, S={S}, V={V}, R={R}, A={A}, ΔD={dD}\n\n"
+                + f"Ψ = **{psi:.4f}**\n\n"
+                + f"{debug_msg}"
+                + self._t("Interpretation: Je hoeher Ψ, desto klarer und koehaerenter arbeitet das System.", "Interpretation: The higher Ψ, the clearer and more coherent the system operates.")
             )
 
         return None

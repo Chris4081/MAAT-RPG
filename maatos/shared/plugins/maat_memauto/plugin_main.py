@@ -31,11 +31,11 @@ class Plugin:
 
     # Commands für CommandRouter (/help)
     commands = {
-        "/memauto": "MAAT-MemAuto Hilfe & Status",
-        "/memauto on": "MemAuto-Kontext-Injektion aktivieren",
-        "/memauto off": "MemAuto-Kontext-Injektion deaktivieren",
-        "/memauto list": "Letzte 10 Erinnerungen anzeigen",
-        "/memauto clear": "Alle MemAuto-Erinnerungen löschen",
+        "/memauto": {"de": "MAAT-MemAuto Hilfe und Status.", "en": "MAAT MemAuto help and status."},
+        "/memauto on": {"de": "Aktiviert die MemAuto-Kontext-Injektion.", "en": "Enables MemAuto context injection."},
+        "/memauto off": {"de": "Deaktiviert die MemAuto-Kontext-Injektion.", "en": "Disables MemAuto context injection."},
+        "/memauto list": {"de": "Zeigt die letzten 10 Erinnerungen.", "en": "Shows the last 10 memories."},
+        "/memauto clear": {"de": "Loescht alle MemAuto-Erinnerungen.", "en": "Clears all MemAuto memories."},
     }
 
     # ------------------------------------------------------------------

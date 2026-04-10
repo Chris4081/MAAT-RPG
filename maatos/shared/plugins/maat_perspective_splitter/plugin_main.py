@@ -13,8 +13,8 @@ class Plugin:
 
     type = "chat"
     commands = {
-        "/perspective on": "Aktiviert die Perspektiv-Trennung für Antworten.",
-        "/perspective off": "Deaktiviert die Perspektiv-Trennung.",
+        "/perspective on": {"de": "Aktiviert die Perspektiv-Trennung fuer Antworten.", "en": "Enables perspective splitting for responses."},
+        "/perspective off": {"de": "Deaktiviert die Perspektiv-Trennung.", "en": "Disables perspective splitting."},
     }
 
     def __init__(self, core=None, **kwargs):

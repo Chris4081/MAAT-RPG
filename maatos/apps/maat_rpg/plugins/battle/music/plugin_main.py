@@ -679,9 +679,9 @@ class Plugin:
     type = "chat"
 
     commands = {
-        "/fight": "Startet einen normalen MAAT-Kampf (Debug).",
-        "/fightboss": "Erzwingt einen Bosskampf (Debug).",
-        "/fightfinal": "Erzwingt einen Endbosskampf (Debug).",
+        "/fight": {"de": "Startet einen normalen MAAT-Kampf (Debug).", "en": "Starts a normal MAAT battle (debug)."},
+        "/fightboss": {"de": "Erzwingt einen Bosskampf (Debug).", "en": "Forces a boss fight (debug)."},
+        "/fightfinal": {"de": "Erzwingt einen Endbosskampf (Debug).", "en": "Forces a final boss fight (debug)."},
     }
 
     def __init__(self):

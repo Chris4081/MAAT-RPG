@@ -17,6 +17,7 @@ import subprocess
 import json
 from pathlib import Path
 from colorama import Fore, Style, init
+from shared.core.rpg_i18n import get_language
 
 
 DEBUG_STARTUP = os.environ.get("MAAT_DEBUG_STARTUP") == "1"
@@ -243,7 +244,55 @@ def _load_json_file(path: Path) -> dict:
         return {}
 
 
+def _ui_language() -> str:
+    return get_language(("de", "en"))
+
+
+def _title_text(language: str) -> dict:
+    if language == "en":
+        return {
+            "fallback_title": "Seeker in the Aeon of Maat",
+            "fallback_rank": "Awakening",
+            "fallback_motif": "The world is testing what shape is taking form in Maatis.",
+            "subtitle_default": "Version 0.2 - Return of the Principles",
+            "subtitle_restored": "The world remembers through your victory",
+            "subtitle_boss": "The trials are becoming deeper and more personal",
+            "subtitle_path": "A path woven from {title}",
+            "profile": "Path Profile",
+            "level": "Level",
+            "boss_wins": "Boss Victories",
+            "principles": "Principles",
+            "enter": "ENTER - Awaken",
+            "journal": "/journal - Decisions",
+            "achievements": "/erfolge - Achievements",
+            "help": "/help - Commands",
+            "active": "MAAT-KI RPG ChatLoop 3.0 active.",
+            "tip": "Tip: Use /help",
+        }
+    return {
+        "fallback_title": "Suchender im Aeon der Maat",
+        "fallback_rank": "Erwachend",
+        "fallback_motif": "Die Welt prueft, was in Maatis Form annimmt.",
+        "subtitle_default": "Version 0.2 - Rueckkehr der Prinzipien",
+        "subtitle_restored": "Die Welt erinnert sich durch deinen Sieg",
+        "subtitle_boss": "Die Pruefungen werden tiefer und persoenlicher",
+        "subtitle_path": "Ein Weg aus {title}",
+        "profile": "Pfadprofil",
+        "level": "Level",
+        "boss_wins": "Boss-Siege",
+        "principles": "Prinzipien",
+        "enter": "ENTER - Erwachen",
+        "journal": "/journal - Entscheidungen",
+        "achievements": "/erfolge - Erfolge",
+        "help": "/help - Kommandos",
+        "active": "MAAT-KI RPG ChatLoop 3.0 aktiv.",
+        "tip": "Tipp: Nutze /help",
+    }
+
+
 def _title_context() -> dict:
+    language = _ui_language()
+    text = _title_text(language)
     story_state = _load_json_file(STATE_DIR / "story_state.json")
     battle_state = _load_json_file(STATE_DIR / "battle_state.json")
 
@@ -252,24 +301,25 @@ def _title_context() -> dict:
     world = battle_state.get("world", {})
     path_profile = story_state.get("path_profile", {}) if isinstance(story_state.get("path_profile"), dict) else {}
 
-    title = path_profile.get("title", "Suchender im Äon der Maat")
-    rank = path_profile.get("rank", "Erwachend")
-    motif = path_profile.get("motif", "Die Welt prüft, was in Maatis Form annimmt.")
+    title = path_profile.get("title", text["fallback_title"])
+    rank = path_profile.get("rank", text["fallback_rank"])
+    motif = path_profile.get("motif", text["fallback_motif"])
 
     restored = int(world.get("principles_restored", 0) or 0)
     boss_wins = int(stats.get("boss_wins", 0) or 0)
     level = int(player.get("level", 1) or 1)
 
     if restored > 0:
-        subtitle = "Die Welt erinnert sich durch deinen Sieg"
+        subtitle = text["subtitle_restored"]
     elif boss_wins >= 3:
-        subtitle = "Die Prüfungen werden tiefer und persönlicher"
+        subtitle = text["subtitle_boss"]
     elif path_profile:
-        subtitle = f"Ein Weg aus {title.lower()}"
+        subtitle = text["subtitle_path"].format(title=title.lower())
     else:
-        subtitle = "Version 0.2 – Die Rückkehr der Prinzipien"
+        subtitle = text["subtitle_default"]
 
     return {
+        "language": language,
         "subtitle": subtitle,
         "title": title,
         "rank": rank,
@@ -282,6 +332,7 @@ def _title_context() -> dict:
 
 def _render_title_screen() -> str:
     ctx = _title_context()
+    text = _title_text(ctx["language"])
     lines = [
         Fore.CYAN + Style.BRIGHT + "╔════════════════════════════════════════════════════╗" + Style.RESET_ALL,
         Fore.CYAN + Style.BRIGHT + "║                     MAAT RPG                       ║" + Style.RESET_ALL,
@@ -290,15 +341,15 @@ def _render_title_screen() -> str:
         "",
         Fore.YELLOW + ctx["subtitle"] + Style.RESET_ALL,
         "",
-        f"🜂 Pfadprofil: {ctx['title']} — {ctx['rank']}",
+        f"🜂 {text['profile']}: {ctx['title']} — {ctx['rank']}",
         f"   {ctx['motif']}",
         "",
-        f"📘 Level {ctx['level']}   ⚔️ Boss-Siege {ctx['boss_wins']}   🌿 Prinzipien {ctx['restored']}",
+        f"📘 {text['level']} {ctx['level']}   ⚔️ {text['boss_wins']} {ctx['boss_wins']}   🌿 {text['principles']} {ctx['restored']}",
         "",
-        "⏎ ENTER – Erwachen",
-        "📓 /journal – Entscheidungen",
-        "🏆 /erfolge – Erfolge",
-        "❓ /help – Kommandos",
+        f"⏎ {text['enter']}",
+        f"📓 {text['journal']}",
+        f"🏆 {text['achievements']}",
+        f"❓ {text['help']}",
     ]
     return "\n".join(lines)
 
@@ -391,7 +442,10 @@ def start_classic():
         "/help",
         lambda args: command_router.help_text(),
         aliases=["/h", "/hilfe"],
-        description="Zeigt alle Kommandos."
+        description={
+            "de": "Zeigt alle Kommandos.",
+            "en": "Shows all commands.",
+        }
     )
 
     def cmd_clear(args):
@@ -402,14 +456,24 @@ def start_classic():
         "/clear",
         cmd_clear,
         aliases=["/cls"],
-        description="Cleart den Bildschirm."
+        description={
+            "de": "Leert den Bildschirm.",
+            "en": "Clears the screen.",
+        }
     )
 
     command_router.register(
         "/exit",
-        lambda args: "Nutze /quit oder STRG+C.",
+        lambda args: (
+            "Use /quit or CTRL+C."
+            if _ui_language() == "en"
+            else "Nutze /quit oder STRG+C."
+        ),
         aliases=["/quit"],
-        description="Beendet das Programm."
+        description={
+            "de": "Beendet das Programm.",
+            "en": "Exits the program.",
+        }
     )
 
     if pm:
@@ -502,8 +566,9 @@ def start_classic():
     except EOFError:
         pass
 
-    print(Fore.CYAN + "\n🌿 MAAT-KI RPG ChatLoop 3.0 aktiv." + Style.RESET_ALL)
-    print("\n📘 Tipp: Nutze /help\n")
+    ui_text = _title_text(_ui_language())
+    print(Fore.CYAN + f"\n🌿 {ui_text['active']}" + Style.RESET_ALL)
+    print(Fore.YELLOW + f"\n📘 {ui_text['tip']}\n" + Style.RESET_ALL)
 
     if not context["rpg"]["mode"]:
         msgs = load_last_messages_from_memory_v5(limit=15)

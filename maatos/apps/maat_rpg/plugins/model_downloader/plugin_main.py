@@ -22,6 +22,7 @@ from typing import Optional
 
 import requests
 from colorama import Fore, Style
+from shared.core.rpg_i18n import get_language
 
 # ==========================================================
 # CONFIG
@@ -39,6 +40,81 @@ CONNECT_TIMEOUT = 20
 READ_TIMEOUT = 60
 MAX_RETRIES = 8
 RETRY_WAIT = 6
+
+DOWNLOADER_TEXT = {
+    "de": {
+        "resume_at": "🔁 Fortsetzen bei {size}",
+        "new_download": "🆕 Neuer Download startet",
+        "incomplete": "Download unvollstaendig, wird erneut versucht.",
+        "resume_rejected": "Server hat Resume nicht akzeptiert, starte neu.",
+        "interrupted": "⚠ Download unterbrochen: {error}",
+        "retrying": "🔁 Wiederhole in {wait}s (Versuch {retry}/{max_retries}) – Fortschritt bleibt erhalten.",
+        "aborted": "Download nach {max_retries} Wiederholungen abgebrochen. Fortschritt bleibt erhalten: {progress}",
+        "model_found": "\n✔ Modell gefunden: {model}\n",
+        "path": "📁 Pfad: {path}\n",
+        "missing_model": "\n⚠ Kein lokales Modell gefunden.\n",
+        "required": "Benoetigt: {model}",
+        "source": "Quelle: HuggingFace",
+        "target": "Zielordner: {path}",
+        "partial_with_total": "🧩 Teil-Download gefunden: {current} von {total} ({pct:.2f}%)",
+        "partial_found": "🧩 Teil-Download gefunden: {size}",
+        "resume_hint": "➡ Beim Start wird genau dort weitergeladen.\n",
+        "no_partial": "➡ Noch kein Teil-Download vorhanden.\n",
+        "download_prompt": "📥 Modell jetzt herunterladen / fortsetzen? [j/N]: ",
+        "skipped": "\n⏭ Download uebersprungen. MAAT-OS wird beendet.\n",
+        "loading": "⬇️  MAAT-OS laedt das Modell…\n",
+        "wait": "Bitte warten. Der Fortschritt bleibt auch nach Abbruch erhalten.\n",
+        "done": "\n✔ Download abgeschlossen\n",
+        "saved": "📁 Gespeichert unter: {path}",
+        "welcome": "🌿 Willkommen in MAAT-OS.\n",
+        "download_error": "\n❌ Fehler beim Download:\n{error}\n",
+        "progress_kept": "💾 Der bisherige Fortschritt wurde behalten und kann spaeter fortgesetzt werden.\n",
+        "no_model_exit": "MAAT-OS: Kein Modell verfuegbar.",
+    },
+    "en": {
+        "resume_at": "🔁 Resuming at {size}",
+        "new_download": "🆕 Starting new download",
+        "incomplete": "Download incomplete, retrying.",
+        "resume_rejected": "Server did not accept resume, restarting.",
+        "interrupted": "⚠ Download interrupted: {error}",
+        "retrying": "🔁 Retrying in {wait}s (attempt {retry}/{max_retries}) – progress is preserved.",
+        "aborted": "Download aborted after {max_retries} retries. Progress remains preserved: {progress}",
+        "model_found": "\n✔ Model found: {model}\n",
+        "path": "📁 Path: {path}\n",
+        "missing_model": "\n⚠ No local model found.\n",
+        "required": "Required: {model}",
+        "source": "Source: HuggingFace",
+        "target": "Target folder: {path}",
+        "partial_with_total": "🧩 Partial download found: {current} of {total} ({pct:.2f}%)",
+        "partial_found": "🧩 Partial download found: {size}",
+        "resume_hint": "➡ Startup will continue exactly from that point.\n",
+        "no_partial": "➡ No partial download found yet.\n",
+        "download_prompt": "📥 Download / resume the model now? [y/N]: ",
+        "skipped": "\n⏭ Download skipped. MAAT-OS will exit.\n",
+        "loading": "⬇️  MAAT-OS is loading the model…\n",
+        "wait": "Please wait. Progress will be preserved even after interruption.\n",
+        "done": "\n✔ Download complete\n",
+        "saved": "📁 Saved at: {path}",
+        "welcome": "🌿 Welcome to MAAT-OS.\n",
+        "download_error": "\n❌ Download error:\n{error}\n",
+        "progress_kept": "💾 Your current progress was preserved and can be resumed later.\n",
+        "no_model_exit": "MAAT-OS: No model available.",
+    },
+}
+
+
+def _dl_lang() -> str:
+    return get_language(tuple(DOWNLOADER_TEXT.keys()))
+
+
+def _dt(key: str, **kwargs) -> str:
+    lang = _dl_lang()
+    template = DOWNLOADER_TEXT.get(lang, DOWNLOADER_TEXT["de"]).get(key, DOWNLOADER_TEXT["de"].get(key, key))
+    return template.format(**kwargs) if kwargs else template
+
+
+def _yes(choice: str) -> bool:
+    return choice.strip().lower() in ("j", "ja", "y", "yes")
 
 
 # ==========================================================
@@ -185,9 +261,9 @@ def resumable_download(url: str, final_path: Path):
         existing = 0
 
     if existing > 0:
-        print(Fore.CYAN + f"🔁 Fortsetzen bei {format_bytes(existing)}" + Style.RESET_ALL)
+        print(Fore.CYAN + _dt("resume_at", size=format_bytes(existing)) + Style.RESET_ALL)
     else:
-        print(Fore.CYAN + "🆕 Neuer Download startet" + Style.RESET_ALL)
+        print(Fore.CYAN + _dt("new_download") + Style.RESET_ALL)
 
     retries = 0
     downloaded_total = existing
@@ -220,7 +296,7 @@ def resumable_download(url: str, final_path: Path):
                             meta_path.unlink()
                         headers = {}
                         mode = "wb"
-                        raise RuntimeError("Server hat Resume nicht akzeptiert, starte neu.")
+                        raise RuntimeError(_dt("resume_rejected"))
 
                     r.raise_for_status()
 
@@ -255,7 +331,7 @@ def resumable_download(url: str, final_path: Path):
             # Fertig?
             print()
             if total_size > 0 and downloaded_total < total_size:
-                raise RuntimeError("Download unvollständig, wird erneut versucht.")
+                raise RuntimeError(_dt("incomplete"))
 
             part_path.replace(final_path)
             meta_path.unlink(missing_ok=True)
@@ -264,19 +340,17 @@ def resumable_download(url: str, final_path: Path):
         except Exception as e:
             retries += 1
             print()
-            print(Fore.YELLOW + f"⚠ Download unterbrochen: {e}" + Style.RESET_ALL)
+            print(Fore.YELLOW + _dt("interrupted", error=e) + Style.RESET_ALL)
             save_progress(meta_path, downloaded_total, total_size)
 
             if retries > MAX_RETRIES:
                 raise RuntimeError(
-                    f"Download nach {MAX_RETRIES} Wiederholungen abgebrochen. "
-                    f"Fortschritt bleibt erhalten: {format_bytes(downloaded_total)}"
+                    _dt("aborted", max_retries=MAX_RETRIES, progress=format_bytes(downloaded_total))
                 ) from e
 
             print(
                 Fore.CYAN
-                + f"🔁 Wiederhole in {RETRY_WAIT}s "
-                  f"(Versuch {retries}/{MAX_RETRIES}) – Fortschritt bleibt erhalten."
+                + _dt("retrying", wait=RETRY_WAIT, retry=retries, max_retries=MAX_RETRIES)
                 + Style.RESET_ALL
             )
             time.sleep(RETRY_WAIT)
@@ -292,14 +366,14 @@ def ensure_model(plugin_dir: str) -> bool:
     meta_path = final_path.with_suffix(final_path.suffix + ".progress.json")
 
     if final_path.exists() and final_path.stat().st_size > 0:
-        print(Fore.GREEN + f"\n✔ Modell gefunden: {MODEL_NAME}\n" + Style.RESET_ALL)
-        print(f"📁 Pfad: {final_path}\n")
+        print(Fore.GREEN + _dt("model_found", model=MODEL_NAME) + Style.RESET_ALL)
+        print(_dt("path", path=final_path))
         return True
 
-    print(Fore.RED + "\n⚠ Kein lokales Modell gefunden.\n" + Style.RESET_ALL)
-    print(f"Benötigt: {MODEL_NAME}")
-    print("Quelle: HuggingFace")
-    print("Zielordner:", models_dir)
+    print(Fore.RED + _dt("missing_model") + Style.RESET_ALL)
+    print(_dt("required", model=MODEL_NAME))
+    print(_dt("source"))
+    print(_dt("target", path=models_dir))
 
     progress = load_progress(meta_path)
     if part_path.exists():
@@ -307,39 +381,39 @@ def ensure_model(plugin_dir: str) -> bool:
         total = progress.get("total", 0)
         if total:
             pct = partial_size / total * 100
-            print(f"🧩 Teil-Download gefunden: {format_bytes(partial_size)} von {format_bytes(total)} ({pct:.2f}%)")
+            print(_dt("partial_with_total", current=format_bytes(partial_size), total=format_bytes(total), pct=pct))
         else:
-            print(f"🧩 Teil-Download gefunden: {format_bytes(partial_size)}")
-        print("➡ Beim Start wird genau dort weitergeladen.\n")
+            print(_dt("partial_found", size=format_bytes(partial_size)))
+        print(_dt("resume_hint"))
     else:
-        print("➡ Noch kein Teil-Download vorhanden.\n")
+        print(_dt("no_partial"))
 
-    choice = input("📥 Modell jetzt herunterladen / fortsetzen? [j/N]: ").strip().lower()
-    if choice != "j":
-        print("\n⏭ Download übersprungen. MAAT-OS wird beendet.\n")
+    choice = input(_dt("download_prompt")).strip().lower()
+    if not _yes(choice):
+        print(_dt("skipped"))
         return False
 
     music = Music(os.path.join(plugin_dir, "download_theme.mp3"))
     music.start()
 
     clear()
-    print(Fore.CYAN + "⬇️  MAAT-OS lädt das Modell…\n" + Style.RESET_ALL)
-    print("Bitte warten. Der Fortschritt bleibt auch nach Abbruch erhalten.\n")
+    print(Fore.CYAN + _dt("loading") + Style.RESET_ALL)
+    print(_dt("wait"))
 
     try:
         resumable_download(MODEL_URL, final_path)
         music.stop()
 
-        print(Fore.GREEN + "\n✔ Download abgeschlossen\n" + Style.RESET_ALL)
-        print(f"📁 Gespeichert unter: {final_path}")
-        print("🌿 Willkommen in MAAT-OS.\n")
+        print(Fore.GREEN + _dt("done") + Style.RESET_ALL)
+        print(_dt("saved", path=final_path))
+        print(_dt("welcome"))
         time.sleep(0.8)
         return True
 
     except Exception as e:
         music.stop()
-        print(Fore.RED + f"\n❌ Fehler beim Download:\n{e}\n" + Style.RESET_ALL)
-        print("💾 Der bisherige Fortschritt wurde behalten und kann später fortgesetzt werden.\n")
+        print(Fore.RED + _dt("download_error", error=e) + Style.RESET_ALL)
+        print(_dt("progress_kept"))
         return False
 
 
@@ -356,4 +430,4 @@ class Plugin:
         clear()
         ok = ensure_model(self.plugin_dir)
         if not ok:
-            raise SystemExit("MAAT-OS: Kein Modell verfügbar.")
+            raise SystemExit(_dt("no_model_exit"))

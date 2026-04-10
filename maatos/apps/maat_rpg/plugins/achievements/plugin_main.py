@@ -12,6 +12,7 @@ import os
 import json
 from colorama import Fore, Style
 from shared.core.maat_paths import data_file, state_file, log_file
+from shared.core.rpg_i18n import get_language
 
 # --------------------------------------------------------
 # Wörter + Titel + XP
@@ -100,13 +101,22 @@ class Plugin:
     type = "chat"
 
     commands = {
-        "/erfolge": "Zeigt deine freigeschalteten Erfolge.",
+        "/erfolge": {
+            "de": "Zeigt deine freigeschalteten Erfolge.",
+            "en": "Shows your unlocked achievements.",
+        },
     }
 
     def __init__(self):
         self.plugin_dir = os.path.dirname(__file__)
         self.state_path = state_file('achievements_state.json')
         self.state = self._load()
+
+    def _lang(self):
+        return get_language(("de", "en"))
+
+    def _t(self, de: str, en: str) -> str:
+        return en if self._lang() == "en" else de
 
     # --------------------------------------------------------
     # PERSISTENZ
@@ -146,14 +156,14 @@ class Plugin:
 
         if not unlocked and not combat:
             return (
-                "🏆 **Erfolge**\n"
-                "\n"
-                "Du hast bisher noch keine Erfolge freigeschaltet.\n"
-                "Sprich mit Herz, Wissen und Magie – und entdecke sie! ✨"
+                self._t(
+                    "🏆 **Erfolge**\n\nDu hast bisher noch keine Erfolge freigeschaltet.\nSprich mit Herz, Wissen und Magie - und entdecke sie! ✨",
+                    "🏆 **Achievements**\n\nYou have not unlocked any achievements yet.\nSpeak with heart, knowledge, and magic - and discover them! ✨",
+                )
             )
 
         lines = []
-        lines.append("🏆 **Erfolge**")
+        lines.append(self._t("🏆 **Erfolge**", "🏆 **Achievements**"))
         lines.append("")
 
         for word in unlocked:
@@ -163,15 +173,15 @@ class Plugin:
         if combat:
             if unlocked:
                 lines.append("")
-            lines.append("⚔️ **Kampf-Erfolge**")
+            lines.append(self._t("⚔️ **Kampf-Erfolge**", "⚔️ **Battle Achievements**"))
             lines.append("")
             for key in combat:
                 lines.append(f"🏆 {COMBAT_ACHIEVEMENTS.get(key, key)}")
 
         lines.append("")
-        lines.append(f"📜 Wort-Erfolge: **{len(unlocked)} / {total}**")
-        lines.append(f"⚔️ Kampf-Erfolge: **{len(combat)} / {len(COMBAT_ACHIEVEMENTS)}**")
-        lines.append(f"⚡ Fortschritt: {int(len(unlocked)/total*100)}%")
+        lines.append(f"{self._t('📜 Wort-Erfolge', '📜 Word achievements')}: **{len(unlocked)} / {total}**")
+        lines.append(f"{self._t('⚔️ Kampf-Erfolge', '⚔️ Battle achievements')}: **{len(combat)} / {len(COMBAT_ACHIEVEMENTS)}**")
+        lines.append(f"{self._t('⚡ Fortschritt', '⚡ Progress')}: {int(len(unlocked)/total*100)}%")
 
         return "\n".join(lines)
 

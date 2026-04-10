@@ -14,9 +14,9 @@ class Plugin:
 
     # Command-Liste (damit /help funktioniert)
     commands = {
-        "/antirepeat": "Zeigt den Status des Anti-Repeat Filters",
-        "/antirepeat on": "Aktiviert Anti-Repeat",
-        "/antirepeat off": "Deaktiviert Anti-Repeat"
+        "/antirepeat": {"de": "Zeigt den Status des Anti-Repeat-Filters.", "en": "Shows the anti-repeat filter status."},
+        "/antirepeat on": {"de": "Aktiviert Anti-Repeat.", "en": "Enables anti-repeat."},
+        "/antirepeat off": {"de": "Deaktiviert Anti-Repeat.", "en": "Disables anti-repeat."}
     }
 
     def __init__(self):

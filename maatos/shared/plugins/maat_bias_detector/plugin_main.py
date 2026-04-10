@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+from shared.core.rpg_i18n import get_language
 
 class Plugin:
     """
@@ -13,7 +14,7 @@ class Plugin:
 
     type = "chat"
     commands = {
-        "/bias": "Zeigt den letzten Bias-Score der Antwort.",
+        "/bias": {"de": "Zeigt den letzten Bias-Score der Antwort.", "en": "Shows the last response bias score."},
     }
 
     def __init__(self, core=None, **kwargs):
@@ -21,10 +22,16 @@ class Plugin:
         self.state = getattr(core, "state", None)
         self.last_bias = 0.0
 
+    def _t(self, de: str, en: str) -> str:
+        return en if get_language(("de", "en")) == "en" else de
+
     def command(self, full_cmd: str, context=None):
         cmd = full_cmd.strip().lower()
         if cmd == "/bias":
-            return True, f"Letzter Bias-Score: {self.last_bias:.3f}"
+            return True, self._t(
+                f"Letzter Bias-Score: {self.last_bias:.3f}",
+                f"Latest bias score: {self.last_bias:.3f}",
+            )
         return None
 
     def before_chat(self, user_input, context=None):

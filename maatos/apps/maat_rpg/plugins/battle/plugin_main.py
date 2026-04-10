@@ -20,6 +20,223 @@ import sys
 from colorama import Fore, Style
 from shared.core.maat_paths import data_file, state_file, log_file
 from shared.core.audio import ManagedAudioPlayer
+from shared.core.rpg_i18n import get_language
+
+
+BATTLE_TEXT = {
+    "de": {
+        "guide_hint_final_1": "📘 Guide: Beginne ruhig mit Fokus. So lernst du Resonanz und Schild ohne Druck kennen.",
+        "guide_hint_final_2": "📘 Guide: Beobachte jetzt Aura, Charge-Balken und Spezialname. Der Finalboss kündigt Gefahr klar an.",
+        "guide_hint_final_3": "📘 Guide: Wenn Resonanz 100/100 erreicht, kannst du den MAAT-Impuls bewusst timen.",
+        "guide_hint_normal_1": "📘 Guide: Angriff zeigt dir die fünf Prinzipien. Fokus ist die sichere Lernaktion fuer Schild und Heilung.",
+        "guide_hint_normal_2": "📘 Guide: Achte auf Schwachstelle und Resonanz. So lernst du den Rhythmus des Systems.",
+        "guide_bonus_potion": "🧪 Guide-Bonus: Du findest einen Heiltrank. (Traenke: {potions})",
+        "guide_complete": "📘 Guide-Kampf abgeschlossen.",
+        "guide_reward_note": "Kein XP, kein Gold und keine dauerhaften Kampfverluste wurden angerechnet.",
+        "guide_protection": " Guide-Schutz aktiv.",
+        "guide_intro_normal": (
+            "📘 Dies ist ein Guide-Kampf zum Selberspielen.\n"
+            "Erklaerung: Du lernst hier Angriff, Fokus, Heiltrank und MAAT-Impuls in Ruhe kennen.\n"
+            "Unterschied zum echten Kampf: kein XP, kein Gold, kein dauerhafter Schaden. Mit Glueck findest du nur einen Trank."
+        ),
+        "guide_intro_boss": "🧪 Dies ist ein Test-Bosskampf. Er demonstriert Auren, Boss-HUD, Spezialattacken und Phase-Druck.",
+        "guide_intro_final": (
+            "🌌 Dies ist ein Finalboss-Guide zum Lernen.\n"
+            "Erklaerung: Du kannst den Ablauf, das Timing von Fokus und den Umgang mit Spezialattacken gefahrlos ueben.\n"
+            "Dir werden keine Lebenspunkte dauerhaft abgezogen, und es gibt kein XP oder Gold."
+        ),
+        "status_title": "📘 **Dein MAAT-RPG Status**",
+        "status_level": "Level",
+        "status_xp": "XP",
+        "status_profile": "Pfadprofil",
+        "status_unknown": "Unbestimmt",
+        "status_fights": "Kaempfe gesamt",
+        "status_wins": "Siege",
+        "status_losses": "Niederlagen",
+        "status_boss_wins": "Boss-Siege",
+        "status_final_wins": "Finalboss-Siege",
+        "status_principles": "Wiederhergestellte Maat-Prinzipien",
+        "status_gold": "Gold",
+        "status_potions": "Heiltraenke",
+        "status_achievements": "Kampf-Erfolge",
+        "status_tip": "Tipp: Die XP-Leiste siehst du im Terminal nach jeder Nachricht. 🌀",
+        "hud_wins": "Siege",
+        "hud_boss_wins": "Boss-Siege",
+        "hud_path": "Pfad",
+        "hud_principles": "Wiederhergestellte Maat-Prinzipien",
+        "potion_none": "🧪 Du hast keinen Heiltrank im Inventar.",
+        "potion_full": "Du bist bereits voll geheilt. (HP: {hp}/{max_hp})",
+        "potion_used": "🧪 Du trinkst einen Heiltrank und regenerierst {heal} HP.\nHP: {hp}/{max_hp}  |  Traenke: {potions}",
+        "shop_invalid_amount": "Bitte gib eine gueltige Anzahl an: `/shop buy potion 1`",
+        "shop_amount_positive": "Die Anzahl muss groesser als 0 sein.",
+        "shop_not_enough": "Du hast nicht genug Gold. ({gold} / {cost})",
+        "shop_buy": "🛒 Du kaufst {amount} Heiltrank/Heiltraenke fuer {cost} Gold.\nGold: {gold} | Traenke: {potions}",
+        "shop_title": "🏪 **MAAT-RPG Laden**",
+        "shop_inventory": "Heiltraenke im Inventar: {potions}",
+        "shop_items": "Verfuegbare Items:",
+        "shop_potion_item": "  • Heiltrank – 25 Gold (stellt 50% deiner Max-HP wieder her)",
+        "shop_buy_hint": "Kaufen mit: `/shop buy potion 1` oder `/shop buy potion 3`",
+        "summary_win": "📘 Kampfanalyse: Sieg, weil {reasons}.",
+        "summary_loss": "📘 Kampfanalyse: Niederlage gegen {enemy}, weil {reasons}.",
+        "reason_phase2_win": "du hast auch die zweite Bossphase getragen",
+        "reason_special_win": "du hast eine Spezialattacke ueberlebt",
+        "reason_ult_win": "du hast den Kampf mit MAAT-Impuls beendet",
+        "reason_no_potion_win": "du bist ohne Heiltrank durchgekommen",
+        "reason_rhythm_win": "du hast den Rhythmus des Kampfes frueh kontrolliert",
+        "reason_hp_loss": "deine Rest-HP fielen auf {hp}",
+        "reason_phase2_loss": "die zweite Bossphase hat den Druck deutlich erhoeht",
+        "reason_aura_loss": "die Aura `{aura}` hat dich zusaetzlich gebunden",
+        "reason_potion_loss": "du hattest keinen rettenden Heiltrank-Moment",
+        "boss_hud": "👁 Boss-HUD: {enemy} — {title}",
+        "boss_phase_line": "{phase} | Aura: {aura} | Spezial: {special}",
+        "boss_charge": "Charge: {bar}",
+        "boss_warning": "⚠ Warnung: Die Spezialattacke baut sich auf.",
+        "phase_1": "PHASE 1",
+        "phase_2": "PHASE 2",
+        "action_attack": "1) Angriff",
+        "action_skills": "2) Skills",
+        "action_focus": "3) Fokus",
+        "action_potion": "4) Heiltrank",
+        "action_ult": "5) MAAT-Impuls",
+        "action_flee": "6) Flucht",
+        "action_prompt": "Aktion: ",
+        "attack_menu": "--- MAAT-Angriff ---",
+        "attack_back": "6) Zurueck",
+        "attack_choose": "Waehle [1-6]: ",
+        "invalid_choice": "Ungueltige Auswahl.",
+        "skills_none": "Noch keine Skills gelernt.",
+        "skills_menu": "--- Skills ---",
+        "skills_choose": "Waehle: ",
+        "invalid_input": "Ungueltige Eingabe.",
+        "aura_none": "",
+        "aura_shatter": "⚠ Zersplitterungs-Aura: Schilde werden geschwaecht, aber Fokus heilt staerker.",
+        "aura_counter": "⚠ Konter-Aura: direkte Angriffe laden den Gegenschlag auf.",
+        "aura_wildfire": "⚠ Wildfeuer-Aura: Schoepfungskraft und Impuls werden heftiger, aber riskanter.",
+        "aura_silence": "⚠ Schweige-Aura: Skills geraten unter Druck.",
+        "aura_sealed": "⚠ Siegel-Aura: ein Teil deines Schadens wird versiegelt.",
+        "aura_judgment": "⚠ Urteils-Aura: Flucht und Hast werden haerter bestraft.",
+        "special_fraktur": "💠 {title} wirkt **{special}**! Klangsplitter zerreissen die Ordnung. Du verlierst {dmg} HP und dein Schild sinkt um {guard}.",
+        "special_spiegel": "🪞 {title} entfesselt **{special}**! Deine Bewegung wird gespiegelt. {dmg} Schaden, Resonanz -{resonance}.",
+        "special_nova": "🔥 {title} zündet **{special}**! Rohe Schoepfung ueberflutet die Arena. {dmg} Schaden. Die Schwachstelle springt auf Schoepfungskraft.",
+        "special_vakuum": "🌑 {title} ruft **{special}**! Alle Naehe reisst ab. {dmg} Schaden, Resonanz -18, Schild faellt in sich zusammen.",
+        "special_urteil": "⚖️ {title} spricht **{special}**! Ein praeziser Schlag markiert deine Grenze. {dmg} Schaden.",
+        "special_achsenbruch": "🌌 {title} nutzt **{special}**! Die Achsen kippen. {dmg} Schaden und dein Schild bricht an.",
+        "special_genesis": "🌠 {title} entfacht **{special}**! {dmg} Schaden, Resonanz -15.",
+        "special_default": "💥 {title} entfesselt **{special}** und trifft dich fuer {dmg}.",
+    },
+    "en": {
+        "guide_hint_final_1": "📘 Guide: Start calmly with Focus. This lets you learn resonance and shielding without pressure.",
+        "guide_hint_final_2": "📘 Guide: Watch the aura, charge bar, and special name. The final boss signals danger clearly.",
+        "guide_hint_final_3": "📘 Guide: When resonance reaches 100/100, you can time the MAAT impulse on purpose.",
+        "guide_hint_normal_1": "📘 Guide: Attack shows the five principles. Focus is the safe learning action for shield and healing.",
+        "guide_hint_normal_2": "📘 Guide: Watch the weakness and resonance. That is how you learn the system's rhythm.",
+        "guide_bonus_potion": "🧪 Guide bonus: You find a healing potion. (Potions: {potions})",
+        "guide_complete": "📘 Guide battle completed.",
+        "guide_reward_note": "No XP, no gold, and no permanent combat losses were applied.",
+        "guide_protection": " Tutorial shield active.",
+        "guide_intro_normal": (
+            "📘 This is a self-play guide battle.\n"
+            "Explanation: Here you can learn attack, focus, healing potion, and MAAT impulse at your own pace.\n"
+            "Difference from a real battle: no XP, no gold, no permanent damage. If you are lucky, you may only find one potion."
+        ),
+        "guide_intro_boss": "🧪 This is a test boss battle. It demonstrates auras, the boss HUD, special attacks, and phase pressure.",
+        "guide_intro_final": (
+            "🌌 This is a final boss guide for learning.\n"
+            "Explanation: You can practice the flow, the timing of Focus, and dealing with special attacks without danger.\n"
+            "No HP will be permanently removed, and there is no XP or gold."
+        ),
+        "status_title": "📘 **Your MAAT-RPG Status**",
+        "status_level": "Level",
+        "status_xp": "XP",
+        "status_profile": "Path Profile",
+        "status_unknown": "Undetermined",
+        "status_fights": "Total battles",
+        "status_wins": "Victories",
+        "status_losses": "Defeats",
+        "status_boss_wins": "Boss Victories",
+        "status_final_wins": "Final Boss Victories",
+        "status_principles": "Restored Maat Principles",
+        "status_gold": "Gold",
+        "status_potions": "Healing Potions",
+        "status_achievements": "Combat Achievements",
+        "status_tip": "Tip: You can see the XP bar in the terminal after every message. 🌀",
+        "hud_wins": "Victories",
+        "hud_boss_wins": "Boss Victories",
+        "hud_path": "Path",
+        "hud_principles": "Restored Maat Principles",
+        "potion_none": "🧪 You do not have a healing potion in your inventory.",
+        "potion_full": "You are already fully healed. (HP: {hp}/{max_hp})",
+        "potion_used": "🧪 You drink a healing potion and restore {heal} HP.\nHP: {hp}/{max_hp}  |  Potions: {potions}",
+        "shop_invalid_amount": "Please enter a valid amount: `/shop buy potion 1`",
+        "shop_amount_positive": "The amount must be greater than 0.",
+        "shop_not_enough": "You do not have enough gold. ({gold} / {cost})",
+        "shop_buy": "🛒 You buy {amount} healing potion(s) for {cost} gold.\nGold: {gold} | Potions: {potions}",
+        "shop_title": "🏪 **MAAT-RPG Shop**",
+        "shop_inventory": "Healing potions in inventory: {potions}",
+        "shop_items": "Available items:",
+        "shop_potion_item": "  • Healing Potion – 25 gold (restores 50% of your max HP)",
+        "shop_buy_hint": "Buy with: `/shop buy potion 1` or `/shop buy potion 3`",
+        "summary_win": "📘 Battle analysis: victory, because {reasons}.",
+        "summary_loss": "📘 Battle analysis: defeat against {enemy}, because {reasons}.",
+        "reason_phase2_win": "you endured the second boss phase as well",
+        "reason_special_win": "you survived a special attack",
+        "reason_ult_win": "you ended the battle with MAAT impulse",
+        "reason_no_potion_win": "you made it through without a healing potion",
+        "reason_rhythm_win": "you controlled the rhythm of the battle early",
+        "reason_hp_loss": "your remaining HP fell to {hp}",
+        "reason_phase2_loss": "the second boss phase greatly increased the pressure",
+        "reason_aura_loss": "the `{aura}` aura bound you further",
+        "reason_potion_loss": "you had no saving healing-potion moment",
+        "boss_hud": "👁 Boss HUD: {enemy} — {title}",
+        "boss_phase_line": "{phase} | Aura: {aura} | Special: {special}",
+        "boss_charge": "Charge: {bar}",
+        "boss_warning": "⚠ Warning: The special attack is building.",
+        "phase_1": "PHASE 1",
+        "phase_2": "PHASE 2",
+        "action_attack": "1) Attack",
+        "action_skills": "2) Skills",
+        "action_focus": "3) Focus",
+        "action_potion": "4) Healing Potion",
+        "action_ult": "5) MAAT Impulse",
+        "action_flee": "6) Escape",
+        "action_prompt": "Action: ",
+        "attack_menu": "--- MAAT Attack ---",
+        "attack_back": "6) Back",
+        "attack_choose": "Choose [1-6]: ",
+        "invalid_choice": "Invalid choice.",
+        "skills_none": "No skills learned yet.",
+        "skills_menu": "--- Skills ---",
+        "skills_choose": "Choose: ",
+        "invalid_input": "Invalid input.",
+        "aura_none": "",
+        "aura_shatter": "⚠ Shatter Aura: shields weaken, but Focus heals more strongly.",
+        "aura_counter": "⚠ Counter Aura: direct attacks charge the counterblow.",
+        "aura_wildfire": "⚠ Wildfire Aura: Creation and impulse grow stronger, but riskier.",
+        "aura_silence": "⚠ Silence Aura: skills come under pressure.",
+        "aura_sealed": "⚠ Seal Aura: part of your damage is sealed away.",
+        "aura_judgment": "⚠ Judgment Aura: escape and haste are punished more harshly.",
+        "special_fraktur": "💠 {title} casts **{special}**! Sound shards tear through order. You lose {dmg} HP and your shield drops by {guard}.",
+        "special_spiegel": "🪞 {title} unleashes **{special}**! Your motion is reflected back at you. {dmg} damage, resonance -{resonance}.",
+        "special_nova": "🔥 {title} ignites **{special}**! Raw creation floods the arena. {dmg} damage. The weakness shifts to Creation.",
+        "special_vakuum": "🌑 {title} calls **{special}**! All nearness is ripped away. {dmg} damage, resonance -18, shield collapses.",
+        "special_urteil": "⚖️ {title} invokes **{special}**! A precise strike marks your boundary. {dmg} damage.",
+        "special_achsenbruch": "🌌 {title} uses **{special}**! The axes tilt. {dmg} damage and your shield fractures.",
+        "special_genesis": "🌠 {title} unleashes **{special}**! {dmg} damage, resonance -15.",
+        "special_default": "💥 {title} releases **{special}** and hits you for {dmg}.",
+    },
+}
+
+
+def _battle_ui_language() -> str:
+    return get_language(tuple(BATTLE_TEXT.keys()))
+
+
+def _battle_text(key: str, **kwargs) -> str:
+    language = _battle_ui_language()
+    template = BATTLE_TEXT.get(language, BATTLE_TEXT["de"]).get(key, BATTLE_TEXT["de"].get(key, key))
+    if kwargs:
+        return template.format(**kwargs)
+    return template
 
 
 
@@ -580,25 +797,42 @@ class BattleCore:
     def _choice_reward_line(self, story_choices: dict, ftype: str) -> str:
         reflection_path = story_choices.get("reflection_path")
         combat_vow = story_choices.get("combat_vow")
+        en = _battle_ui_language() == "en"
 
         if ftype == "boss":
             if reflection_path == "harmonie":
+                if en:
+                    return "🎼 The boss leaves behind more than a trophy: a technique with rhythm and quiet steadiness."
                 return "🎼 Der Boss hinterlaesst keine bloße Trophäe, sondern eine Technik mit Rhythmus und Ruhe."
             if reflection_path == "respekt":
+                if en:
+                    return "⚖️ The victory feels precise. Even the reward seems earned rather than stolen."
                 return "⚖️ Der Sieg fuehlt sich praezise an. Selbst die Belohnung wirkt eher verdient als geraubt."
             if reflection_path == "schoepfung":
+                if en:
+                    return "🔥 Something formable remains from the boss-break, as if the battle itself uncovered a new idea."
                 return "🔥 Aus dem Bossbruch bleibt etwas Formbares zurück, als haette der Kampf selbst eine neue Idee freigelegt."
             if combat_vow == "truth":
+                if en:
+                    return "🔎 Maatis takes away not only power, but a clearer reading of the enemy."
                 return "🔎 Maatis nimmt nicht nur Macht mit, sondern ein klareres Lesen des Gegners."
             if combat_vow == "remember":
+                if en:
+                    return "🌌 The loot feels like an echo: not possession, but memory in usable form."
                 return "🌌 Der Loot wirkt wie ein Echo: nicht Besitz, sondern Erinnerung in brauchbarer Form."
             if combat_vow == "protect":
+                if en:
+                    return "🛡️ Even the reward submits to protection. Power remains a means, not an end."
                 return "🛡️ Selbst die Belohnung ordnet sich dem Schutz unter. Kraft bleibt Mittel, nicht Selbstzweck."
 
         if ftype == "final":
             if reflection_path == "respekt":
+                if en:
+                    return "⚖️ The restored principle does not stand beside Maatis; it answers his stance."
                 return "⚖️ Das wiederhergestellte Prinzip steht nicht neben Maatis, sondern antwortet auf seine Haltung."
             if combat_vow == "remember":
+                if en:
+                    return "🌠 The final victory feels as if the world itself briefly stepped into the battle."
                 return "🌠 Der Finalsieg fuehlt sich an, als waere die Welt selbst kurz mit in den Kampf getreten."
 
         return ""
@@ -610,7 +844,10 @@ class BattleCore:
         title = profile.get("title", "Wegsucher")
         rank = profile.get("rank", "Erwachend")
         motif = profile.get("motif", "")
-        lines = [f"🜂 {title} tritt in die Arena. Sein Weg ist inzwischen {rank.lower()}."]
+        if _battle_ui_language() == "en":
+            lines = [f"🜂 {title} enters the arena. His path is now {rank.lower()}."]
+        else:
+            lines = [f"🜂 {title} tritt in die Arena. Sein Weg ist inzwischen {rank.lower()}."]
         if motif:
             lines.append(f"   {motif}")
         return lines
@@ -622,19 +859,29 @@ class BattleCore:
         title = profile.get("title", "")
         rank = profile.get("rank", "")
         boss_title = boss_profile.get("title", "Boss")
+        en = _battle_ui_language() == "en"
 
         if "Grenzhüter" in title:
+            if en:
+                return f"The {boss_title} immediately senses that Maatis has not come as a raw attacker, but as an ordered boundary."
             return f"Der {boss_title} spürt sofort, dass Maatis nicht als roher Angreifer kommt, sondern als geordnete Grenze."
         if "Klangsucher" in title:
+            if en:
+                return f"A fine aftertone moves through the arena. Even the {boss_title} notices that Maatis now carries a rhythm of his own."
             return f"Ein feiner Nachhall geht durch die Arena. Selbst der {boss_title} merkt, dass Maatis inzwischen einen eigenen Rhythmus traegt."
         if "Formträger" in title:
+            if en:
+                return f"The {boss_title} recoils for a moment, as if Maatis were no longer only reacting, but already bringing new form into the room."
             return f"Der {boss_title} weicht einen Moment zurück, als würde Maatis nicht nur reagieren, sondern bereits neue Form in den Raum bringen."
         if rank == "Verankert":
+            if en:
+                return f"There is something deeply anchored within Maatis now. The {boss_title} is no longer answering only an opponent, but a path that has taken shape."
             return f"Etwas an Maatis wirkt fest in sich verankert. Der {boss_title} beantwortet nicht nur einen Gegner, sondern einen gewordenen Weg."
         return ""
 
     def _apply_story_modifiers(self, context: dict | None, turn_state: dict) -> dict:
         choices = self._get_story_choices(context)
+        en = _battle_ui_language() == "en"
         modifiers = {
             "choices": choices,
             "attack_mult": 1.0,
@@ -647,31 +894,55 @@ class BattleCore:
         if reflection_path == "harmonie":
             turn_state["focus_heal_bonus"] = 4
             turn_state["focus_guard_bonus"] = 4
-            modifiers["intro_lines"].append("🌿 Maatis erinnert sich an den Weg der Harmonie. Fokus und Ausgleich tragen ihn spuerbar.")
+            modifiers["intro_lines"].append(
+                "🌿 Maatis remembers the path of harmony. Focus and balance carry him in a tangible way."
+                if en else
+                "🌿 Maatis erinnert sich an den Weg der Harmonie. Fokus und Ausgleich tragen ihn spuerbar."
+            )
         elif reflection_path == "respekt":
             turn_state["aura_resist"] = {"judgment": 0.2, "sealed": 0.15}
             modifiers["defense_mult"] *= 0.96
-            modifiers["intro_lines"].append("🕊️ Die Entscheidung fuer Respekt haelt Maatis in der Grenze. Urteil und Siegel greifen schlechter.")
+            modifiers["intro_lines"].append(
+                "🕊️ The choice of respect keeps Maatis within the boundary. Judgment and seals take hold less strongly."
+                if en else
+                "🕊️ Die Entscheidung fuer Respekt haelt Maatis in der Grenze. Urteil und Siegel greifen schlechter."
+            )
         elif reflection_path == "schoepfung":
             turn_state["creation_bonus_mult"] = 1.15
             turn_state["ult_damage_mult"] = 1.10
             modifiers["attack_mult"] *= 1.03
-            modifiers["intro_lines"].append("🎨 Die Wahl der Schoepfungskraft glimmt weiter. Neue Moeglichkeiten verdichten den Angriff.")
+            modifiers["intro_lines"].append(
+                "🎨 The choice of creation still glows. New possibilities condense the attack."
+                if en else
+                "🎨 Die Wahl der Schoepfungskraft glimmt weiter. Neue Moeglichkeiten verdichten den Angriff."
+            )
 
         combat_vow = choices.get("combat_vow")
         if combat_vow == "protect":
             turn_state["guard"] = max(turn_state.get("guard", 0), 6)
             turn_state["potion_heal_bonus"] = 8
             modifiers["defense_mult"] *= 0.94
-            modifiers["intro_lines"].append("🛡️ Maatis' Geluebde zu schuetzen wird zu einem ersten Schild.")
+            modifiers["intro_lines"].append(
+                "🛡️ Maatis' vow to protect becomes a first shield."
+                if en else
+                "🛡️ Maatis' Geluebde zu schuetzen wird zu einem ersten Schild."
+            )
         elif combat_vow == "truth":
             turn_state["weakness_bonus_mult"] = 1.15
             modifiers["crit_bonus"] += 0.05
-            modifiers["intro_lines"].append("🔎 Maatis sucht Wahrheit. Schwachstellen treten schaerfer hervor.")
+            modifiers["intro_lines"].append(
+                "🔎 Maatis seeks truth. Weaknesses stand out more sharply."
+                if en else
+                "🔎 Maatis sucht Wahrheit. Schwachstellen treten schaerfer hervor."
+            )
         elif combat_vow == "remember":
             turn_state["resonance"] = max(turn_state.get("resonance", 0), 18)
             turn_state["resonance_gain_bonus"] = 4
-            modifiers["intro_lines"].append("🌌 Maatis kaempft fuer Erinnerung. Resonanz antwortet frueher auf seine Schritte.")
+            modifiers["intro_lines"].append(
+                "🌌 Maatis fights for remembrance. Resonance answers his steps earlier."
+                if en else
+                "🌌 Maatis kaempft fuer Erinnerung. Resonanz antwortet frueher auf seine Schritte."
+            )
 
         return modifiers
 
@@ -830,7 +1101,7 @@ class BattleCore:
                     },
                 },
             }
-            return profiles.get(((boss_idx - 1) % 5) + 1, profiles[1])
+            return self._localize_boss_profile(profiles.get(((boss_idx - 1) % 5) + 1, profiles[1]))
 
         if ftype == "final":
             finals = {
@@ -861,9 +1132,9 @@ class BattleCore:
                     "victory_line": "»Nicht jede Schöpfung will dich tragen.«",
                 },
             }
-            return finals.get(((final_idx - 1) % 2) + 1, finals[1])
+            return self._localize_boss_profile(finals.get(((final_idx - 1) % 2) + 1, finals[1]))
 
-        return {
+        return self._localize_boss_profile({
             "title": "Wandernde Dissonanz",
             "intro": "",
             "aura_cycle": ["none"],
@@ -873,7 +1144,96 @@ class BattleCore:
             "entrance": "",
             "taunts": [],
             "victory_line": "»Die Dissonanz sammelt ein, was schwankt.«",
+        })
+
+    def _localize_boss_profile(self, profile: dict) -> dict:
+        if _battle_ui_language() != "en":
+            return profile
+
+        localized = dict(profile)
+        title_map = {
+            "Harmoniebrecher": "Breaker of Harmony",
+            "Wächter des Gegengewichts": "Warden of Counterbalance",
+            "Flamme der Schöpfung": "Flame of Creation",
+            "Stimme der Leere": "Voice of the Void",
+            "Richter des Respekts": "Judge of Respect",
+            "Avatar der Balance": "Avatar of Balance",
+            "Herz der Schöpfung": "Heart of Creation",
+            "Wandernde Dissonanz": "Wandering Dissonance",
         }
+        special_map = {
+            "Fraktur der Harmonie": "Fracture of Harmony",
+            "Spiegel des Gegengewichts": "Mirror of Counterbalance",
+            "Nova der Möglichkeiten": "Nova of Possibility",
+            "Vakuum-Ruf": "Vacuum Call",
+            "Urteil der Grenze": "Judgment of the Boundary",
+            "Achsenbruch": "Axis Break",
+            "Genesis-Sturm": "Genesis Storm",
+            "Dissonanzstoß": "Dissonance Strike",
+        }
+        intro_map = {
+            "Die Luft zittert. Dieser Boss lebt von roher Zerspaltung.": "The air trembles. This boss lives on raw fragmentation.",
+            "Ein schweres Feld aus Gegengewicht legt sich über die Arena.": "A heavy field of counterweight settles over the arena.",
+            "Funken kreisen wie unfertige Welten. Chaos sucht Form.": "Sparks circle like unfinished worlds. Chaos seeks form.",
+            "Die Arena wird still. Verbundenheit scheint fern.": "The arena falls quiet. Connectedness feels far away.",
+            "Jede falsche Bewegung wird hier sofort beantwortet.": "Every false movement is answered immediately here.",
+            "Das Finale beobachtet jede Entscheidung und verstärkt Extreme.": "The finale watches every decision and amplifies extremes.",
+            "Das Finale lädt sich mit jeder Runde tiefer auf.": "The finale charges more deeply with every round.",
+        }
+        entrance_map = {
+            "Splitter aus Licht schweben wie gebrochene Glasfetzen durch die Arena.": "Shards of light drift through the arena like broken glass splinters.",
+            "Goldene Linien ordnen sich zu Waagschalen, die jede Bewegung messen.": "Golden lines arrange themselves into scales that measure every movement.",
+            "Purpurne Funken zerreißen die Dunkelheit, als würde eine Idee zu heiß werden.": "Purple sparks tear through the dark as if an idea were becoming too hot.",
+            "Kalte Kreise aus Nacht ziehen sich zusammen. Geräusche werden schwer.": "Cold circles of night contract. Sound grows heavy.",
+            "Rote Glyphen bilden einen Kreis. Der Raum wirkt plötzlich wie ein Tribunal.": "Red glyphs form a ring. The room suddenly feels like a tribunal.",
+            "Helle Achsen schneiden durch den Raum, als wäre die Welt selbst vermessen worden.": "Bright axes cut through the room as if the world itself had been measured.",
+            "Ein grünes Pulsieren geht durch die Arena, als entstünde gerade etwas Ursprüngliches.": "A green pulse moves through the arena as if something primordial were being born.",
+        }
+        victory_map = {
+            "»Siehst du? Klang ohne Zentrum wird zu Splittern.«": "\"See? Sound without a center becomes splinters.\"",
+            "»Balance ohne Bewusstsein ist nur Last.«": "\"Balance without awareness is only burden.\"",
+            "»Ungeformte Möglichkeit frisst den Zögernden.«": "\"Unshaped possibility devours the hesitant.\"",
+            "»Im Vakuum klingt selbst Mut wie Schweigen.«": "\"In the vacuum, even courage sounds like silence.\"",
+            "»Du wolltest Stärke ohne Maß. Das ist dein Fehler.«": "\"You wanted strength without measure. That is your failure.\"",
+            "»Wer die Achse verliert, stürzt trotz Stärke.«": "\"Whoever loses the axis falls despite strength.\"",
+            "»Nicht jede Schöpfung will dich tragen.«": "\"Not every act of creation wishes to carry you.\"",
+            "»Die Dissonanz sammelt ein, was schwankt.«": "\"Dissonance gathers in all that wavers.\"",
+        }
+        taunt_map = {
+            "»Harmonie ist nur ein dünnes Glas.«": "\"Harmony is only thin glass.\"",
+            "»Ich zeige dir, wie leicht Ordnung zerbricht.«": "\"I will show you how easily order shatters.\"",
+            "»Jede Bewegung ruft ihr Gegengewicht.«": "\"Every movement summons its counterweight.\"",
+            "»Je stärker du drückst, desto härter drückt die Welt zurück.«": "\"The harder you press, the harder the world presses back.\"",
+            "»Schöpfung ist kein Trost. Sie ist Feuer.«": "\"Creation is no comfort. It is fire.\"",
+            "»Willst du formen? Dann wage das Brennen.«": "\"If you want to shape, dare the burning.\"",
+            "»Hier antwortet dir niemand.«": "\"No one answers you here.\"",
+            "»Verbundenheit endet dort, wo die Leere beginnt.«": "\"Connectedness ends where the void begins.\"",
+            "»Respekt ist keine Bitte. Er ist eine Grenze.«": "\"Respect is not a request. It is a boundary.\"",
+            "»Wer Grenzen missachtet, ruft das Urteil.«": "\"Whoever ignores boundaries calls down judgment.\"",
+            "»Ich prüfe nicht nur deine Kraft, sondern dein Maß.«": "\"I test not only your strength, but your measure.\"",
+            "»Am Ursprung ist jede Möglichkeit zugleich Geburt und Verlust.«": "\"At the origin, every possibility is both birth and loss.\"",
+        }
+        localized["title"] = title_map.get(profile.get("title"), profile.get("title"))
+        localized["special"] = special_map.get(profile.get("special"), profile.get("special"))
+        localized["intro"] = intro_map.get(profile.get("intro"), profile.get("intro"))
+        localized["entrance"] = entrance_map.get(profile.get("entrance"), profile.get("entrance"))
+        localized["victory_line"] = victory_map.get(profile.get("victory_line"), profile.get("victory_line"))
+        localized["taunts"] = [taunt_map.get(t, t) for t in profile.get("taunts", [])]
+        phase2 = profile.get("phase2")
+        if isinstance(phase2, dict):
+            localized_phase2 = dict(phase2)
+            localized_phase2["name"] = {
+                "Überhitzte Genesis": "Overheated Genesis",
+                "Absolute Stille": "Absolute Silence",
+                "Letzte Instanz": "Final Tribunal",
+            }.get(phase2.get("name"), phase2.get("name"))
+            localized_phase2["message"] = {
+                "Die Flamme kippt in eine zweite Gestalt. Möglichkeiten werden zu Sturm.": "The flame tips into a second form. Possibilities become storm.",
+                "Die Leere verdichtet sich. Selbst dein Atem klingt jetzt fremd.": "The void condenses. Even your own breathing sounds foreign now.",
+                "Das Tribunal schließt sich. Jede Entscheidung wird nun endgültig gewogen.": "The tribunal closes. Every decision is now weighed as final.",
+            }.get(phase2.get("message"), phase2.get("message"))
+            localized["phase2"] = localized_phase2
+        return localized
 
     def _apply_enemy_aura(self, profile: dict, turn_state: dict, turn_counter: int) -> str:
         cycle = profile.get("aura_cycle") or ["none"]
@@ -881,13 +1241,13 @@ class BattleCore:
         turn_state["enemy_aura"] = aura
 
         aura_texts = {
-            "none": "",
-            "shatter": "⚠ Zersplitterungs-Aura: Schilde werden geschwächt, aber Fokus heilt stärker.",
-            "counter": "⚠ Konter-Aura: direkte Angriffe laden den Gegenschlag auf.",
-            "wildfire": "⚠ Wildfeuer-Aura: Schöpfungskraft und Impuls werden heftiger, aber riskanter.",
-            "silence": "⚠ Schweige-Aura: Skills geraten unter Druck.",
-            "sealed": "⚠ Siegel-Aura: ein Teil deines Schadens wird versiegelt.",
-            "judgment": "⚠ Urteils-Aura: Flucht und Hast werden härter bestraft.",
+            "none": _battle_text("aura_none"),
+            "shatter": _battle_text("aura_shatter"),
+            "counter": _battle_text("aura_counter"),
+            "wildfire": _battle_text("aura_wildfire"),
+            "silence": _battle_text("aura_silence"),
+            "sealed": _battle_text("aura_sealed"),
+            "judgment": _battle_text("aura_judgment"),
         }
         return aura_texts.get(aura, "")
 
@@ -930,6 +1290,29 @@ class BattleCore:
         filled = int(round((current / maximum) * width))
         return "[" + ("█" * filled) + ("·" * (width - filled)) + f"] {current}/{maximum}"
 
+    def _guide_hint(self, ftype: str, turn_counter: int, turn_state: dict) -> str:
+        if ftype == "final":
+            hints = {
+                1: _battle_text("guide_hint_final_1"),
+                2: _battle_text("guide_hint_final_2"),
+                3: _battle_text("guide_hint_final_3"),
+            }
+            return hints.get(turn_counter, "")
+
+        hints = {
+            1: _battle_text("guide_hint_normal_1"),
+            2: _battle_text("guide_hint_normal_2"),
+        }
+        return hints.get(turn_counter, "")
+
+    def _restore_guide_state(self, original_player_hp: int, stats_snapshot: dict | None):
+        self.state.state["player"]["hp"] = original_player_hp
+        if stats_snapshot is not None:
+            self.state.state["stats"].update(stats_snapshot)
+            self.state.state["stats"]["messages_since_last_fight"] = 0
+        self.state.state["flags"]["needs_heal"] = False
+        self.state.save()
+
     def _print_boss_hud(self, enemy_name: str, enemy_hp: int, max_enemy_hp: int, turn_state: dict, profile: dict):
         if max_enemy_hp <= 0:
             max_enemy_hp = 1
@@ -940,15 +1323,15 @@ class BattleCore:
         aura = turn_state.get("enemy_aura") or "none"
         charge = int(turn_state.get("enemy_charge", 0))
         special = profile.get("special", "Spezial")
-        phase_label = "PHASE 2" if turn_state.get("phase2_active") else "PHASE 1"
+        phase_label = _battle_text("phase_2") if turn_state.get("phase2_active") else _battle_text("phase_1")
         color = profile.get("phase2_color") if turn_state.get("phase2_active") else profile.get("color")
         reset = Style.RESET_ALL if color else ""
-        print(color + f"👁 Boss-HUD: {enemy_name} — {profile.get('title', 'Boss')}" + reset)
+        print(color + _battle_text("boss_hud", enemy=enemy_name, title=profile.get("title", "Boss")) + reset)
         print(color + f"   HP {enemy_hp}/{max_enemy_hp} {hp_bar}" + reset)
-        print(color + f"   {phase_label} | Aura: {aura} | Spezial: {special}" + reset)
-        print(color + f"   Charge: {self._build_charge_bar(charge)}" + reset)
+        print(color + "   " + _battle_text("boss_phase_line", phase=phase_label, aura=aura, special=special) + reset)
+        print(color + "   " + _battle_text("boss_charge", bar=self._build_charge_bar(charge)) + reset)
         if charge >= 2:
-            print(color + "   ⚠ Warnung: Die Spezialattacke baut sich auf." + reset)
+            print(color + "   " + _battle_text("boss_warning") + reset)
 
     def _show_special_vignette(self, special: str):
         frames = {
@@ -1003,37 +1386,62 @@ class BattleCore:
     def _story_boss_line(self, choices: dict, outcome: str = "taunt") -> str:
         reflection_path = choices.get("reflection_path")
         combat_vow = choices.get("combat_vow")
+        en = _battle_ui_language() == "en"
 
         if outcome == "taunt":
             if combat_vow == "protect":
+                if en:
+                    return "»You want to protect? Then show me that your protection is more than fear.«"
                 return "»Du willst schuetzen? Dann zeig, dass dein Schutz mehr ist als Angst.«"
             if combat_vow == "truth":
+                if en:
+                    return "»Truth without steadiness blinds. I will test what you can truly see.«"
                 return "»Wahrheit ohne Standfestigkeit blendet. Ich pruefe, was du wirklich sehen kannst.«"
             if combat_vow == "remember":
+                if en:
+                    return "»Then remember the price of every step as well.«"
                 return "»Dann erinnere dich auch an den Preis jedes Schrittes.«"
             if reflection_path == "respekt":
+                if en:
+                    return "»You carry boundaries within you. That is why my judgment will sharpen.«"
                 return "»Du traegst Grenzen in dir. Darum wird mein Urteil schaerfer.«"
             if reflection_path == "schoepfung":
+                if en:
+                    return "»You seek new paths. I will see whether they are more than sparks.«"
                 return "»Du suchst neue Wege. Ich werde sehen, ob sie mehr sind als Funken.«"
             if reflection_path == "harmonie":
+                if en:
+                    return "»Harmony is easy to love as long as it is not placed under pressure.«"
                 return "»Harmonie ist leicht zu lieben, solange sie nicht unter Druck geraet.«"
             return ""
 
         if outcome == "victory":
             if combat_vow == "remember":
+                if en:
+                    return "🌠 This victory does not feel private. Something in the world moved with it."
                 return "🌠 Der Sieg fuehlt sich nicht privat an. Etwas in der Welt hat sich mitbewegt."
             if combat_vow == "truth":
+                if en:
+                    return "🔎 In victory it becomes clearer what the boss truly meant to test."
                 return "🔎 Im Sieg wird klarer, was der Boss wirklich pruefen wollte."
             if combat_vow == "protect":
+                if en:
+                    return "🛡️ Maatis senses that protection here is not escape from danger, but posture given form."
                 return "🛡️ Maatis spuert: Schutz ist hier nicht Flucht vor Gefahr, sondern Form gewordene Haltung."
             return ""
 
         if outcome == "defeat":
             if reflection_path == "respekt":
+                if en:
+                    return "⚖️ Even in defeat something remains ordered: Maatis knows the boundary from which he must begin again."
                 return "⚖️ Selbst in der Niederlage bleibt etwas geordnet: Maatis kennt die Grenze, an der er neu ansetzen muss."
             if reflection_path == "schoepfung":
+                if en:
+                    return "🔥 The defeat does not feel like an ending, but like a form not yet able to carry its weight."
                 return "🔥 Die Niederlage fuehlt sich nicht wie Ende an, sondern wie eine Form, die noch nicht tragen konnte."
             if reflection_path == "harmonie":
+                if en:
+                    return "🌿 Maatis realizes that harmony does not protect from pain, but it keeps the path back open."
                 return "🌿 Maatis merkt, dass Harmonie nicht vor Schmerz schuetzt, aber den Rueckweg offen haelt."
             return ""
 
@@ -1045,36 +1453,60 @@ class BattleCore:
 
         title = profile.get("title", "")
         rank = profile.get("rank", "")
-        boss_title = boss_profile.get("title", "Boss")
+        en = _battle_ui_language() == "en"
 
         if outcome == "taunt":
             if "Grenzhüter" in title:
+                if en:
+                    return f"»So you come as {title}. Then I will see whether your boundary still stands under pressure.«"
                 return f"»Also kommst du als {title}. Dann werde ich sehen, ob deine Grenze auch unter Druck noch steht.«"
             if "Klangsucher" in title:
+                if en:
+                    return f"»{title}... good. Then I will break not only your body, but your rhythm.«"
                 return f"»{title}... gut. Dann zerbreche ich nicht nur deinen Leib, sondern auch deinen Rhythmus.«"
             if "Formträger" in title:
+                if en:
+                    return f"»You already carry form within you. Good. Then it is worth truly testing you.«"
                 return f"»Du traegst schon Form in dir. Umso besser. Dann lohnt es sich, dich wirklich zu pruefen.«"
             if rank == "Verankert":
+                if en:
+                    return f"»I can see it. You are no longer a seeker. That is exactly why this battle will have weight.«"
                 return f"»Ich sehe es. Du bist kein Suchender mehr. Genau deshalb wird dieser Kampf Gewicht haben.«"
 
         if outcome == "victory":
             if "Grenzhüter" in title:
+                if en:
+                    return "⚖️ The victory feels as if Maatis did not dominate, but held a boundary that could bear weight."
                 return "⚖️ Der Sieg fuehlt sich an, als habe Maatis nicht dominiert, sondern eine Grenze gehalten, die tragen konnte."
             if "Klangsucher" in title:
+                if en:
+                    return "🎼 Even after the impact, something resonant remains. Maatis' path continues beyond mere triumph."
                 return "🎼 Selbst nach dem Einschlag bleibt etwas Stimmiges zurück. Maatis' Weg klingt weiter als bloßer Triumph."
             if "Formträger" in title:
+                if en:
+                    return "🔥 In victory it becomes clear that Maatis did not merely react. He impressed a new form upon the battle."
                 return "🔥 Im Sieg wird deutlich, dass Maatis nicht nur reagiert hat. Er hat dem Kampf eine neue Form aufgepraegt."
             if rank == "Verankert":
+                if en:
+                    return "🜂 The victory does not feel accidental. Maatis now stands in the room with an identity others can feel."
                 return "🜂 Der Sieg wirkt nicht zufaellig. Maatis steht inzwischen mit einer Identitaet im Raum, die andere spüren."
 
         if outcome == "defeat":
             if "Grenzhüter" in title:
+                if en:
+                    return "⚖️ Even in defeat the boundary does not fully give way. Maatis loses footing, but not posture."
                 return "⚖️ Selbst in der Niederlage weicht die Grenze nicht ganz. Maatis verliert Halt, aber nicht Haltung."
             if "Klangsucher" in title:
+                if en:
+                    return "🎼 The rhythm breaks, but not completely. Somewhere the trace of his path still remains."
                 return "🎼 Der Takt bricht, aber nicht vollstaendig. Irgendwo bleibt noch die Spur seines Weges erhalten."
             if "Formträger" in title:
+                if en:
+                    return "🔥 The form does not hold yet. But even in the break, it is visible that Maatis aims for more than survival."
                 return "🔥 Die Form haelt noch nicht. Doch selbst im Bruch bleibt sichtbar, dass Maatis auf mehr zielt als Ueberleben."
             if rank == "Verankert":
+                if en:
+                    return "🜂 The defeat cuts deeply precisely because Maatis now fights as a formed path, no longer as a mere one-who-tries."
                 return "🜂 Die Niederlage trifft tief, gerade weil Maatis inzwischen als gewordener Weg und nicht mehr als bloßer Versuchender kaempft."
 
         return ""
@@ -1134,59 +1566,44 @@ class BattleCore:
             dmg = max(12, int(max_hp * 0.18))
             reduced_guard = max(0, guard_before - 8)
             turn_state["guard"] = reduced_guard
-            return player_hp - dmg, (
-                f"💠 {title} wirkt **{special}**! Klangsplitter zerreißen die Ordnung."
-                f" Du verlierst {dmg} HP und dein Schild sinkt um {guard_before - reduced_guard}."
-            )
+            return player_hp - dmg, _battle_text("special_fraktur", title=title, special=special, dmg=dmg, guard=guard_before - reduced_guard)
 
         if special == "Spiegel des Gegengewichts":
             dmg = max(10, int(max_hp * 0.14))
             resonance_loss = min(25, turn_state.get("resonance", 0))
             turn_state["resonance"] = max(0, turn_state.get("resonance", 0) - resonance_loss)
-            return player_hp - dmg, (
-                f"🪞 {title} entfesselt **{special}**! Deine Bewegung wird gespiegelt."
-                f" {dmg} Schaden, Resonanz -{resonance_loss}."
-            )
+            return player_hp - dmg, _battle_text("special_spiegel", title=title, special=special, dmg=dmg, resonance=resonance_loss)
 
         if special == "Nova der Möglichkeiten":
             dmg = max(14, int(max_hp * 0.16))
             if aura == "wildfire":
                 dmg += 6
             turn_state["weakness"] = "Schöpfungskraft"
-            return player_hp - dmg, (
-                f"🔥 {title} zündet **{special}**! Rohe Schöpfung überflutet die Arena."
-                f" {dmg} Schaden. Die Schwachstelle springt auf Schöpfungskraft."
-            )
+            return player_hp - dmg, _battle_text("special_nova", title=title, special=special, dmg=dmg)
 
         if special == "Vakuum-Ruf":
             dmg = max(9, int(max_hp * 0.12))
             turn_state["resonance"] = max(0, turn_state.get("resonance", 0) - 18)
             turn_state["guard"] = 0
-            return player_hp - dmg, (
-                f"🌑 {title} ruft **{special}**! Alle Nähe reißt ab."
-                f" {dmg} Schaden, Resonanz -18, Schild fällt in sich zusammen."
-            )
+            return player_hp - dmg, _battle_text("special_vakuum", title=title, special=special, dmg=dmg)
 
         if special == "Urteil der Grenze":
             dmg = max(16, int(max_hp * 0.15))
             turn_state["enemy_charge"] = 0
-            return player_hp - dmg, (
-                f"⚖️ {title} spricht **{special}**! Ein präziser Schlag markiert deine Grenze."
-                f" {dmg} Schaden."
-            )
+            return player_hp - dmg, _battle_text("special_urteil", title=title, special=special, dmg=dmg)
 
         if special == "Achsenbruch":
             dmg = max(18, int(max_hp * 0.18))
             turn_state["guard"] = max(0, turn_state.get("guard", 0) - 10)
-            return player_hp - dmg, f"🌌 {title} nutzt **{special}**! Die Achsen kippen. {dmg} Schaden und dein Schild bricht an."
+            return player_hp - dmg, _battle_text("special_achsenbruch", title=title, special=special, dmg=dmg)
 
         if special == "Genesis-Sturm":
             dmg = max(20, int(max_hp * 0.2))
             turn_state["resonance"] = max(0, turn_state.get("resonance", 0) - 15)
-            return player_hp - dmg, f"🌠 {title} entfacht **{special}**! {dmg} Schaden, Resonanz -15."
+            return player_hp - dmg, _battle_text("special_genesis", title=title, special=special, dmg=dmg)
 
         dmg = max(10, int(max_hp * 0.1))
-        return player_hp - dmg, f"💥 {title} entfesselt **{special}** und trifft dich für {dmg}."
+        return player_hp - dmg, _battle_text("special_default", title=title, special=special, dmg=dmg)
 
     def _combat_achievement_catalog(self):
         return {
@@ -1228,25 +1645,25 @@ class BattleCore:
         reasons = []
         if won:
             if turn_state.get("phase2_active"):
-                reasons.append("du hast auch die zweite Bossphase getragen")
+                reasons.append(_battle_text("reason_phase2_win"))
             if turn_state.get("survived_special"):
-                reasons.append("du hast eine Spezialattacke ueberlebt")
+                reasons.append(_battle_text("reason_special_win"))
             if turn_state.get("ult_finisher"):
-                reasons.append("du hast den Kampf mit MAAT-Impuls beendet")
+                reasons.append(_battle_text("reason_ult_win"))
             if not turn_state.get("used_potion") and ftype in ("boss", "final"):
-                reasons.append("du bist ohne Heiltrank durchgekommen")
+                reasons.append(_battle_text("reason_no_potion_win"))
             if not reasons:
-                reasons.append("du hast den Rhythmus des Kampfes frueh kontrolliert")
-            return "📘 Kampfanalyse: Sieg, weil " + "; ".join(reasons) + "."
+                reasons.append(_battle_text("reason_rhythm_win"))
+            return _battle_text("summary_win", reasons="; ".join(reasons))
 
-        reasons.append(f"deine Rest-HP fielen auf {max(0, player_hp)}")
+        reasons.append(_battle_text("reason_hp_loss", hp=max(0, player_hp)))
         if turn_state.get("phase2_active"):
-            reasons.append("die zweite Bossphase hat den Druck deutlich erhoeht")
+            reasons.append(_battle_text("reason_phase2_loss"))
         if turn_state.get("enemy_aura") not in (None, "none"):
-            reasons.append(f"die Aura `{turn_state['enemy_aura']}` hat dich zusaetzlich gebunden")
+            reasons.append(_battle_text("reason_aura_loss", aura=turn_state["enemy_aura"]))
         if not turn_state.get("used_potion"):
-            reasons.append("du hattest keinen rettenden Heiltrank-Moment")
-        return f"📘 Kampfanalyse: Niederlage gegen {enemy_name}, weil " + "; ".join(reasons) + "."
+            reasons.append(_battle_text("reason_potion_loss"))
+        return _battle_text("summary_loss", enemy=enemy_name, reasons="; ".join(reasons))
 
     def _use_potion_in_fight(self, turn_state: dict | None = None) -> str:
         p = self.state.state["player"]
@@ -1255,9 +1672,9 @@ class BattleCore:
         hp = int(p.get("hp", max_hp))
 
         if potions <= 0:
-            return "🧪 Du hast keinen Heiltrank im Inventar."
+            return _battle_text("potion_none")
         if hp >= max_hp:
-            return f"Du bist bereits voll geheilt. (HP: {hp}/{max_hp})"
+            return _battle_text("potion_full", hp=hp, max_hp=max_hp)
 
         heal_amount = max(10, max_hp // 2)
         bonus = int((turn_state or {}).get("potion_heal_bonus", 0))
@@ -1266,10 +1683,7 @@ class BattleCore:
         p["potions"] = potions - 1
         p["hp"] = new_hp
         self.state.save()
-        return (
-            f"🧪 Du trinkst einen Heiltrank und regenerierst {new_hp - hp} HP.\n"
-            f"HP: {new_hp}/{max_hp}  |  Tränke: {p['potions']}"
-        )
+        return _battle_text("potion_used", heal=new_hp - hp, hp=new_hp, max_hp=max_hp, potions=p["potions"])
 
     # ------------------------------------------
     # 🐢 LANGSAME KAMPFZEILEN (Terminal-Immersion)
@@ -1483,6 +1897,7 @@ class BattleCore:
 
         # 🔹 MAAT-Felder greifen
         H, B, S, V, R = self._get_maat_fields(context)
+        guide_mode = bool(isinstance(context, dict) and context.get("guide_mode"))
 
         # 🔹 XP- und Gold-Multiplikatoren:
         # H = bis zu +25% XP (gute Ausrichtung)
@@ -1496,8 +1911,6 @@ class BattleCore:
         potion_chance = base_potion_chance + 0.25 * R
         potion_chance = max(0.0, min(0.8, potion_chance))
 
-        stats["fights_won"] += 1
-
         # Für Text
         skill_msg = ""
         potion_msg = ""
@@ -1505,6 +1918,22 @@ class BattleCore:
         # -------------------------------
         # BOSSE / FINALBOSSE
         # -------------------------------
+        if guide_mode:
+            if random.random() < base_potion_chance:
+                p["potions"] = p.get("potions", 0) + 1
+                potion_msg = _battle_text("guide_bonus_potion", potions=p["potions"])
+            self.state.state["flags"]["needs_heal"] = False
+            self.state.save()
+            lines = [
+                _battle_text("guide_complete"),
+                _battle_text("guide_reward_note"),
+            ]
+            if potion_msg:
+                lines.append(potion_msg)
+            return "\n".join(lines)
+
+        stats["fights_won"] += 1
+
         if ftype == "boss":
             stats["boss_fights"] += 1
             stats["boss_wins"] += 1
@@ -1700,6 +2129,8 @@ class BattleCore:
         s = self.state.state
         p = s["player"]
         stats = s["stats"]
+        guide_mode = bool(isinstance(context, dict) and context.get("guide_mode"))
+        stats_snapshot = dict(stats) if guide_mode else None
 
         # 🔹 MAAT-Felder lesen
         H, B, S, V, R = self._get_maat_fields(context)
@@ -1748,6 +2179,7 @@ class BattleCore:
         enemy_hp, enemy_dmg_base, xp_reward = self._enemy_stats(ftype)
         max_enemy_hp = enemy_hp
         player_hp = p["hp"]
+        original_player_hp = p["hp"]
         turn_state = self._build_turn_state(context)
         story_mods = self._apply_story_modifiers(context, turn_state)
         story_choices = story_mods.get("choices", {})
@@ -1837,8 +2269,11 @@ class BattleCore:
                     line = "⏳ Der Kampf zerfasert. MAAT ordnet die Kräfte neu und beendet die Begegnung."
                     self._slow_line(line)
                     log_lines.append("Kampf wurde aus Stabilitätsgründen beendet.")
-                    self.state.state["flags"]["needs_heal"] = True
-                    self.state.save()
+                    if guide_mode:
+                        self._restore_guide_state(original_player_hp, stats_snapshot)
+                    else:
+                        self.state.state["flags"]["needs_heal"] = True
+                        self.state.save()
                     return "\n".join(log_lines)
                 if ftype in ("boss", "final"):
                     boss_profile = self._activate_phase2_if_needed(
@@ -1864,34 +2299,38 @@ class BattleCore:
                     print(aura_text)
                 if ftype in ("boss", "final"):
                     self._print_boss_hud(enemy_name, enemy_hp, max_enemy_hp, turn_state, boss_profile)
+                if guide_mode:
+                    guide_hint = self._guide_hint(ftype, turn_counter, turn_state)
+                    if guide_hint:
+                        print(guide_hint)
                 print("------------------------------------------")
                 taunt = self._boss_taunt(boss_profile, turn_counter, story_choices, story_path_profile) if ftype in ("boss", "final") else ""
                 if taunt:
                     self._slow_line(Fore.MAGENTA + f"{enemy_name}: {taunt}" + Style.RESET_ALL, delay_char=0.008, delay_line=0.2)
                     log_lines.append(f"{enemy_name}: {taunt}")
-                print("1) Angriff")
-                print("2) Skills")
-                print("3) Fokus")
-                print("4) Heiltrank")
-                print("5) MAAT-Impuls")
-                print("6) Flucht")
-                choice = self._prompt("Aktion: ", context=context, default="3")
+                print(_battle_text("action_attack"))
+                print(_battle_text("action_skills"))
+                print(_battle_text("action_focus"))
+                print(_battle_text("action_potion"))
+                print(_battle_text("action_ult"))
+                print(_battle_text("action_flee"))
+                choice = self._prompt(_battle_text("action_prompt"), context=context, default="3")
 
                 if choice == "1":
                     # ANGRIFF → Prinzip wählen
                     while True:
-                        print("\n--- MAAT-Angriff ---")
+                        print("\n" + _battle_text("attack_menu"))
                         print("1) Harmonie")
                         print("2) Balance")
                         print("3) Schöpfungskraft")
                         print("4) Verbundenheit")
                         print("5) Respekt")
-                        print("6) Zurück")
-                        sub = self._prompt("Wähle [1–6]: ", context=context, default="6")
+                        print(_battle_text("attack_back"))
+                        sub = self._prompt(_battle_text("attack_choose"), context=context, default="6")
                         if sub == "6":
                             break
                         if sub not in principles:
-                            print("Ungültige Auswahl.")
+                            print(_battle_text("invalid_choice"))
                             continue
                         atk_type = principles[sub]
                         base_dmg = self._base_attack_damage(atk_type)
@@ -1930,13 +2369,13 @@ class BattleCore:
                 elif choice == "2":
                     # SKILLS
                     if not p["skills"]:
-                        print("Noch keine Skills gelernt.")
+                        print(_battle_text("skills_none"))
                     else:
-                        print("\n--- Skills ---")
+                        print("\n" + _battle_text("skills_menu"))
                         for i, sk in enumerate(p["skills"], 1):
                             print(f"{i}) {sk}")
                         print(f"{len(p['skills'])+1}) Zurück")
-                        sub = self._prompt("Wähle: ", context=context, default=str(len(p["skills"]) + 1))
+                        sub = self._prompt(_battle_text("skills_choose"), context=context, default=str(len(p["skills"]) + 1))
                         try:
                             idx = int(sub) - 1
                             if idx == len(p["skills"]):
@@ -1957,7 +2396,7 @@ class BattleCore:
                                 self._slow_line(line)
                                 log_lines.append(f"Skill {sk}: {final_dmg} Schaden")
                         except ValueError:
-                            print("Ungültige Eingabe.")
+                            print(_battle_text("invalid_input"))
 
                 elif choice == "3":
                     player_hp, line = self._use_focus(player_hp, p["max_hp"], turn_state)
@@ -1996,9 +2435,12 @@ class BattleCore:
                         self._slow_line(line)
                         log_lines.append("Spieler ist erfolgreich geflohen.")
                         music.stop()
-                        self.state.state["flags"]["needs_heal"] = True
-                        self.state.state["stats"]["messages_since_last_fight"] = 0
-                        self.state.save()
+                        if guide_mode:
+                            self._restore_guide_state(original_player_hp, stats_snapshot)
+                        else:
+                            self.state.state["flags"]["needs_heal"] = True
+                            self.state.state["stats"]["messages_since_last_fight"] = 0
+                            self.state.save()
                         return "\n".join(log_lines)
                     else:
                         line = "❌ Flucht fehlgeschlagen!"
@@ -2006,7 +2448,7 @@ class BattleCore:
                         log_lines.append("Fluchtversuch fehlgeschlagen.")
 
                 else:
-                    print("Ungültige Auswahl.")
+                    print(_battle_text("invalid_choice"))
                     continue
 
                 turn_state["last_player_action"] = choice
@@ -2041,6 +2483,10 @@ class BattleCore:
                     dmg_in = max(1, int(round(dmg_in)))
                     dmg_in, aura_counter_txt = self._modify_incoming_damage(dmg_in, turn_state, choice)
                     dmg_in, guard_txt = self._apply_guard(dmg_in, turn_state)
+                    if isinstance(context, dict) and context.get("no_hp_loss"):
+                        dmg_in = 0
+                        guard_txt = ""
+                        aura_counter_txt += _battle_text("guide_protection")
 
                     player_hp -= dmg_in
                     resonance = self._gain_resonance(turn_state, 12 if dmg_in > 0 else 6)
@@ -2052,7 +2498,10 @@ class BattleCore:
             music.stop()
 
         # Kampfende
-        p["hp"] = max(0, player_hp)
+        if isinstance(context, dict) and context.get("guide_mode"):
+            p["hp"] = original_player_hp
+        else:
+            p["hp"] = max(0, player_hp)
 
         if player_hp > 0 and enemy_hp <= 0:
             # Sieg
@@ -2114,15 +2563,19 @@ class BattleCore:
             if profile_defeat:
                 self._slow_line(profile_defeat, delay_char=0.008, delay_line=0.3)
                 log_lines.append(profile_defeat)
-            stats["fights_lost"] += 1
-            # Zurück zum letzten Boss-Checkpoint (weiche Rücksetzung)
-            checkpoint = self.state.state["world"]["last_boss_checkpoint"]
-            stats["fights_won"] = checkpoint * 10
-            p["hp"] = max(10, p["max_hp"] // 4)
-            self.state.state["flags"]["needs_heal"] = True
-            self.state.save()
+            if not (isinstance(context, dict) and context.get("guide_mode")):
+                stats["fights_lost"] += 1
+                # Zurück zum letzten Boss-Checkpoint (weiche Rücksetzung)
+                checkpoint = self.state.state["world"]["last_boss_checkpoint"]
+                stats["fights_won"] = checkpoint * 10
+                p["hp"] = max(10, p["max_hp"] // 4)
+                self.state.state["flags"]["needs_heal"] = True
+                self.state.save()
 
         stats["messages_since_last_fight"] = 0
+        if guide_mode and stats_snapshot is not None:
+            stats.update(stats_snapshot)
+            stats["messages_since_last_fight"] = 0
         self.state.save()
 
         return "\n".join(log_lines)
@@ -2136,13 +2589,34 @@ class Plugin:
     type = "chat"
 
     commands = {
-        "/fight": "Startet einen normalen MAAT-Kampf (Debug).",
-        "/fightboss": "Erzwingt einen Bosskampf (Debug).",
-        "/fightfinal": "Erzwingt einen Endbosskampf (Debug).",
-        "/xp": "Zeigt deinen aktuellen Level- und XP-Status.",
-        "/shop": "MAAT-RPG Laden (z.B. /shop buy potion 2).",   # 🏪 NEU
-        "/usepotion": "Benutze einen Heiltrank.",                # 🧪 NEU
-        "/battletest": "Führt einen stabilen Battle-Core-Selbsttest aus.",
+        "/fight": {
+            "de": "Startet einen geführten MAAT-Testkampf.",
+            "en": "Starts a guided MAAT test battle.",
+        },
+        "/fightboss": {
+            "de": "Startet einen geführten Boss-Testkampf.",
+            "en": "Starts a guided boss test battle.",
+        },
+        "/fightfinal": {
+            "de": "Startet einen geführten Finalboss-Testkampf.",
+            "en": "Starts a guided final boss test battle.",
+        },
+        "/xp": {
+            "de": "Zeigt deinen aktuellen Level- und XP-Status.",
+            "en": "Shows your current level and XP status.",
+        },
+        "/shop": {
+            "de": "Oeffnet den MAAT-RPG-Laden (z. B. /shop buy potion 2).",
+            "en": "Opens the MAAT-RPG shop (e.g. /shop buy potion 2).",
+        },
+        "/usepotion": {
+            "de": "Benutze einen Heiltrank.",
+            "en": "Use a healing potion.",
+        },
+        "/battletest": {
+            "de": "Fuehrt einen stabilen Battle-Core-Selbsttest aus.",
+            "en": "Runs a stable battle-core self-test.",
+        },
     }
 
     def __init__(self):
@@ -2169,7 +2643,8 @@ class Plugin:
             return True, out
 
         if base == "/fightfinal":
-            out = self.core.run_fight("final", context or {})
+            demo_context = self._build_demo_context("final", context)
+            out = self.core.run_fight("final", demo_context)
             return True, out
 
         if base == "/usepotion":
@@ -2201,30 +2676,34 @@ class Plugin:
             potions = p.get("potions", 0)
 
             lines = []
-            lines.append("📘 **Dein MAAT-RPG Status**")
+            lines.append(_battle_text("status_title"))
             lines.append("")
-            lines.append(f"• Level: {lvl}")
-            lines.append(f"• XP: {xp}/{xp_next}")
+            lines.append(f"• {_battle_text('status_level')}: {lvl}")
+            lines.append(f"• {_battle_text('status_xp')}: {xp}/{xp_next}")
             if story_profile:
-                lines.append(f"• Pfadprofil: {story_profile.get('title', 'Unbestimmt')} — {story_profile.get('rank', 'Erwachend')}")
+                lines.append(
+                    f"• {_battle_text('status_profile')}: "
+                    f"{story_profile.get('title', _battle_text('status_unknown'))} — "
+                    f"{story_profile.get('rank', 'Erwachend')}"
+                )
             lines.append("")
-            lines.append(f"• Kämpfe gesamt: {fights}")
-            lines.append(f"  ├─ Siege: {wins}")
-            lines.append(f"  └─ Niederlagen: {losses}")
-            lines.append(f"• Boss-Siege: {boss_wins}")
-            lines.append(f"• Finalboss-Siege: {final_wins}")
-            lines.append(f"• Wiederhergestellte Maat-Prinzipien: {restored}")
+            lines.append(f"• {_battle_text('status_fights')}: {fights}")
+            lines.append(f"  ├─ {_battle_text('status_wins')}: {wins}")
+            lines.append(f"  └─ {_battle_text('status_losses')}: {losses}")
+            lines.append(f"• {_battle_text('status_boss_wins')}: {boss_wins}")
+            lines.append(f"• {_battle_text('status_final_wins')}: {final_wins}")
+            lines.append(f"• {_battle_text('status_principles')}: {restored}")
             lines.append("")
-            lines.append(f"• Gold: {gold}")
-            lines.append(f"• Heiltränke: {potions}")
+            lines.append(f"• {_battle_text('status_gold')}: {gold}")
+            lines.append(f"• {_battle_text('status_potions')}: {potions}")
             if combat_achievements:
                 lines.append("")
-                lines.append("• Kampf-Erfolge:")
+                lines.append(f"• {_battle_text('status_achievements')}:")
                 for key in combat_achievements:
                     title = self.core._combat_achievement_catalog().get(key, key)
                     lines.append(f"  - {title}")
             lines.append("")
-            lines.append("Tipp: Die XP-Leiste siehst du im Terminal nach jeder Nachricht. 🌀")
+            lines.append(_battle_text("status_tip"))
 
             return True, "\n".join(lines)
 
@@ -2240,36 +2719,33 @@ class Plugin:
                 try:
                     amount = int(parts[3])
                 except ValueError:
-                    return True, "Bitte gib eine gültige Anzahl an: `/shop buy potion 1`"
+                    return True, _battle_text("shop_invalid_amount")
 
                 if amount <= 0:
-                    return True, "Die Anzahl muss größer als 0 sein."
+                    return True, _battle_text("shop_amount_positive")
 
                 cost = 25 * amount
                 if gold < cost:
-                    return True, f"Du hast nicht genug Gold. ({gold} / {cost})"
+                    return True, _battle_text("shop_not_enough", gold=gold, cost=cost)
 
                 # Kauf durchführen
                 p["gold"] = gold - cost
                 p["potions"] = potions + amount
                 self.core.state.save()
 
-                return True, (
-                    f"🛒 Du kaufst {amount} Heiltrank/Heiltränke für {cost} Gold.\n"
-                    f"Gold: {p['gold']} | Tränke: {p['potions']}"
-                )
+                return True, _battle_text("shop_buy", amount=amount, cost=cost, gold=p["gold"], potions=p["potions"])
 
             # Nur Shop-Übersicht
             lines = []
-            lines.append("🏪 **MAAT-RPG Laden**")
+            lines.append(_battle_text("shop_title"))
             lines.append("")
-            lines.append(f"Gold: {gold}")
-            lines.append(f"Heiltränke im Inventar: {potions}")
+            lines.append(f"{_battle_text('status_gold')}: {gold}")
+            lines.append(_battle_text("shop_inventory", potions=potions))
             lines.append("")
-            lines.append("Verfügbare Items:")
-            lines.append("  • Heiltrank – 25 Gold (stellt 50% deiner Max-HP wieder her)")
+            lines.append(_battle_text("shop_items"))
+            lines.append(_battle_text("shop_potion_item"))
             lines.append("")
-            lines.append("Kaufen mit: `/shop buy potion 1` oder `/shop buy potion 3`")
+            lines.append(_battle_text("shop_buy_hint"))
 
             return True, "\n".join(lines)
 
@@ -2284,13 +2760,13 @@ class Plugin:
 
         potions = p.get("potions", 0)
         if potions <= 0:
-            return "🧪 Du hast keinen Heiltrank im Inventar."
+            return _battle_text("potion_none")
 
         max_hp = p.get("max_hp", 100)
         hp = p.get("hp", max_hp)
 
         if hp >= max_hp:
-            return f"Du bist bereits voll geheilt. (HP: {hp}/{max_hp})"
+            return _battle_text("potion_full", hp=hp, max_hp=max_hp)
 
         heal_amount = max_hp // 2  # 50% Max-HP
         new_hp = min(max_hp, hp + heal_amount)
@@ -2299,10 +2775,7 @@ class Plugin:
         p["hp"] = new_hp
         self.core.state.save()
 
-        return (
-            f"🧪 Du trinkst einen Heiltrank und regenerierst {new_hp - hp} HP.\n"
-            f"HP: {new_hp}/{max_hp}  |  Tränke: {p['potions']}"
-        )
+        return _battle_text("potion_used", heal=new_hp - hp, hp=new_hp, max_hp=max_hp, potions=p["potions"])
 
     # -------------------------------------------------
     # HUD: HP-Leiste + Level + Titel
@@ -2407,16 +2880,20 @@ class Plugin:
 
         lines = [
             f"❤️ HP {hp}/{max_hp}  {bar}",
-            f"📘 Level {level} — {title}",
-            f"⚔️ Siege: {fights}  |  Boss-Siege: {boss_wins}",
-            f"💰 Gold: {gold}  |  🧪 Tränke: {potions}",
+            f"📘 {_battle_text('status_level')} {level} — {title}",
+            f"⚔️ {_battle_text('hud_wins')}: {fights}  |  {_battle_text('hud_boss_wins')}: {boss_wins}",
+            f"💰 {_battle_text('status_gold')}: {gold}  |  🧪 {_battle_text('status_potions')}: {potions}",
         ]
 
         if story_profile:
-            lines.append(f"🜂 Pfad: {story_profile.get('title', 'Unbestimmt')} — {story_profile.get('rank', 'Erwachend')}")
+            lines.append(
+                f"🜂 {_battle_text('hud_path')}: "
+                f"{story_profile.get('title', _battle_text('status_unknown'))} — "
+                f"{story_profile.get('rank', 'Erwachend')}"
+            )
 
         if restored > 0:
-            lines.append(f"🌿 Wiederhergestellte Maat-Prinzipien: {restored}")
+            lines.append(f"🌿 {_battle_text('hud_principles')}: {restored}")
 
         return "\n".join(lines)
     # -----------------------------------------------------
@@ -2580,17 +3057,19 @@ class Plugin:
         if isinstance(context, dict):
             merged.update(context)
 
-        merged.setdefault(
-            "narrative_prepend",
-            (
-                "🧪 Dies ist ein Testkampf. Er demonstriert gezielt Kernfunktionen wie "
-                "Resonanz, Schild, Spezialattacken, Auren und Heilung."
-            ),
-        )
+        guide_texts = {
+            "normal": _battle_text("guide_intro_normal"),
+            "boss": _battle_text("guide_intro_boss"),
+            "final": _battle_text("guide_intro_final"),
+        }
+        merged.setdefault("narrative_prepend", guide_texts.get(mode, guide_texts["normal"]))
         merged.setdefault(
             "maat_fields",
             {"H": 0.8, "B": 0.8, "S": 0.9, "V": 0.7, "R": 1.0},
         )
+        if mode in ("normal", "final"):
+            merged.setdefault("guide_mode", True)
+            merged.setdefault("no_hp_loss", True)
 
         if mode == "normal":
             merged.setdefault(
@@ -2601,6 +3080,11 @@ class Plugin:
             merged.setdefault(
                 "scripted_actions",
                 ["3", "1", "3", "5", "4", "1", "3", "1", "5", "2", "1"],
+            )
+        elif mode == "final":
+            merged.setdefault(
+                "scripted_actions",
+                ["3", "1", "1", "5", "3", "1", "4", "5", "3", "1", "1", "5"],
             )
         return merged
     #--------------------------------

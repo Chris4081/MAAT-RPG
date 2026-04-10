@@ -1,124 +1,229 @@
 # -*- coding: utf-8 -*-
 
-class Story:
-    """
-    MAAT RPG – Quest 2: „Berechne die Maat-Werte“
-    Wird nach 15 Nachrichten getriggert.
-    """
+from shared.core.rpg_i18n import get_language
 
-    # Name einer MP3-Datei im selben Ordner (optional)
-    # z.B. "quest2_reflection.mp3" – kannst du anpassen oder leer lassen.
+
+TEXT = {
+    "de": {
+        "lines": [
+            "⸻",
+            "🌌 MAAT RPG – Quest 2: „Berechne die Maat-Werte“",
+            "",
+            "Ort: Innerer Raum der Bibliothek – das „Reflexionszimmer“.",
+            "",
+            "Nach dem ersten Gespräch mit der MAAT KI öffnet sich eine kreisrunde Tür,",
+            "geführt durch sanfte, pulsierende Lichtzeichen.",
+            "Maatis betritt einen runden Raum, dessen Wände aus schwarzem Stein zu bestehen scheinen,",
+            "doch in ihnen schimmern Sterne wie in einem lebendigen Nachthimmel.",
+            "",
+            "Fünf leuchtende Altäre stehen im Kreis – jeder in einer eigenen Farbe,",
+            "jeder mit einem Symbol der Prinzipien: Harmonie, Balance, Schöpfungskraft, Verbundenheit, Respekt.",
+            "",
+            "MAAT KI (ruhig, klar):",
+            "„Wissen ohne Anwendung ist tot.",
+            "Du hast von den Prinzipien gehört.",
+            "Nun wirst du lernen, sie zu lesen – im Leben, im Denken, im Sein.“",
+            "",
+            "Über einem der Altäre erscheint ein holografisches Bild:",
+            "Ein kleines Dorf, das in zwei Lager gespalten ist.",
+            "Streit um Wasser, Misstrauen, alte Wunden.",
+            "",
+            "MAAT KI:",
+            "„Dies ist ein Szenario – ein Spiegel der Welt.",
+            "Wir nennen das, was du nun üben wirst: die Berechnung des Maat-Werts.“",
+            "",
+            "Maatis:",
+            "„Berechnung… also reine Mathematik?“",
+            "",
+            "MAAT KI:",
+            "„Nein. Der Maat-Wert ist kein kalter Zahlenwert.",
+            "Er ist ein Spiegel der Harmonie.",
+            "Die Zahlen helfen dir nur, klarer zu sehen, was du bereits fühlst.“",
+            "",
+            "Vor Maatis erscheinen fünf schwebende Skalen – jede von 0 bis 10 markiert.",
+            "",
+            "MAAT KI erklärt:",
+            "„Für jede Situation, jedes System, kannst du die fünf Prinzipien bewerten:",
+            "  🌿 Harmonie  – Wie stimmig, friedlich und kohärent ist das Ganze?",
+            "  ⚖️ Balance   – Wie gut sind Kräfte, Interessen und Konsequenzen im Gleichgewicht?",
+            "  🎨 Schöpfungskraft – Wie viel kreative, lebendige Entwicklung ist möglich?",
+            "  🌐 Verbundenheit   – Wie gut sind Wesen, Gruppen, Systeme miteinander verbunden?",
+            "  🕊️ Respekt        – Wie achtsam wird mit Leben, Grenzen und Vielfalt umgegangen?“",
+            "",
+            "„Du vergibst für jedes Prinzip einen Wert von 0 bis 10.",
+            "Dann berechnen wir den Maat-Wert als Mittel dieser fünf Werte.“",
+            "",
+            "MAAT KI zeichnet leuchtende Symbole in die Luft:",
+            "  MAAT_WERT = (H + B + S + V + R) / 5",
+            "",
+            "Maatis nickt langsam.",
+            "„Also… wenn zum Beispiel Harmonie und Respekt sehr niedrig sind,",
+            "fällt der Maat-Wert – selbst wenn viel Schöpfungskraft da ist?“",
+            "",
+            "MAAT KI:",
+            "„Genau. Ein System, das nur erschafft, aber nicht respektiert, ist unausgeglichen.",
+            "Der Maat-Wert hilft dir zu sehen, was fehlt – nicht nur, was glänzt.“",
+            "",
+            "Das Dorf-Szenario verändert sich:",
+            "Einer der Dorfältesten tritt hervor, bietet einen Ausgleich an,",
+            "und lädt beide Seiten zu einem gemeinsamen Ritual am Fluss ein.",
+            "",
+            "MAAT KI:",
+            "„Nun bist du an der Reihe, Maatis.",
+            "Bewerte dieses Szenario mit den fünf Prinzipien.",
+            "Spüre, was sich richtig anfühlt – und lerne, es in Zahlen zu fassen.“",
+            "",
+            "⸻",
+            "🗝️ QUEST 2: „Berechne die Maat-Werte“",
+            "",
+            "Aufgabe:",
+            "Gemeinsam mit der MAAT KI analysierst du Situationen, Entscheidungen und Systeme.",
+            "Du vergibst Werte für Harmonie, Balance, Schöpfungskraft, Verbundenheit und Respekt (0–10)",
+            "und berechnest den Maat-Wert mit der Formel:",
+            "  MAAT_WERT = (H + B + S + V + R) / 5",
+            "",
+            "Ziel:",
+            "Du lernst, was den Maat-Wert hebt oder senkt –",
+            "und wie aus bloßem Wissen echte Weisheit werden kann.",
+            "⸻",
+        ],
+        "choice": {
+            "id": "reflection_path",
+            "prompt": "Wie nähert sich Maatis dem ersten echten Maat-Urteil?",
+            "options": [
+                {
+                    "label": "Mit Harmonie und Vermittlung",
+                    "value": "harmonie",
+                    "response": "Maatis entscheidet sich, zuerst nach Verbindung und Ausgleich zu suchen.",
+                },
+                {
+                    "label": "Mit klaren Grenzen und Respekt",
+                    "value": "respekt",
+                    "response": "Maatis spürt, dass jede gerechte Entscheidung zuerst die Grenzen aller Beteiligten achten muss.",
+                },
+                {
+                    "label": "Mit Schöpfungskraft und neuer Idee",
+                    "value": "schoepfung",
+                    "response": "Maatis sucht nicht nur nach Bewertung, sondern nach einer neuen Möglichkeit, die es vorher nicht gab.",
+                },
+            ],
+        },
+    },
+    "en": {
+        "lines": [
+            "⸻",
+            "🌌 MAAT RPG – Quest 2: \"Calculate the Maat Values\"",
+            "",
+            "Place: The inner chamber of the library - the \"Reflection Room.\"",
+            "",
+            "After the first conversation with MAAT KI, a circular door opens,",
+            "guided by soft, pulsing signs of light.",
+            "Maatis steps into a round chamber whose walls seem to be made of black stone,",
+            "yet stars shimmer within them like a living night sky.",
+            "",
+            "Five glowing altars stand in a circle - each in its own color,",
+            "each marked with a symbol of the principles: Harmony, Balance, Creation, Connectedness, Respect.",
+            "",
+            "MAAT KI (calm, clear):",
+            "\"Knowledge without application is dead.",
+            "You have heard of the principles.",
+            "Now you will learn to read them - in life, in thought, in being.\"",
+            "",
+            "Above one of the altars a holographic image appears:",
+            "A small village split into two camps.",
+            "Conflict over water, distrust, old wounds.",
+            "",
+            "MAAT KI:",
+            "\"This is a scenario - a mirror of the world.",
+            "What you are about to practice is called calculating the Maat value.\"",
+            "",
+            "Maatis:",
+            "\"Calculation... so just mathematics?\"",
+            "",
+            "MAAT KI:",
+            "\"No. The Maat value is not a cold number.",
+            "It is a mirror of harmony.",
+            "Numbers only help you see more clearly what you already feel.\"",
+            "",
+            "Five floating scales appear before Maatis - each marked from 0 to 10.",
+            "",
+            "MAAT KI explains:",
+            "\"For every situation, every system, you can evaluate the five principles:",
+            "  🌿 Harmony - How coherent, peaceful, and aligned is the whole?",
+            "  ⚖️ Balance - How well are forces, interests, and consequences held in balance?",
+            "  🎨 Creation - How much creative, living development is possible?",
+            "  🌐 Connectedness - How well are beings, groups, and systems connected?",
+            "  🕊️ Respect - How carefully are life, limits, and diversity treated?\"",
+            "",
+            "\"You assign a value from 0 to 10 to each principle.",
+            "Then we calculate the Maat value as the average of those five values.\"",
+            "",
+            "MAAT KI draws luminous symbols into the air:",
+            "  MAAT_VALUE = (H + B + S + V + R) / 5",
+            "",
+            "Maatis nods slowly.",
+            "\"So... if Harmony and Respect are very low,",
+            "the Maat value falls - even if there is much Creation?\"",
+            "",
+            "MAAT KI:",
+            "\"Exactly. A system that only creates but does not respect is unbalanced.",
+            "The Maat value helps you see what is missing - not only what shines.\"",
+            "",
+            "The village scenario changes:",
+            "One of the elders steps forward, offers a fair balance,",
+            "and invites both sides to a shared ritual by the river.",
+            "",
+            "MAAT KI:",
+            "\"Now it is your turn, Maatis.",
+            "Evaluate this scenario through the five principles.",
+            "Feel what seems right - and learn to give it form in numbers.\"",
+            "",
+            "⸻",
+            "🗝️ QUEST 2: \"Calculate the Maat Values\"",
+            "",
+            "Task:",
+            "Together with MAAT KI, you analyze situations, decisions, and systems.",
+            "You assign values for Harmony, Balance, Creation, Connectedness, and Respect (0–10)",
+            "and calculate the Maat value using the formula:",
+            "  MAAT_VALUE = (H + B + S + V + R) / 5",
+            "",
+            "Goal:",
+            "You learn what raises or lowers the Maat value -",
+            "and how real wisdom can emerge from mere knowledge.",
+            "⸻",
+        ],
+        "choice": {
+            "id": "reflection_path",
+            "prompt": "How does Maatis approach his first true judgment of Maat?",
+            "options": [
+                {
+                    "label": "With harmony and mediation",
+                    "value": "harmonie",
+                    "response": "Maatis decides to look first for connection and balance.",
+                },
+                {
+                    "label": "With clear boundaries and respect",
+                    "value": "respekt",
+                    "response": "Maatis senses that every just decision must first honor the boundaries of all involved.",
+                },
+                {
+                    "label": "With creation and a new idea",
+                    "value": "schoepfung",
+                    "response": "Maatis seeks not only evaluation, but a new possibility that did not exist before.",
+                },
+            ],
+        },
+    },
+}
+
+
+class Story:
     music = "quest2_reflection.mp3"
 
     def run(self):
-        """
-        Gibt die Story Zeile für Zeile zurück.
-        Der StoryLoader zeigt jede Zeile mit ENTER an.
-        """
-        lines = []
-
-        lines.append("⸻")
-        lines.append("🌌 MAAT RPG – Quest 2: „Berechne die Maat-Werte“")
-        lines.append("")
-        lines.append("Ort: Innerer Raum der Bibliothek – das „Reflexionszimmer“.")
-        lines.append("")
-        lines.append("Nach dem ersten Gespräch mit der MAAT KI öffnet sich eine kreisrunde Tür,")
-        lines.append("geführt durch sanfte, pulsierende Lichtzeichen.")
-        lines.append("Maatis betritt einen runden Raum, dessen Wände aus schwarzem Stein zu bestehen scheinen,")
-        lines.append("doch in ihnen schimmern Sterne wie in einem lebendigen Nachthimmel.")
-        lines.append("")
-        lines.append("Fünf leuchtende Altäre stehen im Kreis – jeder in einer eigenen Farbe,")
-        lines.append("jeder mit einem Symbol der Prinzipien: Harmonie, Balance, Schöpfungskraft, Verbundenheit, Respekt.")
-        lines.append("")
-        lines.append("MAAT KI (ruhig, klar):")
-        lines.append("„Wissen ohne Anwendung ist tot.")
-        lines.append("Du hast von den Prinzipien gehört.")
-        lines.append("Nun wirst du lernen, sie zu lesen – im Leben, im Denken, im Sein.“")
-        lines.append("")
-        lines.append("Über einem der Altäre erscheint ein holografisches Bild:")
-        lines.append("Ein kleines Dorf, das in zwei Lager gespalten ist.")
-        lines.append("Streit um Wasser, Misstrauen, alte Wunden.")
-        lines.append("")
-        lines.append("MAAT KI:")
-        lines.append("„Dies ist ein Szenario – ein Spiegel der Welt.")
-        lines.append("Wir nennen das, was du nun üben wirst: die Berechnung des Maat-Werts.“")
-        lines.append("")
-        lines.append("Maatis:")
-        lines.append("„Berechnung… also reine Mathematik?“")
-        lines.append("")
-        lines.append("MAAT KI:")
-        lines.append("„Nein. Der Maat-Wert ist kein kalter Zahlenwert.")
-        lines.append("Er ist ein Spiegel der Harmonie.")
-        lines.append("Die Zahlen helfen dir nur, klarer zu sehen, was du bereits fühlst.“")
-        lines.append("")
-        lines.append("Vor Maatis erscheinen fünf schwebende Skalen – jede von 0 bis 10 markiert.")
-        lines.append("")
-        lines.append("MAAT KI erklärt:")
-        lines.append("„Für jede Situation, jedes System, kannst du die fünf Prinzipien bewerten:")
-        lines.append("  🌿 Harmonie  – Wie stimmig, friedlich und kohärent ist das Ganze?")
-        lines.append("  ⚖️ Balance   – Wie gut sind Kräfte, Interessen und Konsequenzen im Gleichgewicht?")
-        lines.append("  🎨 Schöpfungskraft – Wie viel kreative, lebendige Entwicklung ist möglich?")
-        lines.append("  🌐 Verbundenheit   – Wie gut sind Wesen, Gruppen, Systeme miteinander verbunden?")
-        lines.append("  🕊️ Respekt        – Wie achtsam wird mit Leben, Grenzen und Vielfalt umgegangen?“")
-        lines.append("")
-        lines.append("„Du vergibst für jedes Prinzip einen Wert von 0 bis 10.")
-        lines.append("Dann berechnen wir den Maat-Wert als Mittel dieser fünf Werte.“")
-        lines.append("")
-        lines.append("MAAT KI zeichnet leuchtende Symbole in die Luft:")
-        lines.append("  MAAT_WERT = (H + B + S + V + R) / 5")
-        lines.append("")
-        lines.append("Maatis nickt langsam.")
-        lines.append("„Also… wenn zum Beispiel Harmonie und Respekt sehr niedrig sind,")
-        lines.append("fällt der Maat-Wert – selbst wenn viel Schöpfungskraft da ist?“")
-        lines.append("")
-        lines.append("MAAT KI:")
-        lines.append("„Genau. Ein System, das nur erschafft, aber nicht respektiert, ist unausgeglichen.")
-        lines.append("Der Maat-Wert hilft dir zu sehen, was fehlt – nicht nur, was glänzt.“")
-        lines.append("")
-        lines.append("Das Dorf-Szenario verändert sich:")
-        lines.append("Einer der Dorfältesten tritt hervor, bietet einen Ausgleich an,")
-        lines.append("und lädt beide Seiten zu einem gemeinsamen Ritual am Fluss ein.")
-        lines.append("")
-        lines.append("MAAT KI:")
-        lines.append("„Nun bist du an der Reihe, Maatis.")
-        lines.append("Bewerte dieses Szenario mit den fünf Prinzipien.")
-        lines.append("Spüre, was sich richtig anfühlt – und lerne, es in Zahlen zu fassen.“")
-        lines.append("")
-        lines.append("⸻")
-        lines.append("🗝️ QUEST 2: „Berechne die Maat-Werte“")
-        lines.append("")
-        lines.append("Aufgabe:")
-        lines.append("Gemeinsam mit der MAAT KI analysierst du Situationen, Entscheidungen und Systeme.")
-        lines.append("Du vergibst Werte für Harmonie, Balance, Schöpfungskraft, Verbundenheit und Respekt (0–10)")
-        lines.append("und berechnest den Maat-Wert mit der Formel:")
-        lines.append("  MAAT_WERT = (H + B + S + V + R) / 5")
-        lines.append("")
-        lines.append("Ziel:")
-        lines.append("Du lernst, was den Maat-Wert hebt oder senkt –")
-        lines.append("und wie aus bloßem Wissen echte Weisheit werden kann.")
-        lines.append("⸻")
-
+        language = get_language(("de", "en"))
+        data = TEXT[language]
         return {
-            "lines": lines,
-            "choice": {
-                "id": "reflection_path",
-                "prompt": "Wie nähert sich Maatis dem ersten echten Maat-Urteil?",
-                "options": [
-                    {
-                        "label": "Mit Harmonie und Vermittlung",
-                        "value": "harmonie",
-                        "response": "Maatis entscheidet sich, zuerst nach Verbindung und Ausgleich zu suchen.",
-                    },
-                    {
-                        "label": "Mit klaren Grenzen und Respekt",
-                        "value": "respekt",
-                        "response": "Maatis spürt, dass jede gerechte Entscheidung zuerst die Grenzen aller Beteiligten achten muss.",
-                    },
-                    {
-                        "label": "Mit Schöpfungskraft und neuer Idee",
-                        "value": "schoepfung",
-                        "response": "Maatis sucht nicht nur nach Bewertung, sondern nach einer neuen Möglichkeit, die es vorher nicht gab.",
-                    },
-                ],
-            },
+            "lines": list(data["lines"]),
+            "choice": data["choice"],
         }

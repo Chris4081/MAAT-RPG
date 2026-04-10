@@ -18,6 +18,7 @@ import sqlite3
 import os
 import re
 from pathlib import Path
+from shared.core.rpg_i18n import get_language
 
 class Plugin:
     type = "chat"
@@ -26,17 +27,23 @@ class Plugin:
     # COMMAND LIST → Damit es in /help erscheint!
     # -----------------------------------------------------
     commands = {
-        "/time": "Zeigt die aktuelle Zeit",
-        "/zeit": "Alias für /time",
-        "/runtime": "Zeit seit letzter Antwort",
-        "/laufzeit": "Alias für /runtime",
-        "/timeinfo": "Vollständiger Zeitkontext",
-        "/zeitkontext": "Alias für /timeinfo",
-        "/timelog": "Zeigt die letzten Time-Memory Einträge",
-        "/time topic": "Zeigt Zeit seit letzter Erwähnung eines Themas",
-        "/time stats": "Statistiken über das Time-Memory",
-        "/timestats": "Alias für /time stats"
+        "/time": {"de": "Zeigt die aktuelle Zeit.", "en": "Shows the current time."},
+        "/zeit": {"de": "Alias fuer /time.", "en": "Alias for /time."},
+        "/runtime": {"de": "Zeit seit der letzten Antwort.", "en": "Time since the last response."},
+        "/laufzeit": {"de": "Alias fuer /runtime.", "en": "Alias for /runtime."},
+        "/timeinfo": {"de": "Vollstaendiger Zeitkontext.", "en": "Full time context."},
+        "/zeitkontext": {"de": "Alias fuer /timeinfo.", "en": "Alias for /timeinfo."},
+        "/timelog": {"de": "Zeigt die letzten Time-Memory-Eintraege.", "en": "Shows the latest time-memory entries."},
+        "/time topic": {"de": "Zeigt die Zeit seit der letzten Erwaehnung eines Themas.", "en": "Shows the time since a topic was last mentioned."},
+        "/time stats": {"de": "Statistiken ueber das Time-Memory.", "en": "Statistics about time memory."},
+        "/timestats": {"de": "Alias fuer /time stats.", "en": "Alias for /time stats."}
     }
+
+    def _lang(self):
+        return get_language(("de", "en"))
+
+    def _t(self, de: str, en: str) -> str:
+        return en if self._lang() == "en" else de
 
     def __init__(self):
         # Zeitpunkt der letzten Antwort
@@ -191,10 +198,10 @@ class Plugin:
         if c in ("/time", "/zeit"):
             now = datetime.datetime.now()
             msg = (
-                "⏰ **Aktuelle Zeit**\n"
-                f"- Uhrzeit: {now.strftime('%H:%M:%S')}\n"
-                f"- Datum:   {now.strftime('%d.%m.%Y')}\n"
-                f"- Tag:     {now.strftime('%A')}\n"
+                self._t("⏰ **Aktuelle Zeit**\n", "⏰ **Current Time**\n")
+                + f"- {self._t('Uhrzeit', 'Time')}: {now.strftime('%H:%M:%S')}\n"
+                + f"- {self._t('Datum', 'Date')}:   {now.strftime('%d.%m.%Y')}\n"
+                + f"- {self._t('Tag', 'Day')}:     {now.strftime('%A')}\n"
             )
             return msg
 
@@ -206,9 +213,9 @@ class Plugin:
             diff = now_ts - self.last_timestamp
             feeling = self._runtime_feeling(diff)
             return (
-                "⌛ **Seit letzter Antwort**\n"
-                f"- Sekunden: {diff:.1f}\n"
-                f"- Gefühl:   {feeling}\n"
+                self._t("⌛ **Seit letzter Antwort**\n", "⌛ **Since Last Response**\n")
+                + f"- {self._t('Sekunden', 'Seconds')}: {diff:.1f}\n"
+                + f"- {self._t('Gefuehl', 'Feeling')}:   {feeling}\n"
             )
 
         # ------------------------------
@@ -221,12 +228,12 @@ class Plugin:
             feeling = self._runtime_feeling(diff)
 
             msg = (
-                "🧭 **MAAT-Zeitkontext**\n"
-                f"- Uhrzeit: {now.strftime('%H:%M:%S')}\n"
-                f"- Datum:   {now.strftime('%d.%m.%Y')}\n"
-                f"- Tag:     {now.strftime('%A')}\n"
-                f"- Seit letzter Antwort: {diff:.1f} s\n"
-                f"- Gefühl: {feeling}\n"
+                self._t("🧭 **MAAT-Zeitkontext**\n", "🧭 **MAAT Time Context**\n")
+                + f"- {self._t('Uhrzeit', 'Time')}: {now.strftime('%H:%M:%S')}\n"
+                + f"- {self._t('Datum', 'Date')}:   {now.strftime('%d.%m.%Y')}\n"
+                + f"- {self._t('Tag', 'Day')}:     {now.strftime('%A')}\n"
+                + f"- {self._t('Seit letzter Antwort', 'Since last response')}: {diff:.1f} s\n"
+                + f"- {self._t('Gefuehl', 'Feeling')}: {feeling}\n"
             )
             return msg
 
@@ -241,9 +248,9 @@ class Plugin:
             conn.close()
 
             if not rows:
-                return "📭 Kein Time-Memory gespeichert."
+                return self._t("📭 Kein Time-Memory gespeichert.", "📭 No time memory stored.")
 
-            out = ["🧠 **Letzte Time-Memory Einträge:**\n"]
+            out = [self._t("🧠 **Letzte Time-Memory Eintraege:**\n", "🧠 **Latest Time Memory Entries:**\n")]
             for ts, text, topic in rows:
                 dt = datetime.datetime.fromtimestamp(ts).strftime("%H:%M:%S")
                 out.append(f"- [{dt}] ({topic}): {text}")
@@ -256,7 +263,7 @@ class Plugin:
         if c in ("/time stats", "/timestats"):
             stats = self._compute_stats()
             if not stats or stats["total"] == 0:
-                return "📭 Noch keine Time-Memory-Daten vorhanden."
+                return self._t("📭 Noch keine Time-Memory-Daten vorhanden.", "📭 No time memory data available yet.")
 
             total = stats["total"]
             today = stats["today"]
@@ -264,24 +271,24 @@ class Plugin:
             top_topics = stats["top_topics"]
 
             if avg_gap is None:
-                gap_str = "nicht bestimmbar (zu wenige Einträge)"
+                gap_str = self._t("nicht bestimmbar (zu wenige Eintraege)", "not determinable (too few entries)")
             else:
-                gap_str = f"{avg_gap:.1f} Sekunden"
+                gap_str = self._t(f"{avg_gap:.1f} Sekunden", f"{avg_gap:.1f} seconds")
 
             out = [
-                "📊 **MAAT Time-Memory Statistiken**",
-                f"- Gesamtanzahl Events: {total}",
-                f"- Events heute:        {today}",
-                f"- Ø Abstand zw. Events: {gap_str}",
+                self._t("📊 **MAAT Time-Memory Statistiken**", "📊 **MAAT Time Memory Statistics**"),
+                f"- {self._t('Gesamtanzahl Events', 'Total events')}: {total}",
+                f"- {self._t('Events heute', 'Events today')}:        {today}",
+                f"- {self._t('Ø Abstand zw. Events', 'Ø gap between events')}: {gap_str}",
                 "",
-                "🏷️ Top-Themen:"
+                self._t("🏷️ Top-Themen:", "🏷️ Top topics:")
             ]
 
             if top_topics:
                 for topic, cnt in top_topics:
-                    out.append(f"  • {topic} — {cnt}× erwähnt")
+                    out.append(self._t(f"  • {topic} — {cnt}× erwaehnt", f"  • {topic} — mentioned {cnt}×"))
             else:
-                out.append("  • keine Themen erkannt")
+                out.append(self._t("  • keine Themen erkannt", "  • no topics detected"))
 
             return "\n".join(out)
 
@@ -291,7 +298,7 @@ class Plugin:
         if c.startswith("/time topic"):
             parts = c.split(" ", 2)
             if len(parts) < 3:
-                return "Nutze: `/time topic begriff`"
+                return self._t("Nutze: `/time topic begriff`", "Use: `/time topic term`")
 
             topic = parts[2].strip().lower()
 
@@ -302,16 +309,16 @@ class Plugin:
             conn.close()
 
             if not row:
-                return f"❌ Kein Time-Memory für Thema **{topic}** gefunden."
+                return self._t(f"❌ Kein Time-Memory fuer Thema **{topic}** gefunden.", f"❌ No time memory found for topic **{topic}**.")
 
             ts_last = row[0]
             diff = time.time() - ts_last
             feeling = self._runtime_feeling(diff)
 
             return (
-                f"🧠 **Zeit seit letzter Erwähnung von '{topic}'**\n"
-                f"- Sekunden: {diff:.1f}\n"
-                f"- Gefühl: {feeling}"
+                self._t(f"🧠 **Zeit seit letzter Erwaehnung von '{topic}'**\n", f"🧠 **Time Since Last Mention of '{topic}'**\n")
+                + f"- {self._t('Sekunden', 'Seconds')}: {diff:.1f}\n"
+                + f"- {self._t('Gefuehl', 'Feeling')}: {feeling}"
             )
 
         return None  # nicht mein Kommando
@@ -331,9 +338,12 @@ class Plugin:
 
         block = (
             "[TIME_CONTEXT]\n"
-            f"{now.strftime('%H:%M:%S')} | {now.strftime('%d.%m.%Y')} | {now.strftime('%A')}\n"
-            f"Seit letzter Antwort: {diff:.1f}s ({feeling})\n"
-            "[/TIME_CONTEXT]"
+            + f"{now.strftime('%H:%M:%S')} | {now.strftime('%d.%m.%Y')} | {now.strftime('%A')}\n"
+            + self._t(
+                f"Seit letzter Antwort: {diff:.1f}s ({feeling})\n",
+                f"Since last response: {diff:.1f}s ({feeling})\n",
+            )
+            + "[/TIME_CONTEXT]"
         )
 
         if context and "conversation" in context:

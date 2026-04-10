@@ -22,10 +22,10 @@ class Plugin:
     # Plugin-Befehle (für CommandRouter / /help)
     # ----------------------------------------------------
     commands = {
-        "/say": "Say-TTS Hilfe anzeigen",
-        "/say on": "Say-TTS aktivieren",
-        "/say off": "Say-TTS deaktivieren",
-        "/say voice": "TTS Stimme ändern (/say voice <Name>)"
+        "/say": {"de": "Zeigt die Say-TTS-Hilfe an.", "en": "Shows Say-TTS help."},
+        "/say on": {"de": "Aktiviert Say-TTS.", "en": "Enables Say-TTS."},
+        "/say off": {"de": "Deaktiviert Say-TTS.", "en": "Disables Say-TTS."},
+        "/say voice": {"de": "Aendert die TTS-Stimme (/say voice <Name>).", "en": "Changes the TTS voice (/say voice <Name>)."}
     }
 
     def __init__(self):

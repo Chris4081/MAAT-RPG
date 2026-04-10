@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 import json
+from shared.core.rpg_i18n import get_language
 
 # plugin_main.py (ganz oben, nach imports)
 
@@ -192,13 +193,25 @@ class Plugin:
 
         # Kommandos, die in /help auftauchen sollen
         self.commands = {
-            "/quests": "Zeigt verfügbare, aktive und abgeschlossene Quests.",
-            "/quest": "Quest annehmen oder Details anzeigen (z.B. /quest accept 1).",
+            "/quests": {
+                "de": "Zeigt verfuegbare, aktive und abgeschlossene Quests.",
+                "en": "Shows available, active, and completed quests.",
+            },
+            "/quest": {
+                "de": "Quest annehmen oder Details anzeigen (z. B. /quest accept 1).",
+                "en": "Accept a quest or show details (e.g. /quest accept 1).",
+            },
         }
 
         # interner Quest-State
         self._ensure_state()
         self._ensure_default_quests()
+
+    def _lang(self):
+        return get_language(("de", "en"))
+
+    def _t(self, de: str, en: str) -> str:
+        return en if self._lang() == "en" else de
 
     # -------------------------------------------------
     # STATE INITIALISIEREN
@@ -309,12 +322,12 @@ class Plugin:
             elif args[0] in ("done", "completed", "c"):
                 mode = "done"
 
-        lines = ["📜 Quests"]
+        lines = [self._t("📜 Quests", "📜 Quests")]
 
         if mode in ("all", "available"):
-            lines.append("\n✨ Verfügbare Quests:")
+            lines.append(self._t("\n✨ Verfuegbare Quests:", "\n✨ Available quests:"))
             if not self.qstate["available"]:
-                lines.append("  (Keine)")
+                lines.append(self._t("  (Keine)", "  (None)"))
             else:
                 for i, q in enumerate(self.qstate["available"], start=1):
                     lines.append(
@@ -322,9 +335,9 @@ class Plugin:
                     )
 
         if mode in ("all", "active"):
-            lines.append("\n🔥 Aktive Quests:")
+            lines.append(self._t("\n🔥 Aktive Quests:", "\n🔥 Active quests:"))
             if not self.qstate["active"]:
-                lines.append("  (Keine)")
+                lines.append(self._t("  (Keine)", "  (None)"))
             else:
                 for i, q in enumerate(self.qstate["active"], start=1):
                     progress = self._quest_progress_text(q)
@@ -333,9 +346,9 @@ class Plugin:
                     )
 
         if mode in ("all", "done"):
-            lines.append("\n🏁 Abgeschlossene Quests:")
+            lines.append(self._t("\n🏁 Abgeschlossene Quests:", "\n🏁 Completed quests:"))
             if not self.qstate["completed"]:
-                lines.append("  (Noch keine abgeschlossen)")
+                lines.append(self._t("  (Noch keine abgeschlossen)", "  (None completed yet)"))
             else:
                 for i, q in enumerate(self.qstate["completed"], start=1):
                     lines.append(f"  {i}) [{q['id']}] {q['name']}")
@@ -353,10 +366,10 @@ class Plugin:
         """
         if not args:
             return (
-                "Verwendung:\n"
-                "  /quest accept <id|nr>  – Quest annehmen\n"
-                "  /quest info <id|nr>    – Quest-Details anzeigen\n"
-                "Nutze /quests, um alle IDs und Nummern zu sehen."
+                self._t(
+                    "Verwendung:\n  /quest accept <id|nr>  - Quest annehmen\n  /quest info <id|nr>    - Quest-Details anzeigen\nNutze /quests, um alle IDs und Nummern zu sehen.",
+                    "Usage:\n  /quest accept <id|nr>  - Accept a quest\n  /quest info <id|nr>    - Show quest details\nUse /quests to see all IDs and numbers.",
+                )
             )
 
         sub = args[0]
@@ -370,7 +383,7 @@ class Plugin:
         # ----------------------------
         if sub == "accept":
             if not qid:
-                return "Bitte Quest-ID oder Nummer angeben: /quest accept <id|nr>"
+                return self._t("Bitte Quest-ID oder Nummer angeben: /quest accept <id|nr>", "Please provide a quest ID or number: /quest accept <id|nr>")
 
             q = None
 
@@ -385,7 +398,7 @@ class Plugin:
                 q = self._find_quest_in_list(self.qstate["available"], qid)
 
             if not q:
-                return f"Keine verfügbare Quest mit ID/Nummer '{qid}'."
+                return self._t(f"Keine verfuegbare Quest mit ID/Nummer '{qid}'.", f"No available quest with ID/number '{qid}'.")
 
             # nach active verschieben (flache Kopie)
             self.qstate["available"].remove(q)
@@ -393,14 +406,14 @@ class Plugin:
             if active_q.get("type") in ("counter", "daily_streak"):
                 active_q["progress"] = 0
             self.qstate["active"].append(active_q)
-            return f"✅ Quest '{active_q['name']}' angenommen."
+            return self._t(f"✅ Quest '{active_q['name']}' angenommen.", f"✅ Quest '{active_q['name']}' accepted.")
 
         # ----------------------------
         # /quest info <id|nr>
         # ----------------------------
         if sub == "info":
             if not qid:
-                return "Bitte Quest-ID oder Nummer angeben: /quest info <id|nr>"
+                return self._t("Bitte Quest-ID oder Nummer angeben: /quest info <id|nr>", "Please provide a quest ID or number: /quest info <id|nr>")
 
             q = None
 
@@ -419,25 +432,25 @@ class Plugin:
                 )
 
             if not q:
-                return f"Keine Quest mit ID/Nummer '{qid}' gefunden."
+                return self._t(f"Keine Quest mit ID/Nummer '{qid}' gefunden.", f"No quest found with ID/number '{qid}'.")
 
             lines = [
-                f"📖 Quest: {q['name']}",
+                f"{self._t('📖 Quest', '📖 Quest')}: {q['name']}",
                 f"ID: {q['id']}",
-                f"Beschreibung: {q.get('desc','')}",
-                f"Typ: {q.get('type','')}",
-                f"Belohnung: {q.get('reward_xp',0)} XP",
+                f"{self._t('Beschreibung', 'Description')}: {q.get('desc','')}",
+                f"{self._t('Typ', 'Type')}: {q.get('type','')}",
+                f"{self._t('Belohnung', 'Reward')}: {q.get('reward_xp',0)} XP",
             ]
             if q in self.qstate["active"]:
-                lines.append(f"Status: AKTIV — {self._quest_progress_text(q)}")
+                lines.append(f"{self._t('Status', 'Status')}: {self._t('AKTIV', 'ACTIVE')} — {self._quest_progress_text(q)}")
             elif q in self.qstate["completed"]:
-                lines.append("Status: ABGESCHLOSSEN")
+                lines.append(f"{self._t('Status', 'Status')}: {self._t('ABGESCHLOSSEN', 'COMPLETED')}")
             else:
-                lines.append("Status: VERFÜGBAR")
+                lines.append(f"{self._t('Status', 'Status')}: {self._t('VERFUEGBAR', 'AVAILABLE')}")
 
             return "\n".join(lines)
 
-        return "Unbekanntes Subkommando. Nutze: /quest accept <id|nr> oder /quest info <id|nr>."
+        return self._t("Unbekanntes Subkommando. Nutze: /quest accept <id|nr> oder /quest info <id|nr>.", "Unknown subcommand. Use: /quest accept <id|nr> or /quest info <id|nr>.")
 
         
     # -------------------------------------------------
@@ -458,20 +471,20 @@ class Plugin:
         if qtype == "daily_streak":
             cur = int(q.get("progress", 0))
             target = int(q.get("required_days") or q.get("days") or 1)
-            return f"Fortschritt: {cur}/{target} Tage"
+            return self._t(f"Fortschritt: {cur}/{target} Tage", f"Progress: {cur}/{target} days")
 
         # ⚔️ Zähler-basierte Quests (first_win, battle_win, three_wins, ten_wins, ...)
         if qtype in ("counter", "battle_win"):
             cur = int(q.get("progress", 0))
             target = int(q.get("target", 1))
-            return f"Fortschritt: {cur}/{target}"
+            return self._t(f"Fortschritt: {cur}/{target}", f"Progress: {cur}/{target}")
 
         # 💬 Chat-Keyword-Quests (Maat-Wert, Mona Lisa, Licht, etc.)
         if qtype == "chat_keyword":
-            return "Hinweis: Erfülle die Bedingung im Chat (Schlüsselwörter verwenden)."
+            return self._t("Hinweis: Erfuelle die Bedingung im Chat (Schluesselwoerter verwenden).", "Hint: Fulfill the condition in chat (use the required keywords).")
 
         # Fallback
-        return "Aktive Quest"
+        return self._t("Aktive Quest", "Active quest")
 
 
         

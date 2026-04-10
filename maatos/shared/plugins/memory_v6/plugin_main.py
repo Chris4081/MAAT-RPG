@@ -22,6 +22,7 @@ from datetime import datetime
 import numpy as np
 import faiss
 import hashlib
+from shared.core.rpg_i18n import get_language
 
 EMBED_DIM = 128
 
@@ -45,12 +46,12 @@ class Plugin:
     type = "chat"
 
     commands = {
-        "/mem6": "MAAT-Memory v6 Übersicht anzeigen",
-        "/mem6 last": "Zeigt letzte 10 Memory-Einträge",
-        "/mem6 search": "Hybrid-Suche (Semantik + Patterns + Keywords)",
-        "/mem6 info": "Informationen zum Memory-System",
-        "/mem6 debug on": "Debug-Modus aktivieren",
-        "/mem6 debug off": "Debug-Modus deaktivieren",
+        "/mem6": {"de": "Zeigt die MAAT-Memory-v6-Uebersicht an.", "en": "Shows the MAAT Memory v6 overview."},
+        "/mem6 last": {"de": "Zeigt die letzten 10 Memory-Eintraege.", "en": "Shows the last 10 memory entries."},
+        "/mem6 search": {"de": "Hybrid-Suche (Semantik + Patterns + Keywords).", "en": "Hybrid search (semantics + patterns + keywords)."},
+        "/mem6 info": {"de": "Informationen zum Memory-System.", "en": "Information about the memory system."},
+        "/mem6 debug on": {"de": "Aktiviert den Debug-Modus.", "en": "Enables debug mode."},
+        "/mem6 debug off": {"de": "Deaktiviert den Debug-Modus.", "en": "Disables debug mode."},
     }
 
     # -------------------------------------------------------
@@ -75,6 +76,12 @@ class Plugin:
         self._init_db()
         self._init_identity()
         self._init_index()
+
+    def _lang(self):
+        return get_language(("de", "en"))
+
+    def _t(self, de: str, en: str) -> str:
+        return en if self._lang() == "en" else de
 
     # -------------------------------------------------------
     # DB init
@@ -312,20 +319,20 @@ class Plugin:
         if text == "/mem6":
             ident = self._load_identity()
             return (
-                "📦 MAAT-Memory v6 Übersicht:\n"
-                f"- Identität: {ident}\n"
-                f"- DB: {self.db_path}\n"
-                f"- Index size: {self.index.ntotal}\n"
+                self._t("📦 MAAT-Memory v6 Uebersicht:\n", "📦 MAAT Memory v6 Overview:\n")
+                + f"- {self._t('Identitaet', 'Identity')}: {ident}\n"
+                + f"- DB: {self.db_path}\n"
+                + f"- {self._t('Indexgroesse', 'Index size')}: {self.index.ntotal}\n"
             )
 
         if text == "/mem6 info":
             return (
-                "ℹ MAAT-Memory v6 System:\n"
-                "- Hybrid-Memory (semantic + pattern + identity)\n"
-                "- Topic-Slots\n"
-                "- Safe Context Injection\n"
-                "- Identity-Store\n"
-                "- Debug-Modus verfügbar"
+                self._t("ℹ MAAT-Memory v6 System:\n", "ℹ MAAT Memory v6 system:\n")
+                + "- Hybrid-Memory (semantic + pattern + identity)\n"
+                + self._t("- Topic-Slots\n", "- Topic slots\n")
+                + self._t("- Safe Context Injection\n", "- Safe context injection\n")
+                + self._t("- Identity-Store\n", "- Identity store\n")
+                + self._t("- Debug-Modus verfuegbar", "- Debug mode available")
             )
 
         if text == "/mem6 last":
@@ -339,9 +346,9 @@ class Plugin:
             conn.close()
 
             if not rows:
-                return "📭 Keine Einträge."
+                return self._t("📭 Keine Eintraege.", "📭 No entries.")
 
-            out = ["🧠 Letzte Memories:\n"]
+            out = [self._t("🧠 Letzte Memories:\n", "🧠 Latest memories:\n")]
             for role, content, slot, ts in rows:
                 out.append(f"[{ts}] ({slot}) {role}: {content}")
 
@@ -350,24 +357,24 @@ class Plugin:
         if text.startswith("/mem6 search "):
             q = text.replace("/mem6 search ", "").strip()
             if not q:
-                return "Bitte Suchwort verwenden: /mem6 search <wort>"
+                return self._t("Bitte Suchwort verwenden: /mem6 search <wort>", "Please use a search term: /mem6 search <word>")
 
             hits = self._search_hybrid(q)
             if not hits:
-                return f"❌ Keine Treffer für: {q}"
+                return self._t(f"❌ Keine Treffer fuer: {q}", f"❌ No matches for: {q}")
 
-            out = [f"🔍 Treffer für: {q}\n"]
+            out = [self._t(f"🔍 Treffer fuer: {q}\n", f"🔍 Matches for: {q}\n")]
             for role, content, slot, ts in hits:
                 out.append(f"[{ts}] ({slot}) {role}: {content}")
             return "\n".join(out)
 
         if text == "/mem6 debug on":
             self.debug = True
-            return "🧪 Debug AN"
+            return self._t("🧪 Debug AN", "🧪 Debug ON")
 
         if text == "/mem6 debug off":
             self.debug = False
-            return "🧪 Debug AUS"
+            return self._t("🧪 Debug AUS", "🧪 Debug OFF")
 
         return None
 
@@ -396,21 +403,20 @@ class Plugin:
             lines.append(f"[{slot}] {role}: {snippet}")
 
         memory_block = (
-            "🧠 DEINE ERINNERUNGEN (MAAT-KI – stilles Langzeitgedächtnis):\n"
-            "Die folgenden Punkte stammen aus deinem eigenen Gedächtnis.\n"
-            "Nutze sie implizit für Verständnis und Antwort.\n"
-            "Erwähne sie NICHT ausdrücklich, außer der Nutzer fragt danach.\n\n"
+            self._t(
+                "🧠 DEINE ERINNERUNGEN (MAAT-KI - stilles Langzeitgedaechtnis):\nDie folgenden Punkte stammen aus deinem eigenen Gedaechtnis.\nNutze sie implizit fuer Verstaendnis und Antwort.\nErwaehne sie NICHT ausdruecklich, ausser der Nutzer fragt danach.\n\n",
+                "🧠 YOUR MEMORIES (MAAT-KI - silent long-term memory):\nThe following points come from your own memory.\nUse them implicitly for understanding and response.\nDo NOT mention them explicitly unless the user asks.\n\n",
+            )
             + "\n".join(lines)
             + "\n\n"
-            "———\n"
-            "AKTUELLE EINGABE:\n"
+            + self._t("———\nAKTUELLE EINGABE:\n", "———\nCURRENT INPUT:\n")
             + text
         )
 
         if self.debug:
             print("\n🧪 MEM6 DEBUG:\n")
             print(memory_block)
-            print("\n🧪 MEM6 DEBUG ENDE\n")
+            print("\n🧪 MEM6 DEBUG ENDE\n" if self._lang() == "de" else "\n🧪 MEM6 DEBUG END\n")
 
         # handled=False → andere Plugins dürfen noch ran
         return False, memory_block

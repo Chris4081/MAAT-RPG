@@ -29,11 +29,11 @@ class Plugin:
     # COMMANDS – für CommandRouter (/help)
     # -----------------------------------------------------
     commands = {
-        "/wiki": "Wikipedia-Artikel abrufen & cachen (/wiki <Begriff>)",
-        "/wiki cache": "Zeigt die letzten Cache-Einträge",
-        "/wiki debug on": "Wiki-Debug an (Kontext im Terminal anzeigen)",
-        "/wiki debug off": "Wiki-Debug aus",
-        "/wiki debug once": "Wiki-Debug nur für die nächste Eingabe",
+        "/wiki": {"de": "Ruft Wikipedia-Artikel ab und cached sie (/wiki <Begriff>).", "en": "Fetches and caches Wikipedia articles (/wiki <term>)."},
+        "/wiki cache": {"de": "Zeigt die letzten Cache-Eintraege.", "en": "Shows the latest cache entries."},
+        "/wiki debug on": {"de": "Schaltet Wiki-Debug ein (zeigt Kontext im Terminal).", "en": "Turns wiki debug on (shows context in the terminal)."},
+        "/wiki debug off": {"de": "Schaltet Wiki-Debug aus.", "en": "Turns wiki debug off."},
+        "/wiki debug once": {"de": "Aktiviert Wiki-Debug nur fuer die naechste Eingabe.", "en": "Enables wiki debug only for the next input."},
     }
 
     def __init__(self):

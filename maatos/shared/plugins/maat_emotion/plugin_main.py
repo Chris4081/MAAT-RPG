@@ -15,6 +15,7 @@ z.B. vom BKI/Ψ-Plugin genutzt werden.
 
 import re
 from collections import defaultdict
+from shared.core.rpg_i18n import get_language
 
 
 # -------------------------------------------------
@@ -113,9 +114,9 @@ class Plugin:
     type = "chat"
 
     commands = {
-        "/emotion": "Zeigt die letzte erkannte Emotions-Resonanz.",
-        "/emotion debug on": "Debug-Ausgaben für EmotionEngine aktivieren.",
-        "/emotion debug off": "Debug-Ausgaben für EmotionEngine deaktivieren.",
+        "/emotion": {"de": "Zeigt die letzte erkannte Emotions-Resonanz.", "en": "Shows the last detected emotional resonance."},
+        "/emotion debug on": {"de": "Aktiviert Debug-Ausgaben fuer die EmotionEngine.", "en": "Enables debug output for the emotion engine."},
+        "/emotion debug off": {"de": "Deaktiviert Debug-Ausgaben fuer die EmotionEngine.", "en": "Disables debug output for the emotion engine."},
     }
 
     def __init__(self, core=None, **kwargs):
@@ -124,6 +125,12 @@ class Plugin:
         self.engine = EmotionEngineV2()
         self.debug = False
         self.last_result = None  # wird in before_chat gesetzt
+
+    def _lang(self):
+        return get_language(("de", "en"))
+
+    def _t(self, de: str, en: str) -> str:
+        return en if self._lang() == "en" else de
 
     # -------------------------------------------------
     # INTERN: Mapping → A / ΔD
@@ -166,24 +173,27 @@ class Plugin:
 
         if cmd == "/emotion":
             if not self.last_result:
-                return True, "Noch keine Emotions-Analyse in dieser Session vorgenommen."
+                return True, self._t(
+                    "Noch keine Emotions-Analyse in dieser Session vorgenommen.",
+                    "No emotion analysis has been performed in this session yet.",
+                )
             r = self.last_result
             return True, (
-                "💓 **MAAT-Emotion Status**\n\n"
-                f"Roh-Emotion: {r['emotion_raw']}  (Intensität: {r['intensity']:.2f})\n"
+                self._t("💓 **MAAT-Emotion Status**\n\n", "💓 **MAAT Emotion Status**\n\n")
+                + f"{self._t('Roh-Emotion', 'Raw emotion')}: {r['emotion_raw']}  ({self._t('Intensitaet', 'Intensity')}: {r['intensity']:.2f})\n"
                 f"E_value: {r['E_value']:+.3f}\n"
                 f"A_from_emotion: {r['A_from_emotion']:.3f}\n"
                 f"ΔD_from_emotion: {r['deltaD_from_emotion']:.3f}\n\n"
-                f"Interpretation: {r['safe_text']}"
+                f"{self._t('Interpretation', 'Interpretation')}: {r['safe_text']}"
             )
 
         if cmd == "/emotion debug on":
             self.debug = True
-            return True, "🧪 Emotion-Debug aktiviert."
+            return True, self._t("🧪 Emotion-Debug aktiviert.", "🧪 Emotion debug enabled.")
 
         if cmd == "/emotion debug off":
             self.debug = False
-            return True, "🧪 Emotion-Debug deaktiviert."
+            return True, self._t("🧪 Emotion-Debug deaktiviert.", "🧪 Emotion debug disabled.")
 
         return None
 

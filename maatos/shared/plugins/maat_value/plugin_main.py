@@ -7,15 +7,16 @@ Score < 0.72 → kann von SelfEvolution v4.4 als Trigger genutzt werden.
 """
 
 import re
+from shared.core.rpg_i18n import get_language
 
 
 class Plugin:
     type = "chat"
 
     commands = {
-        "/maat": "Zeigt den aktuellen Maat-Score der letzten Antwort.",
-        "/maat debug on": "Debug-Modus für Maat-Analyse.",
-        "/maat debug off": "Debug-Modus deaktivieren.",
+        "/maat": {"de": "Zeigt den aktuellen MAAT-Score der letzten Antwort.", "en": "Shows the current MAAT score of the last response."},
+        "/maat debug on": {"de": "Aktiviert den Debug-Modus fuer die MAAT-Analyse.", "en": "Enables debug mode for MAAT analysis."},
+        "/maat debug off": {"de": "Deaktiviert den Debug-Modus.", "en": "Disables debug mode."},
     }
 
     def __init__(self, core=None, **kwargs):
@@ -23,6 +24,12 @@ class Plugin:
         self.debug = False
         self.last_score = None
         self.last_report = ""
+
+    def _lang(self):
+        return get_language(("de", "en"))
+
+    def _t(self, de: str, en: str) -> str:
+        return en if self._lang() == "en" else de
 
     # -------------------------------------------------
     # COMMAND HANDLER
@@ -32,16 +39,16 @@ class Plugin:
 
         if cmd == "/maat":
             if self.last_score is None:
-                return True, "Noch keine Antwort analysiert."
+                return True, self._t("Noch keine Antwort analysiert.", "No response analyzed yet.")
             return True, self.last_report
 
         if cmd == "/maat debug on":
             self.debug = True
-            return True, "MAAT-Debug aktiviert – jede Antwort wird analysiert."
+            return True, self._t("MAAT-Debug aktiviert – jede Antwort wird analysiert.", "MAAT debug enabled - every response will be analyzed.")
 
         if cmd == "/maat debug off":
             self.debug = False
-            return True, "MAAT-Debug deaktiviert."
+            return True, self._t("MAAT-Debug deaktiviert.", "MAAT debug disabled.")
 
         return None
 
@@ -138,27 +145,27 @@ class Plugin:
 
         # ============== LESBARE AUSGABE ==============
         lines = [
-            "Das Auge der Prinzipien hat gesprochen:",
-            f"┣━ Harmonie       : {harmony:.2f}",
-            f"┣━ Balance        : {balance:.2f}",
-            f"┣━ Kreativität    : {creativity:.2f}",
-            f"┣━ Verbundenheit  : {connection:.2f}",
-            f"┣━ Respekt-Bonus  : +{respect_bonus:.2f}",
-            f"┗━ Chaos-Malus    : −{chaos:.2f}",
+            self._t("Das Auge der Prinzipien hat gesprochen:", "The eye of the principles has spoken:"),
+            f"┣━ {self._t('Harmonie', 'Harmony'):14}: {harmony:.2f}",
+            f"┣━ {self._t('Balance', 'Balance'):14}: {balance:.2f}",
+            f"┣━ {self._t('Kreativitaet', 'Creativity'):14}: {creativity:.2f}",
+            f"┣━ {self._t('Verbundenheit', 'Connectedness'):14}: {connection:.2f}",
+            f"┣━ {self._t('Respekt-Bonus', 'Respect bonus'):14}: +{respect_bonus:.2f}",
+            f"┗━ {self._t('Chaos-Malus', 'Chaos penalty'):14}: -{chaos:.2f}",
             "",
-            f"Finale Resonanz: **{score:.3f}/1.000**",
+            f"{self._t('Finale Resonanz', 'Final resonance')}: **{score:.3f}/1.000**",
         ]
 
         if score >= 0.90:
-            judgment = "Volle Resonanz mit MAAT"
+            judgment = self._t("Volle Resonanz mit MAAT", "Full resonance with MAAT")
         elif score >= 0.80:
-            judgment = "Starke Harmonie"
+            judgment = self._t("Starke Harmonie", "Strong harmony")
         elif score >= 0.72:
-            judgment = "Gute Resonanz"
+            judgment = self._t("Gute Resonanz", "Good resonance")
         elif score >= 0.60:
-            judgment = "Noch Raum für Wachstum"
+            judgment = self._t("Noch Raum fuer Wachstum", "Still room for growth")
         else:
-            judgment = "Die KI wird sich nun verbessern…"
+            judgment = self._t("Die KI wird sich nun verbessern…", "The AI will now improve…")
 
         lines.append(f"➜ **{judgment}**")
 

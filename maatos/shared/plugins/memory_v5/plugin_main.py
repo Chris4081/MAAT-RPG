@@ -19,6 +19,7 @@ from datetime import datetime
 
 import numpy as np
 import faiss
+from shared.core.rpg_i18n import get_language
 
 # -------------------------------------------------------------
 # EMBEDDING-EINSTELLUNGEN
@@ -51,12 +52,12 @@ class Plugin:
 
     # Commands werden automatisch vom PluginManager registriert
     commands = {
-        "/mem": "Zeigt Memory-Übersicht.",
-        "/mem last": "Zeigt die letzten 10 Erinnerungen.",
-        "/mem search": "Semantische Suche im Memory.",
-        "/mem info": "Infos zum MAAT-Memory v5 System.",
-        "/mem debug on": "Memory v5 Debugmodus aktivieren.",
-        "/mem debug off": "Memory v5 Debugmodus deaktivieren.",
+        "/mem": {"de": "Zeigt die Memory-Uebersicht.", "en": "Shows the memory overview."},
+        "/mem last": {"de": "Zeigt die letzten 10 Erinnerungen.", "en": "Shows the last 10 memories."},
+        "/mem search": {"de": "Semantische Suche im Memory.", "en": "Semantic search in memory."},
+        "/mem info": {"de": "Infos zum MAAT-Memory-v5-System.", "en": "Info about the MAAT Memory v5 system."},
+        "/mem debug on": {"de": "Aktiviert den Memory-v5-Debugmodus.", "en": "Enables Memory v5 debug mode."},
+        "/mem debug off": {"de": "Deaktiviert den Memory-v5-Debugmodus.", "en": "Disables Memory v5 debug mode."},
     }
 
     # -------------------------------------------------------------
@@ -83,6 +84,12 @@ class Plugin:
         self._init_db()
         self._init_identity()
         self._init_vector_index()
+
+    def _lang(self):
+        return get_language(("de", "en"))
+
+    def _t(self, de: str, en: str) -> str:
+        return en if self._lang() == "en" else de
 
     # -------------------------------------------------------------
     # STARTUP
@@ -244,12 +251,12 @@ class Plugin:
         if text == "/mem":
             ident = self._load_identity()
             return (
-                "📦 MAAT-Memory v5 Übersicht\n"
-                f"• Identität: {ident.get('name')} v{ident.get('version')}\n"
-                f"• Zweck: {ident.get('purpose')}\n"
-                f"• DB-Pfad: {self.db_path}\n"
-                f"• Index: {self.index_path}\n"
-                f"• Vektoren im Index: {self.index.ntotal}\n"
+                self._t("📦 MAAT-Memory v5 Uebersicht\n", "📦 MAAT Memory v5 Overview\n")
+                + f"• {self._t('Identitaet', 'Identity')}: {ident.get('name')} v{ident.get('version')}\n"
+                + f"• {self._t('Zweck', 'Purpose')}: {ident.get('purpose')}\n"
+                + f"• {self._t('DB-Pfad', 'DB path')}: {self.db_path}\n"
+                + f"• {self._t('Index', 'Index')}: {self.index_path}\n"
+                + f"• {self._t('Vektoren im Index', 'Vectors in index')}: {self.index.ntotal}\n"
             )
 
         # /mem last
@@ -263,9 +270,9 @@ class Plugin:
             conn.close()
 
             if not rows:
-                return "📭 Keine Erinnerungen gespeichert."
+                return self._t("📭 Keine Erinnerungen gespeichert.", "📭 No memories stored.")
 
-            out = ["🧠 Letzte Erinnerungen:\n"]
+            out = [self._t("🧠 Letzte Erinnerungen:\n", "🧠 Latest memories:\n")]
             for role, content, ts in rows:
                 out.append(f"[{ts}] {role.upper()}: {content}")
             return "\n".join(out)
@@ -274,7 +281,7 @@ class Plugin:
         if text.startswith("/mem search "):
             query = text.replace("/mem search ", "", 1).strip()
             if not query:
-                return "⚠ Bitte ein Suchwort angeben: /mem search <begriff>"
+                return self._t("⚠ Bitte ein Suchwort angeben: /mem search <begriff>", "⚠ Please provide a search term: /mem search <term>")
 
             # 1) Semantische Suche
             hits = self._search_semantic(query, k=5)
@@ -283,10 +290,10 @@ class Plugin:
             if not hits:
                 hits = self._search_text(query, limit=10)
                 if not hits:
-                    return f"🔍 Keine Treffer für: {query}"
-                prefix = "🔍 Textbasierte Treffer (Fallback) für: " + query + "\n"
+                    return self._t(f"🔍 Keine Treffer fuer: {query}", f"🔍 No matches for: {query}")
+                prefix = self._t("🔍 Textbasierte Treffer (Fallback) fuer: ", "🔍 Text-based matches (fallback) for: ") + query + "\n"
             else:
-                prefix = "🔍 Semantische Treffer für: " + query + "\n"
+                prefix = self._t("🔍 Semantische Treffer fuer: ", "🔍 Semantic matches for: ") + query + "\n"
 
             out = [prefix]
             for role, content, ts in hits:
@@ -296,24 +303,24 @@ class Plugin:
         # /mem info
         if text == "/mem info":
             return (
-                "ℹ MAAT-Memory v5:\n"
-                "- Episodisches Memory: SQLite (table: episodic)\n"
-                f"- Semantisches Memory: FAISS Index (Dim={EMBED_DIM}, Vektoren={self.index.ntotal})\n"
-                "- Resonanz: Maat-Felder H,B,S,V,R → Spalte 'resonance'\n"
-                "- Hooks: before_chat() & after_response() speichern automatisch."
+                self._t("ℹ MAAT-Memory v5:\n", "ℹ MAAT Memory v5:\n")
+                + self._t("- Episodisches Memory: SQLite (table: episodic)\n", "- Episodic memory: SQLite (table: episodic)\n")
+                + self._t(f"- Semantisches Memory: FAISS Index (Dim={EMBED_DIM}, Vektoren={self.index.ntotal})\n", f"- Semantic memory: FAISS index (dim={EMBED_DIM}, vectors={self.index.ntotal})\n")
+                + self._t("- Resonanz: Maat-Felder H,B,S,V,R -> Spalte 'resonance'\n", "- Resonance: MAAT fields H,B,S,V,R -> column 'resonance'\n")
+                + self._t("- Hooks: before_chat() und after_response() speichern automatisch.", "- Hooks: before_chat() and after_response() save automatically.")
             )
 
         # /mem debug on
         if text == "/mem debug on":
             self.debug = True
             self.debug_once = False
-            return "🧪 MEM-DEBUG aktiviert. Memory-Kontext wird bei jeder Eingabe angezeigt."
+            return self._t("🧪 MEM-DEBUG aktiviert. Memory-Kontext wird bei jeder Eingabe angezeigt.", "🧪 MEM DEBUG enabled. Memory context will be shown for every input.")
 
         # /mem debug off
         if text == "/mem debug off":
             self.debug = False
             self.debug_once = False
-            return "🧪 MEM-DEBUG deaktiviert."
+            return self._t("🧪 MEM-DEBUG deaktiviert.", "🧪 MEM DEBUG disabled.")
 
         return None
 
@@ -347,7 +354,11 @@ class Plugin:
         if not hits:
             # Kein Kontext gefunden → aber bei Debug anzeigen, dass es leer war
             if getattr(self, "debug", False) or getattr(self, "debug_once", False):
-                print("\n🔍 [MEM-DEBUG] Keine passenden Memory-Treffer gefunden.\n")
+                print(
+                    "\n🔍 [MEM-DEBUG] Keine passenden Memory-Treffer gefunden.\n"
+                    if self._lang() == "de"
+                    else "\n🔍 [MEM-DEBUG] No matching memory hits found.\n"
+                )
                 self.debug_once = False
             return False, user_input
 
@@ -379,21 +390,24 @@ class Plugin:
             return False, user_input
 
         memory_block = (
-            "🧠 DEINE ERINNERUNGEN (MAAT-KI):\n"
-            "Die folgenden Punkte stammen aus deinem eigenen Langzeitgedächtnis. "
-            "Nutze sie still als innere Erinnerung – erwähne sie nicht explizit, "
-            "außer der Nutzer fragt danach.\n\n"
+            self._t(
+                "🧠 DEINE ERINNERUNGEN (MAAT-KI):\nDie folgenden Punkte stammen aus deinem eigenen Langzeitgedaechtnis. Nutze sie still als innere Erinnerung - erwaehne sie nicht explizit, ausser der Nutzer fragt danach.\n\n",
+                "🧠 YOUR MEMORIES (MAAT-KI):\nThe following points come from your own long-term memory. Use them quietly as internal recall - do not mention them explicitly unless the user asks about them.\n\n",
+            )
             + "\n".join(lines)
             + "\n\n"
-            "———\n"
-            "AKTUELLE EINGABE:\n"
+            + self._t("———\nAKTUELLE EINGABE:\n", "———\nCURRENT INPUT:\n")
             + text
 )
 
         if getattr(self, "debug", False) or getattr(self, "debug_once", False):
-            print("\n🔍 [MEM-DEBUG] Kontext, der an das Modell geht:\n")
+            print(
+                "\n🔍 [MEM-DEBUG] Kontext, der an das Modell geht:\n"
+                if self._lang() == "de"
+                else "\n🔍 [MEM-DEBUG] Context being sent to the model:\n"
+            )
             print(memory_block)
-            print("\n🔍 [MEM-DEBUG ENDE]\n")
+            print("\n🔍 [MEM-DEBUG ENDE]\n" if self._lang() == "de" else "\n🔍 [MEM-DEBUG END]\n")
             self.debug_once = False
 
         return False, memory_block

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+from shared.core.rpg_i18n import get_language
 
 class Plugin:
     """
@@ -13,7 +14,7 @@ class Plugin:
 
     type = "chat"
     commands = {
-        "/uncertainty": "Zeigt den letzten geschätzten Unsicherheits-/Halluzinations-Risiko-Wert.",
+        "/uncertainty": {"de": "Zeigt den letzten geschaetzten Unsicherheits-/Halluzinations-Risiko-Wert.", "en": "Shows the latest estimated uncertainty / hallucination risk score."},
     }
 
     def __init__(self, core=None, **kwargs):
@@ -21,10 +22,16 @@ class Plugin:
         self.state = getattr(core, "state", None)
         self.last_risk = 0.0
 
+    def _t(self, de: str, en: str) -> str:
+        return en if get_language(("de", "en")) == "en" else de
+
     def command(self, full_cmd: str, context=None):
         cmd = full_cmd.strip().lower()
         if cmd == "/uncertainty":
-            return True, f"Aktueller Unsicherheits-Risiko-Wert: {self.last_risk:.3f}"
+            return True, self._t(
+                f"Aktueller Unsicherheits-Risiko-Wert: {self.last_risk:.3f}",
+                f"Current uncertainty risk score: {self.last_risk:.3f}",
+            )
         return None
 
     def before_chat(self, user_input, context=None):

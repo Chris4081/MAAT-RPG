@@ -21,6 +21,7 @@ import random
 import time
 from colorama import Fore, Style
 from shared.core.maat_paths import data_file, state_file, log_file
+from shared.core.rpg_i18n import get_language
 
 
 # ==========================================================
@@ -222,7 +223,10 @@ class Plugin:
     type = "chat"
 
     commands = {
-        "/ach": "Zeigt freigeschaltete Achievements."
+        "/ach": {
+            "de": "Zeigt freigeschaltete Achievements.",
+            "en": "Shows unlocked achievements.",
+        }
     }
 
     def __init__(self):
@@ -234,6 +238,12 @@ class Plugin:
             "achievements": {k: False for k in ACHIEVEMENTS}
         })
 
+    def _lang(self):
+        return get_language(("de", "en"))
+
+    def _t(self, de: str, en: str) -> str:
+        return en if self._lang() == "en" else de
+
     # -----------------------------------------------------
     # 📜 Achievement anzeigen
     # -----------------------------------------------------
@@ -242,9 +252,9 @@ class Plugin:
             unlocked = [ACHIEVEMENTS[k]["name"] for k, v in self.state["achievements"].items() if v]
 
             if not unlocked:
-                return True, "🎖️ Keine Achievements freigeschaltet."
+                return True, self._t("🎖️ Keine Achievements freigeschaltet.", "🎖️ No achievements unlocked.")
 
-            text = "🎖️ Freigeschaltete Achievements:\n"
+            text = self._t("🎖️ Freigeschaltete Achievements:\n", "🎖️ Unlocked achievements:\n")
             for a in unlocked:
                 text += f"  • {a}\n"
 

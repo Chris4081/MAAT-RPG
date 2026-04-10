@@ -26,7 +26,10 @@ class Plugin:
 
     # Der Command wird vom PluginManager automatisch registriert
     commands = {
-        "/test_fields": "Zeigt aktuelle MAAT-Feld-Buffs (H, B, S, V, R)."
+        "/test_fields": {
+            "de": "Zeigt aktuelle MAAT-Feld-Buffs (H, B, S, V, R).",
+            "en": "Shows current MAAT field buffs (H, B, S, V, R).",
+        }
     }
 
     def __init__(self):

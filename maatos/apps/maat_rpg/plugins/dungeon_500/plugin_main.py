@@ -16,6 +16,15 @@ import random
 from datetime import datetime
 import importlib.util
 from shared.core.maat_paths import data_file, state_file, log_file
+from shared.core.rpg_i18n import get_language
+
+
+def _lang():
+    return get_language(("de", "en"))
+
+
+def _t(de: str, en: str) -> str:
+    return en if _lang() == "en" else de
 
 # =====================================================
 # 🔗 BattleCore & MusicManager laden
@@ -147,17 +156,17 @@ class Dungeon500:
         if not d["unlocked"]:
             remain = max(0, self.UNLOCK_AT - d["msg"])
             return (
-                f"🔒 **Dungeon 500: Kristallpfad der Fünfhundert**\n"
-                f"Nachrichten: {d['msg']} / {self.UNLOCK_AT}\n"
-                f"✨ Noch {remain} bis zur Öffnung.\n"
+                _t("🔒 **Dungeon 500: Kristallpfad der Fuenfhundert**\n", "🔒 **Dungeon 500: Crystal Path of the Five Hundred**\n")
+                + f"{_t('Nachrichten', 'Messages')}: {d['msg']} / {self.UNLOCK_AT}\n"
+                + f"✨ {_t('Noch', 'Still')} {remain} {_t('bis zur Oeffnung.', 'until it opens.')}\n"
             )
 
         return (
-            f"🏰 **Dungeon 500: Kristallpfad der Fünfhundert**\n"
-            f"Runs: {d['runs']}\n"
-            f"Completed: {d['completed']}\n"
-            f"Letzter Eintritt: {d['last_entered']}\n"
-            f"BattleCore: {'AKTIV ✅' if self.battle_core else 'FEHLT (Demo) ⚠️'}\n"
+            _t("🏰 **Dungeon 500: Kristallpfad der Fuenfhundert**\n", "🏰 **Dungeon 500: Crystal Path of the Five Hundred**\n")
+            + f"Runs: {d['runs']}\n"
+            + f"Completed: {d['completed']}\n"
+            + f"{_t('Letzter Eintritt', 'Last entry')}: {d['last_entered']}\n"
+            + f"BattleCore: {(_t('AKTIV ✅', 'ACTIVE ✅') if self.battle_core else _t('FEHLT (Demo) ⚠️', 'MISSING (demo) ⚠️'))}\n"
         )
 
     # ================================
@@ -168,7 +177,10 @@ class Dungeon500:
 
         if not d["unlocked"]:
             remain = max(0, self.UNLOCK_AT - d["msg"])
-            return f"🔒 Das Tor ist noch versiegelt.\n✨ Noch {remain} Nachrichten."
+            return _t(
+                f"🔒 Das Tor ist noch versiegelt.\n✨ Noch {remain} Nachrichten.",
+                f"🔒 The gate is still sealed.\n✨ {remain} messages remaining.",
+            )
 
         d["runs"] += 1
         d["last_entered"] = datetime.now().isoformat(timespec="seconds")
@@ -184,23 +196,26 @@ class Dungeon500:
     # ================================
     def _room_1(self):
         return (
-            "💎 Die Kristalle an den Wänden beginnen leise zu singen.\n"
-            "Ein kühles, blaues Licht erfüllt den Gang.\n"
-            "👉 Weiter mit: `/d500 next`"
+            _t(
+                "💎 Die Kristalle an den Waenden beginnen leise zu singen.\nEin kuehles, blaues Licht erfuellt den Gang.\n👉 Weiter mit: `/d500 next`",
+                "💎 The crystals in the walls begin to sing softly.\nA cool blue light fills the corridor.\n👉 Continue with: `/d500 next`",
+            )
         )
 
     def _room_2(self):
         return (
-            "🔷 Brechende Lichtstrahlen tanzen über den Boden wie wandernde Runen.\n"
-            "Du spürst, wie der Raum auf deine Schritte reagiert.\n"
-            "👉 Weiter mit: `/d500 next`"
+            _t(
+                "🔷 Brechende Lichtstrahlen tanzen ueber den Boden wie wandernde Runen.\nDu spuerst, wie der Raum auf deine Schritte reagiert.\n👉 Weiter mit: `/d500 next`",
+                "🔷 Shards of light dance across the floor like wandering runes.\nYou can feel the room responding to your steps.\n👉 Continue with: `/d500 next`",
+            )
         )
 
     def _room_3(self):
         return (
-            "✨ Vor dir erhebt sich ein Tor aus poliertem Glas, in dem sich unzählige Welten spiegeln.\n"
-            "Zwischen den Reflexionen flackert eine Silhouette.\n"
-            "👉 Der Boss wartet: `/d500 boss`"
+            _t(
+                "✨ Vor dir erhebt sich ein Tor aus poliertem Glas, in dem sich unzaehlige Welten spiegeln.\nZwischen den Reflexionen flackert eine Silhouette.\n👉 Der Boss wartet: `/d500 boss`",
+                "✨ Before you rises a gate of polished glass reflecting countless worlds.\nA silhouette flickers between the reflections.\n👉 The boss awaits: `/d500 boss`",
+            )
         )
 
     # ================================
@@ -211,8 +226,11 @@ class Dungeon500:
         if self.music_manager:
             self.music_manager.stop()
 
-        boss_name = "Herr der 500 Schatten"
-        intro = f"👑 **{boss_name} tritt aus dem Schattenkreis hervor!**\n\n"
+        boss_name = _t("Herr der 500 Schatten", "Lord of 500 Shadows")
+        intro = _t(
+            f"👑 **{boss_name} tritt aus dem Schattenkreis hervor!**\n\n",
+            f"👑 **{boss_name} steps out of the circle of shadows!**\n\n",
+        )
 
         if self.battle_core:
             try:
@@ -236,13 +254,16 @@ class Dungeon500:
                 result = self.battle_core.run_fight("boss", context=ctx)
 
             except Exception as e:
-                result = f"⚠ Fehler beim Bosskampf: {e}"
+                result = _t(f"⚠ Fehler beim Bosskampf: {e}", f"⚠ Error during boss fight: {e}")
 
         else:
             # Fallback: Demo-Kampf ohne BattleCore
             if self.boss_music_manager:
                 self.boss_music_manager.start()
-            result = f"⚔ (Demo) Boss **{boss_name}** wurde besiegt!"
+            result = _t(
+                f"⚔ (Demo) Boss **{boss_name}** wurde besiegt!",
+                f"⚔ (Demo) Boss **{boss_name}** was defeated!",
+            )
             if self.boss_music_manager:
                 self.boss_music_manager.stop()
 
@@ -260,11 +281,11 @@ class Dungeon500:
 class Plugin:
     type = "chat"
     commands = {
-        "/d500": "Dungeon 500 betreten",
-        "/d500 next": "Nächsten Raum betreten",
-        "/d500 boss": "Bosskampf starten",
-        "/d500 status": "Status anzeigen",
-        "/d500 reset": "Dungeon zurücksetzen",
+        "/d500": {"de": "Dungeon 500 betreten.", "en": "Enter Dungeon 500."},
+        "/d500 next": {"de": "Naechsten Raum betreten.", "en": "Enter the next room."},
+        "/d500 boss": {"de": "Bosskampf starten.", "en": "Start the boss fight."},
+        "/d500 status": {"de": "Status anzeigen.", "en": "Show the status."},
+        "/d500 reset": {"de": "Dungeon zuruecksetzen.", "en": "Reset the dungeon."},
     }
 
     def __init__(self, plugin_dir=None, core=None):
@@ -289,7 +310,7 @@ class Plugin:
             if self._room_stage == 2:
                 self._room_stage = 3
                 return True, self.dungeon._room_3()
-            return True, "⚠ Der Boss wartet bereits. Nutze: `/d500 boss`"
+            return True, _t("⚠ Der Boss wartet bereits. Nutze: `/d500 boss`", "⚠ The boss is already waiting. Use: `/d500 boss`")
 
         if c == "/d500 boss":
             return True, self.dungeon.boss()
@@ -301,7 +322,7 @@ class Plugin:
             self.dungeon.state.data = self.dungeon.state._default()
             self.dungeon.state.save()
             self._room_stage = 0
-            return True, "🔁 Dungeon 500 zurückgesetzt."
+            return True, _t("🔁 Dungeon 500 zurueckgesetzt.", "🔁 Dungeon 500 reset.")
         return None
 
     def before_chat(self, user_input, context=None):

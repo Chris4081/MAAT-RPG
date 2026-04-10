@@ -19,6 +19,15 @@ from datetime import datetime
 # =====================================================
 import importlib.util
 from shared.core.maat_paths import data_file, state_file, log_file
+from shared.core.rpg_i18n import get_language
+
+
+def _lang():
+    return get_language(("de", "en"))
+
+
+def _t(de: str, en: str) -> str:
+    return en if _lang() == "en" else de
 
 def _load_battle_plugin():
     """Versucht BattleCore & MusicManager aus /plugins/battle zu laden."""
@@ -123,17 +132,17 @@ class Dungeon:
         if not d["unlocked"]:
             remain = self.UNLOCK_AT - d["msg"]
             return (
-                f"🔒 **Dungeon: Tor der 60 Stimmen**\n"
-                f"Nachrichten: {d['msg']} / {self.UNLOCK_AT}\n"
-                f"✨ Noch {remain} bis zur Öffnung.\n"
+                _t("🔒 **Dungeon: Tor der 60 Stimmen**\n", "🔒 **Dungeon: Gate of 60 Voices**\n")
+                + f"{_t('Nachrichten', 'Messages')}: {d['msg']} / {self.UNLOCK_AT}\n"
+                + f"✨ {_t('Noch', 'Still')} {remain} {_t('bis zur Oeffnung.', 'until it opens.')}\n"
             )
 
         return (
-            f"🏰 **Dungeon: Tor der 60 Stimmen**\n"
-            f"Runs: {d['runs']}\n"
-            f"Completed: {d['completed']}\n"
-            f"Letzter Eintritt: {d['last_entered']}\n"
-            f"BattleCore: {'AKTIV ✅' if self.battle_core else 'FEHLT (Demo) ⚠️'}\n"
+            _t("🏰 **Dungeon: Tor der 60 Stimmen**\n", "🏰 **Dungeon: Gate of 60 Voices**\n")
+            + f"Runs: {d['runs']}\n"
+            + f"Completed: {d['completed']}\n"
+            + f"{_t('Letzter Eintritt', 'Last entry')}: {d['last_entered']}\n"
+            + f"BattleCore: {(_t('AKTIV ✅', 'ACTIVE ✅') if self.battle_core else _t('FEHLT (Demo) ⚠️', 'MISSING (demo) ⚠️'))}\n"
         )
 
     # ================================
@@ -144,7 +153,10 @@ class Dungeon:
 
         if not d["unlocked"]:
             remain = self.UNLOCK_AT - d["msg"]
-            return f"🔒 Das Tor ist noch versiegelt.\n✨ Noch {remain} Nachrichten."
+            return _t(
+                f"🔒 Das Tor ist noch versiegelt.\n✨ Noch {remain} Nachrichten.",
+                f"🔒 The gate is still sealed.\n✨ {remain} messages remaining.",
+            )
 
         d["runs"] += 1
         d["last_entered"] = datetime.now().isoformat(timespec="seconds")
@@ -159,13 +171,22 @@ class Dungeon:
     # RÄUME
     # ================================
     def _room_1(self):
-        return "🌀 Du betrittst den Tunnel der Stimmen.\n👉 Weiter mit: `/dungeon60 next`"
+        return _t(
+            "🌀 Du betrittst den Tunnel der Stimmen.\n👉 Weiter mit: `/dungeon60 next`",
+            "🌀 You enter the tunnel of voices.\n👉 Continue with: `/dungeon60 next`",
+        )
 
     def _room_2(self):
-        return "🌫 Schatten greifen nach deinem Geist, aber du bleibst standhaft.\n👉 Weiter mit: `/dungeon60 next`"
+        return _t(
+            "🌫 Schatten greifen nach deinem Geist, aber du bleibst standhaft.\n👉 Weiter mit: `/dungeon60 next`",
+            "🌫 Shadows reach for your mind, but you remain steadfast.\n👉 Continue with: `/dungeon60 next`",
+        )
 
     def _room_3(self):
-        return "🔥 Ein Kreis aus goldenen Glyphen bildet den Boden.\n👉 Boss erscheint! `/dungeon60 boss`"
+        return _t(
+            "🔥 Ein Kreis aus goldenen Glyphen bildet den Boden.\n👉 Boss erscheint! `/dungeon60 boss`",
+            "🔥 A circle of golden glyphs forms beneath your feet.\n👉 The boss appears! `/dungeon60 boss`",
+        )
 
     # ================================
     # BOSS
@@ -174,9 +195,12 @@ class Dungeon:
         if self.music_manager:
             self.music_manager.stop()
 
-        boss_name = "Wächter der Resonanz"
+        boss_name = _t("Wächter der Resonanz", "Guardian of Resonance")
 
-        intro = f"👑 **{boss_name} stellt sich dir in den Weg.**\n\n"
+        intro = _t(
+            f"👑 **{boss_name} stellt sich dir in den Weg.**\n\n",
+            f"👑 **{boss_name} blocks your path.**\n\n",
+        )
 
         if self.battle_core:
             try:
@@ -190,11 +214,14 @@ class Dungeon:
                 }
                 result = self.battle_core.run_fight("boss", context=ctx)
             except Exception as e:
-                result = f"⚠ Fehler beim Kampf: {e}"
+                result = _t(f"⚠ Fehler beim Kampf: {e}", f"⚠ Error during battle: {e}")
         else:
             if self.boss_music_manager:
                 self.boss_music_manager.start()
-            result = f"⚔ (Demo) Boss **{boss_name}** wurde besiegt!"
+            result = _t(
+                f"⚔ (Demo) Boss **{boss_name}** wurde besiegt!",
+                f"⚔ (Demo) Boss **{boss_name}** was defeated!",
+            )
             if self.boss_music_manager:
                 self.boss_music_manager.stop()
 
@@ -216,11 +243,11 @@ class Dungeon:
 class Plugin:
     type = "chat"
     commands = {
-        "/dungeon60": "Dungeon betreten",
-        "/dungeon60 next": "Nächsten Raum betreten",
-        "/dungeon60 boss": "Bosskampf starten",
-        "/dungeon60 status": "Status anzeigen",
-        "/dungeon60 reset": "Dungeon zurücksetzen",
+        "/dungeon60": {"de": "Dungeon betreten.", "en": "Enter the dungeon."},
+        "/dungeon60 next": {"de": "Naechsten Raum betreten.", "en": "Enter the next room."},
+        "/dungeon60 boss": {"de": "Bosskampf starten.", "en": "Start the boss fight."},
+        "/dungeon60 status": {"de": "Status anzeigen.", "en": "Show the status."},
+        "/dungeon60 reset": {"de": "Dungeon zuruecksetzen.", "en": "Reset the dungeon."},
     }
 
     def __init__(self, plugin_dir=None, core=None):
@@ -243,7 +270,7 @@ class Plugin:
             if self._room_stage == 2:
                 self._room_stage = 3
                 return True, self.dungeon._room_3()
-            return True, "⚠ Boss wartet. `/dungeon60 boss`"
+            return True, _t("⚠ Boss wartet. `/dungeon60 boss`", "⚠ The boss is waiting. `/dungeon60 boss`")
         if c == "/dungeon60 boss":
             return True, self.dungeon.boss()
         if c == "/dungeon60 status":
@@ -252,7 +279,7 @@ class Plugin:
             self.dungeon.state.data = self.dungeon.state._default()
             self.dungeon.state.save()
             self._room_stage = 0
-            return True, "🔁 Dungeon zurückgesetzt."
+            return True, _t("🔁 Dungeon zurueckgesetzt.", "🔁 Dungeon reset.")
         return None
 
     def before_chat(self, user_input, context=None):

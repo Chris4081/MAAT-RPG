@@ -15,6 +15,15 @@ import random
 from datetime import datetime
 import importlib.util
 from shared.core.maat_paths import data_file, state_file, log_file
+from shared.core.rpg_i18n import get_language
+
+
+def _lang():
+    return get_language(("de", "en"))
+
+
+def _t(de: str, en: str) -> str:
+    return en if _lang() == "en" else de
 
 # =====================================================
 # 🔗 BattleCore & MusicManager laden
@@ -138,15 +147,15 @@ class Dungeon1000:
         if not d["unlocked"]:
             remain = self.UNLOCK_AT - d["msg"]
             return (
-                f"🔒 **Dungeon 1000: Tor der Tausend Echos**\n"
-                f"Nachrichten: {d['msg']} / {self.UNLOCK_AT}\n"
-                f"✨ Noch {remain} bis zur Öffnung.\n"
+                _t("🔒 **Dungeon 1000: Tor der Tausend Echos**\n", "🔒 **Dungeon 1000: Gate of a Thousand Echoes**\n")
+                + f"{_t('Nachrichten', 'Messages')}: {d['msg']} / {self.UNLOCK_AT}\n"
+                + f"✨ {_t('Noch', 'Still')} {remain} {_t('bis zur Oeffnung.', 'until it opens.')}\n"
             )
         return (
-            f"🏰 **Dungeon 1000: Tor der Tausend Echos**\n"
-            f"Runs: {d['runs']}\n"
-            f"Completed: {d['completed']}\n"
-            f"Letzter Eintritt: {d['last_entered']}\n"
+            _t("🏰 **Dungeon 1000: Tor der Tausend Echos**\n", "🏰 **Dungeon 1000: Gate of a Thousand Echoes**\n")
+            + f"Runs: {d['runs']}\n"
+            + f"Completed: {d['completed']}\n"
+            + f"{_t('Letzter Eintritt', 'Last entry')}: {d['last_entered']}\n"
         )
 
     # ---------------------------
@@ -154,7 +163,10 @@ class Dungeon1000:
         d = self.state.data
         if not d["unlocked"]:
             remain = self.UNLOCK_AT - d["msg"]
-            return f"🔒 Das Tor ist noch versiegelt.\n✨ Noch {remain} Nachrichten."
+            return _t(
+                f"🔒 Das Tor ist noch versiegelt.\n✨ Noch {remain} Nachrichten.",
+                f"🔒 The gate is still sealed.\n✨ {remain} messages remaining.",
+            )
 
         d["runs"] += 1
         d["last_entered"] = datetime.now().isoformat(timespec="seconds")
@@ -166,9 +178,9 @@ class Dungeon1000:
         return self._room_1()
 
     # ---------------------------
-    def _room_1(self): return "💠 Die Luft flirrt vor alter Magie… `/d1000 next`"
-    def _room_2(self): return "🌪 Flüsternde Schatten testen deinen Willen… `/d1000 next`"
-    def _room_3(self): return "🔮 Der Boden pulsiert im Takt der Echos… Boss naht. `/d1000 boss`"
+    def _room_1(self): return _t("💠 Die Luft flirrt vor alter Magie… `/d1000 next`", "💠 The air shimmers with ancient magic… `/d1000 next`")
+    def _room_2(self): return _t("🌪 Fluesternde Schatten testen deinen Willen… `/d1000 next`", "🌪 Whispering shadows test your will… `/d1000 next`")
+    def _room_3(self): return _t("🔮 Der Boden pulsiert im Takt der Echos… Boss naht. `/d1000 boss`", "🔮 The floor pulses with the rhythm of echoes… the boss approaches. `/d1000 boss`")
 
     # ---------------------------
     def boss(self):
@@ -178,7 +190,10 @@ class Dungeon1000:
         if self.music_manager:
             self.music_manager.stop()
 
-        intro = f"👑 **{boss} erscheint aus der Echo-Sphäre!**\n\n"
+        intro = _t(
+            f"👑 **{boss} erscheint aus der Echo-Sphaere!**\n\n",
+            f"👑 **{boss} emerges from the echo sphere!**\n\n",
+        )
 
         if self.battle_core:
             try:
@@ -196,12 +211,15 @@ class Dungeon1000:
 
                 result = self.battle_core.run_fight("boss", context=ctx)
             except Exception as e:
-                result = f"⚠ Fehler beim Bosskampf: {e}"
+                result = _t(f"⚠ Fehler beim Bosskampf: {e}", f"⚠ Error during boss fight: {e}")
         else:
             # Fallback ohne BattleCore
             if self.boss_music_manager:
                 self.boss_music_manager.start()
-            result = f"⚔ (Demo) Boss '{boss}' wurde besiegt!"
+            result = _t(
+                f"⚔ (Demo) Boss '{boss}' wurde besiegt!",
+                f"⚔ (Demo) Boss '{boss}' was defeated!",
+            )
             if self.boss_music_manager:
                 self.boss_music_manager.stop()
 
@@ -224,11 +242,11 @@ class Dungeon1000:
 class Plugin:
     type = "chat"
     commands = {
-        "/d1000": "Dungeon 1000 betreten",
-        "/d1000 next": "Nächsten Raum betreten",
-        "/d1000 boss": "Bosskampf starten",
-        "/d1000 status": "Status anzeigen",
-        "/d1000 reset": "Dungeon zurücksetzen",
+        "/d1000": {"de": "Dungeon 1000 betreten.", "en": "Enter Dungeon 1000."},
+        "/d1000 next": {"de": "Naechsten Raum betreten.", "en": "Enter the next room."},
+        "/d1000 boss": {"de": "Bosskampf starten.", "en": "Start the boss fight."},
+        "/d1000 status": {"de": "Status anzeigen.", "en": "Show the status."},
+        "/d1000 reset": {"de": "Dungeon zuruecksetzen.", "en": "Reset the dungeon."},
     }
 
     def __init__(self, plugin_dir=None, core=None):
@@ -253,7 +271,7 @@ class Plugin:
             if self._room_stage == 2:
                 self._room_stage = 3
                 return True, self.dungeon._room_3()
-            return True, "⚠ Boss wartet. `/d1000 boss`"
+            return True, _t("⚠ Boss wartet. `/d1000 boss`", "⚠ The boss is waiting. `/d1000 boss`")
 
         if c == "/d1000 boss":
             return True, self.dungeon.boss()
@@ -265,7 +283,7 @@ class Plugin:
             self.dungeon.state.data = self.dungeon.state._default()
             self.dungeon.state.save()
             self._room_stage = 0
-            return True, "🔁 Dungeon 1000 zurückgesetzt."
+            return True, _t("🔁 Dungeon 1000 zurueckgesetzt.", "🔁 Dungeon 1000 reset.")
 
         return None
 

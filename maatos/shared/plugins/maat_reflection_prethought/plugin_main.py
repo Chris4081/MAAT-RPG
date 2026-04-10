@@ -1,5 +1,6 @@
 # shared/plugins/maat_reflection_prethought.py
 # -*- coding: utf-8 -*-
+from shared.core.rpg_i18n import get_language
 
 class Plugin:
     """
@@ -14,7 +15,7 @@ class Plugin:
 
     type = "chat"
     commands = {
-        "/prethought": "Zeigt die letzte Vor-Analyse (Klarheit, Komplexität, Felder).",
+        "/prethought": {"de": "Zeigt die letzte Vor-Analyse (Klarheit, Komplexitaet, Felder).", "en": "Shows the last pre-analysis (clarity, complexity, fields)."},
     }
 
     def __init__(self, core=None, **kwargs):
@@ -22,18 +23,21 @@ class Plugin:
         self.state = getattr(core, "state", None)
         self.last_meta = None
 
+    def _t(self, de: str, en: str) -> str:
+        return en if get_language(("de", "en")) == "en" else de
+
     def command(self, full_cmd: str, context=None):
         cmd = full_cmd.strip().lower()
         if cmd == "/prethought":
             if not self.last_meta:
-                return True, "Noch keine Vor-Analyse in dieser Session."
+                return True, self._t("Noch keine Vor-Analyse in dieser Session.", "No pre-analysis in this session yet.")
             m = self.last_meta
             fields = m.get("field_prediction", {})
             lines = [
-                "🧠 Vor-Analyse (Prethought):",
-                f"- Klarheit         : {m.get('prethought_clarity', 0.0):.2f}",
-                f"- Komplexität      : {m.get('problem_complexity', 0.0):.2f}",
-                f"- Felder (Heuristik): {fields}",
+                self._t("🧠 Vor-Analyse (Prethought):", "🧠 Pre-analysis (Prethought):"),
+                f"- {self._t('Klarheit', 'Clarity'):16}: {m.get('prethought_clarity', 0.0):.2f}",
+                f"- {self._t('Komplexitaet', 'Complexity'):16}: {m.get('problem_complexity', 0.0):.2f}",
+                f"- {self._t('Felder (Heuristik)', 'Fields (heuristic)')}: {fields}",
             ]
             return True, "\n".join(lines)
 

@@ -17,13 +17,88 @@ import importlib.util
 import subprocess
 import time
 from shared.core.maat_paths import data_file, state_file, log_file
+from shared.core.rpg_i18n import get_language
+
+
+STORY_UI = {
+    "de": {
+        "story_begins": "\n📜 Die Geschichte beginnt...\n",
+        "continue": "⏎ Weiter… ",
+        "scene_ends": "\n📯 Die Szene endet.",
+        "music_question": "🎵 Musik bis zum Ende weiterlaufen lassen? (J/N) [ENTER = N]: ",
+        "music_continues": "🎵 Musik läuft weiter, bis der Track von selbst endet.",
+        "return_chat": "\n⏎ Drücke ENTER, um zum Chat zurückzukehren… ",
+        "decision": "🜂 Entscheidungsszene",
+        "choice_prompt": "Wähle [1-{count}]: ",
+        "number_required": "Bitte eine Zahl eingeben.",
+        "choice_title_reflection": "Erstes Maat-Urteil",
+        "choice_title_combat": "Geluebde vor dem Kampf",
+        "choice_effect_harmonie": "Staerkt Fokus und Ausgleich im Kampf.",
+        "choice_effect_respekt": "Gibt bessere Haltung gegen Urteil und Siegel-Auren.",
+        "choice_effect_schoepfung": "Verstaerkt Schoepfungskraft und MAAT-Impuls.",
+        "choice_effect_protect": "Beginnt Kaempfe defensiver und heilt durch Traenke sicherer.",
+        "choice_effect_truth": "Erkennt Schwaechen klarer und trifft praeziser.",
+        "choice_effect_remember": "Laedt Resonanz schneller auf und haelt den Sinn des Kampfes wach.",
+        "choice_effect_default": "Diese Entscheidung wird Maatis spaeter weiter begleiten.",
+        "journal_title": "📓 **Journal der Entscheidungen**",
+        "journal_profile": "Pfadprofil",
+        "journal_unknown": "Unbestimmt",
+        "journal_empty": "Noch keine Eintraege. Maatis' Weg beginnt mit der naechsten Szene.",
+        "journal_detail": "Folge",
+        "story_reset": "🔄 Story-Progress zurueckgesetzt.",
+        "reflection_scene": "🫀 Innere Szene",
+        "reflection_title": "Innere Szene",
+        "reflection_summary": "Maatis haelt inne.",
+        "story_summary": "Eine neue Szene hat Maatis' Weg erweitert.",
+        "story_detail": "Ausgeloest durch {module}.",
+        "startup": "📖 StoryLoader Plugin geladen – Story-Engine aktiv.",
+    },
+    "en": {
+        "story_begins": "\n📜 The story begins...\n",
+        "continue": "⏎ Continue… ",
+        "scene_ends": "\n📯 The scene ends.",
+        "music_question": "🎵 Let the music continue until the track ends? (Y/N) [ENTER = N]: ",
+        "music_continues": "🎵 The music will continue until the track ends on its own.",
+        "return_chat": "\n⏎ Press ENTER to return to the chat… ",
+        "decision": "🜂 Decision Scene",
+        "choice_prompt": "Choose [1-{count}]: ",
+        "number_required": "Please enter a number.",
+        "choice_title_reflection": "First Judgment of Maat",
+        "choice_title_combat": "Vow Before Battle",
+        "choice_effect_harmonie": "Strengthens focus and balance in battle.",
+        "choice_effect_respekt": "Grants stronger posture against judgment and seal auras.",
+        "choice_effect_schoepfung": "Amplifies creation and MAAT impulse.",
+        "choice_effect_protect": "Begins battles more defensively and makes potion healing safer.",
+        "choice_effect_truth": "Sees weaknesses more clearly and strikes more precisely.",
+        "choice_effect_remember": "Charges resonance faster and keeps the meaning of battle alive.",
+        "choice_effect_default": "This decision will continue to shape Maatis later on.",
+        "journal_title": "📓 **Journal of Decisions**",
+        "journal_profile": "Path Profile",
+        "journal_unknown": "Undetermined",
+        "journal_empty": "No entries yet. Maatis' path begins with the next scene.",
+        "journal_detail": "Consequence",
+        "story_reset": "🔄 Story progress reset.",
+        "reflection_scene": "🫀 Inner Scene",
+        "reflection_title": "Inner Scene",
+        "reflection_summary": "Maatis pauses for a moment.",
+        "story_summary": "A new scene has expanded Maatis' path.",
+        "story_detail": "Triggered by {module}.",
+        "startup": "📖 StoryLoader plugin loaded – story engine active.",
+    },
+}
 
 
 class Plugin:
     type = "chat"
     commands = {
-        "/storyreset": "Setzt den Story-Fortschritt zurück.",
-        "/journal": "Zeigt Maatis bisherigen Weg und seine Entscheidungen."
+        "/storyreset": {
+            "de": "Setzt den Story-Fortschritt zurueck.",
+            "en": "Resets the story progress.",
+        },
+        "/journal": {
+            "de": "Zeigt Maatis bisherigen Weg und seine Entscheidungen.",
+            "en": "Shows Maatis' path so far and his decisions.",
+        },
     }
 
     def __init__(self):
@@ -45,6 +120,24 @@ class Plugin:
 
         # Musik-Prozess (kein Loop, nur einmaliger Track)
         self._music_proc = None
+
+    def _language(self) -> str:
+        return get_language(tuple(STORY_UI.keys()))
+
+    def _t(self, key: str, **kwargs) -> str:
+        language = self._language()
+        template = STORY_UI.get(language, STORY_UI["de"]).get(key, STORY_UI["de"].get(key, key))
+        return template.format(**kwargs) if kwargs else template
+
+    def _load_json(self, path: str) -> dict:
+        if os.path.exists(path):
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                return data if isinstance(data, dict) else {}
+            except Exception:
+                return {}
+        return {}
 
     # -------------------------------------------------
     # CONFIG HANDLING
@@ -263,7 +356,7 @@ class Plugin:
         - Jede Zeile mit ENTER weiter
         - Am Ende fragen, ob Musik gestoppt werden soll
         """
-        print("\n📜 Die Geschichte beginnt...\n")
+        print(self._t("story_begins"))
 
         # 🎵 Musik EINMAL starten (kein Loop)
         if music_filename:
@@ -285,7 +378,7 @@ class Plugin:
             lines = list(lines) + ["" ] + list(extra_lines)
 
         for line in lines:
-            input("⏎ Weiter… ")
+            input(self._t("continue"))
             print(line)
             time.sleep(0.05)
 
@@ -293,15 +386,15 @@ class Plugin:
             self._handle_story_choice(choice_result)
 
         # 🎵 MUSIK-NACHFRAGE
-        print("\n📯 Die Szene endet.")
-        ans = input("🎵 Musik bis zum Ende weiterlaufen lassen? (J/N) [ENTER = N]: ").strip().lower()
+        print(self._t("scene_ends"))
+        ans = input(self._t("music_question")).strip().lower()
 
         if ans != "j":
             self._stop_music()
         else:
-            print("🎵 Musik läuft weiter, bis der Track von selbst endet.")
+            print(self._t("music_continues"))
 
-        input("\n⏎ Drücke ENTER, um zum Chat zurückzukehren… ")
+        input(self._t("return_chat"))
 
     def _handle_story_choice(self, choice_result: dict):
         choice_id = choice_result.get("id")
@@ -312,17 +405,17 @@ class Plugin:
             return
 
         print("")
-        print("🜂 Entscheidungsszene")
+        print(self._t("decision"))
         print(prompt)
         for idx, opt in enumerate(options, 1):
             print(f"[{idx}] {opt.get('label', f'Option {idx}')}")
 
         while True:
-            raw = input("Wähle [1-" + str(len(options)) + "]: ").strip()
+            raw = input(self._t("choice_prompt", count=len(options))).strip()
             try:
                 index = int(raw) - 1
             except ValueError:
-                print("Bitte eine Zahl eingeben.")
+                print(self._t("number_required"))
                 continue
             if 0 <= index < len(options):
                 chosen = options[index]
@@ -345,21 +438,21 @@ class Plugin:
 
     def _choice_title(self, choice_id: str) -> str:
         titles = {
-            "reflection_path": "Erstes Maat-Urteil",
-            "combat_vow": "Geluebde vor dem Kampf",
+            "reflection_path": self._t("choice_title_reflection"),
+            "combat_vow": self._t("choice_title_combat"),
         }
         return titles.get(choice_id, choice_id.replace("_", " ").title())
 
     def _choice_consequence(self, choice_id: str, value: str | None) -> str:
         effects = {
-            ("reflection_path", "harmonie"): "Staerkt Fokus und Ausgleich im Kampf.",
-            ("reflection_path", "respekt"): "Gibt bessere Haltung gegen Urteil und Siegel-Auren.",
-            ("reflection_path", "schoepfung"): "Verstaerkt Schoepfungskraft und MAAT-Impuls.",
-            ("combat_vow", "protect"): "Beginnt Kaempfe defensiver und heilt durch Traenke sicherer.",
-            ("combat_vow", "truth"): "Erkennt Schwaechen klarer und trifft praeziser.",
-            ("combat_vow", "remember"): "Laedt Resonanz schneller auf und haelt den Sinn des Kampfes wach.",
+            ("reflection_path", "harmonie"): self._t("choice_effect_harmonie"),
+            ("reflection_path", "respekt"): self._t("choice_effect_respekt"),
+            ("reflection_path", "schoepfung"): self._t("choice_effect_schoepfung"),
+            ("combat_vow", "protect"): self._t("choice_effect_protect"),
+            ("combat_vow", "truth"): self._t("choice_effect_truth"),
+            ("combat_vow", "remember"): self._t("choice_effect_remember"),
         }
-        return effects.get((choice_id, value), "Diese Entscheidung wird Maatis spaeter weiter begleiten.")
+        return effects.get((choice_id, value), self._t("choice_effect_default"))
 
     def _append_journal_entry(self, key: str, kind: str, title: str, summary: str, detail: str = ""):
         journal = self.state.setdefault("journal", [])
@@ -430,17 +523,17 @@ class Plugin:
         self.state["path_profile"] = self._build_path_profile()
 
     def _render_journal(self) -> str:
-        lines = ["📓 **Journal der Entscheidungen**", ""]
+        lines = [self._t("journal_title"), ""]
         profile = self.state.get("path_profile") or self._build_path_profile()
         if profile:
-            lines.append(f"Pfadprofil: {profile.get('title', 'Unbestimmt')} — {profile.get('rank', 'Erwachend')}")
+            lines.append(f"{self._t('journal_profile')}: {profile.get('title', self._t('journal_unknown'))} — {profile.get('rank', 'Erwachend')}")
             motif = profile.get("motif")
             if motif:
                 lines.append(motif)
             lines.append("")
         journal = self.state.get("journal", [])
         if not journal:
-            lines.append("Noch keine Eintraege. Maatis' Weg beginnt mit der naechsten Szene.")
+            lines.append(self._t("journal_empty"))
             return "\n".join(lines)
 
         for idx, entry in enumerate(journal, 1):
@@ -450,7 +543,7 @@ class Plugin:
                 lines.append(f"   {summary}")
             detail = entry.get("detail")
             if detail:
-                lines.append(f"   Folge: {detail}")
+                lines.append(f"   {self._t('journal_detail')}: {detail}")
             lines.append("")
 
         return "\n".join(lines).rstrip()
@@ -467,19 +560,35 @@ class Plugin:
 
         title = profile.get("title", "Wegsucher")
         rank = profile.get("rank", "Erwachend")
+        en = self._language() == "en"
 
         if scene_key == "story4_boss1":
             if "Grenzhüter" in title:
+                if en:
+                    return [
+                        "A library spirit of light remains at the edge of the hall.",
+                        f"\"{title},\" it whispers, as if it already recognizes Maatis by his stance and not only by his victory.",
+                    ]
                 return [
                     "Ein Bibliotheksgeist aus Licht bleibt am Rand der Halle stehen.",
                     f"\"{title}\", flüstert er, als würde er Maatis bereits an einer Haltung erkennen und nicht nur an einem Sieg.",
                 ]
             if "Klangsucher" in title:
+                if en:
+                    return [
+                        "A quiet tone lingers among the shards, as if the library itself were answering Maatis' new rhythm.",
+                        f"Even the silent walls seem to feel that the {title} is not standing here by accident.",
+                    ]
                 return [
                     "Zwischen den Splittern klingt ein leiser Ton nach, als würde die Bibliothek Maatis' neuen Rhythmus beantworten.",
                     f"Selbst stumme Wände scheinen zu spüren, dass der {title} nicht zufaellig hier steht.",
                 ]
             if "Formträger" in title:
+                if en:
+                    return [
+                        "For a moment, the shape of an ancient scribe rises out of the light remnants.",
+                        f"It bows its head before the {title}, as if Maatis had already begun to reshape this place.",
+                    ]
                 return [
                     "Aus den Lichtresten löst sich für einen Moment die Form eines alten Schreibers.",
                     f"Er neigt den Kopf vor dem {title}, als hätte Maatis schon jetzt begonnen, den Ort neu zu prägen.",
@@ -487,16 +596,31 @@ class Plugin:
 
         if scene_key == "story5_boss3":
             if "Grenzhüter" in title:
+                if en:
+                    return [
+                        "MAAT KI watches Maatis more quietly than before.",
+                        "\"Good,\" she says at last. \"You now carry boundary into a zone that wants to overheat everything.\"",
+                    ]
                 return [
                     "MAAT KI beobachtet Maatis stiller als zuvor.",
                     "\"Gut\", sagt sie schließlich. \"Du trägst inzwischen Grenze in einer Zone, die alles überhitzen will.\"",
                 ]
             if "Klangsucher" in title:
+                if en:
+                    return [
+                        "A distant choir of unfinished tones moves through the chamber.",
+                        f"Creation feels less chaotic now that a {title} is trying to give it measure.",
+                    ]
                 return [
                     "Ein ferner Chor aus unvollendeten Tönen zieht durch den Raum.",
                     f"Die Schöpfung wirkt weniger chaotisch, seit ein {title} versucht, ihr Maß zu geben.",
                 ]
             if "Formträger" in title:
+                if en:
+                    return [
+                        "The half-worlds in the air do not collapse at once.",
+                        f"For a single breath they seem to wait for the {title}, as if he could decide which form may remain.",
+                    ]
                 return [
                     "Die halben Welten in der Luft zerfallen nicht sofort.",
                     f"Für einen Atemzug scheinen sie auf den {title} zu warten, als könnte er entscheiden, welche Form bleiben darf.",
@@ -504,28 +628,51 @@ class Plugin:
 
         if scene_key == "story6_final1":
             if "Grenzhüter" in title:
+                if en:
+                    return [
+                        "As the principle returns, it does not feel foreign to Maatis.",
+                        f"It settles against the {title}, as if it had already found a supporting edge within him.",
+                    ]
                 return [
                     "Als das Prinzip zurückkehrt, wirkt es nicht fremd zu Maatis.",
                     f"Es legt sich an den {title}, als hätte es in ihm bereits einen tragenden Rand gefunden.",
                 ]
             if "Klangsucher" in title:
+                if en:
+                    return [
+                        "The returning principle does not sound like power, but like a chord finally made whole again.",
+                        f"MAAT KI looks at Maatis as if she knows that a {title} would hope for precisely such a return.",
+                    ]
                 return [
                     "Das wiederkehrende Prinzip klingt nicht wie Macht, sondern wie ein Akkord, der endlich wieder voll ist.",
                     f"MAAT KI schaut Maatis an, als wüsste sie, dass ein {title} genau auf solche Rückkehr gehofft hat.",
                 ]
             if "Formträger" in title:
+                if en:
+                    return [
+                        "In the light of the returning principle, forms arise that do not immediately collapse this time.",
+                        f"The world seems to ask whether the {title} can turn this victory into a lasting shape.",
+                    ]
                 return [
                     "Im Licht des wiederkehrenden Prinzips entstehen Formen, die diesmal nicht sofort zerfallen.",
                     f"Die Welt scheint zu prüfen, ob der {title} aus diesem Sieg eine dauerhafte Gestalt machen kann.",
                 ]
 
         if scene_key == "boss1_echo":
+            if en:
+                return [f"Something within Maatis now has more contour. The path of the {title} is no longer only intuition, but first reality."]
             return [f"Etwas in Maatis hat jetzt mehr Kontur. Der Weg des {title} ist nicht mehr nur Ahnung, sondern erste Wirklichkeit."]
         if scene_key == "boss3_weight":
+            if en:
+                return [f"The weight strikes Maatis differently now, because a {title} must carry not only power, but responsibility."]
             return [f"Die Schwere trifft Maatis anders, weil ein {title} nicht nur Kraft, sondern Verantwortung mittragen muss."]
         if scene_key == "final1_breath":
+            if en:
+                return [f"With the returned principle, even Maatis' profile seems clearer: {title}, now {rank.lower()}."]
             return [f"Mit dem zurückgekehrten Prinzip wirkt selbst Maatis' Profil klarer: {title}, inzwischen {rank.lower()}."]
         if scene_key == "choice_respekt" and "Grenzhüter" in title:
+            if en:
+                return ["The memory no longer feels accidental. This is where the later Boundary Keeper had already begun."]
             return ["Die Erinnerung daran fühlt sich nicht zufällig an. Hier begann bereits der spätere Grenzhüter."]
 
         return []
@@ -626,6 +773,10 @@ class Plugin:
                 "key": "boss1_echo",
                 "music": "story1_theme.mp3",
                 "lines": [
+                    "🌒 Maatis remains still for a moment.",
+                    "The first boss has fallen, but the inner tension has not simply vanished.",
+                    "He realizes that every battle leaves something inside him behind, not only experience.",
+                ] if self._language() == "en" else [
                     "🌒 Maatis bleibt einen Moment stehen.",
                     "Der erste Boss ist gefallen, aber die innere Spannung ist nicht einfach verschwunden.",
                     "Er merkt: Jeder Kampf lässt etwas in ihm zurück, nicht nur Erfahrung.",
@@ -637,6 +788,10 @@ class Plugin:
                 "key": "boss3_weight",
                 "music": "quest2_reflection.mp3",
                 "lines": [
+                    "🔥 Between two battles, Maatis feels a heaviness that does not look like exhaustion.",
+                    "It is the realization that creation without measure can become just as dangerous as the shadow itself.",
+                    "For the first time he asks himself whether strength must also be carried.",
+                ] if self._language() == "en" else [
                     "🔥 Zwischen zwei Kämpfen spürt Maatis eine Schwere, die nicht nach Erschöpfung aussieht.",
                     "Es ist die Erkenntnis, dass Schöpfungskraft ohne Maß genauso gefährlich werden kann wie der Schatten selbst.",
                     "Zum ersten Mal fragt er sich, ob Stärke auch getragen werden muss.",
@@ -648,6 +803,10 @@ class Plugin:
                 "key": "final1_breath",
                 "music": "story3_theme.mp3",
                 "lines": [
+                    "🌌 After the first restored principle, even silence itself changes.",
+                    "Maatis breathes more deeply than before.",
+                    "He has not only won. He has carried something back into the world.",
+                ] if self._language() == "en" else [
                     "🌌 Nach dem ersten wiederhergestellten Prinzip verändert sich selbst die Stille.",
                     "Maatis atmet tiefer ein als zuvor.",
                     "Er hat nicht nur gesiegt. Er hat etwas in die Welt zurückgetragen.",
@@ -659,6 +818,10 @@ class Plugin:
                 "key": "choice_respekt",
                 "music": "quest2_reflection.mp3",
                 "lines": [
+                    "🕊️ Maatis remembers his decision not to cross certain boundaries.",
+                    "It does not feel like weakness.",
+                    "More like a form of strength that does not need to shout.",
+                ] if self._language() == "en" else [
                     "🕊️ Maatis erinnert sich an seine Entscheidung, Grenzen nicht zu übergehen.",
                     "Es fühlt sich nicht wie Schwäche an.",
                     "Eher wie eine Form von Kraft, die nicht schreien muss.",
@@ -670,6 +833,10 @@ class Plugin:
                 "key": "harmonie_boss_resonance",
                 "music": "story1_theme.mp3",
                 "lines": [
+                    "🎼 After the victory, what remains in Maatis is not triumphal noise, but a quiet aftertone.",
+                    "He realizes that harmony does not merely mean peace, but the ability to turn pressure into form.",
+                    "For the first time, protection feels like a rhythm rather than a reflex.",
+                ] if self._language() == "en" else [
                     "🎼 Nach dem Sieg bleibt kein Triumphlaerm in Maatis zurueck, sondern ein ruhiger Nachklang.",
                     "Er merkt, dass Harmonie nicht bloss Frieden meint, sondern die Faehigkeit, Druck in Form zu verwandeln.",
                     "Zum ersten Mal fuehlt sich Schutz wie ein Rhythmus an, nicht wie ein Reflex.",
@@ -681,6 +848,10 @@ class Plugin:
                 "key": "respekt_final_restored",
                 "music": "story3_theme.mp3",
                 "lines": [
+                    "⚖️ A restored principle reaches Maatis differently now that he has chosen the path of respect.",
+                    "Not power, but boundary suddenly seems to him like the thing that holds the world.",
+                    "He senses that some victories only become true when they humiliate no one.",
+                ] if self._language() == "en" else [
                     "⚖️ Ein wiederhergestelltes Prinzip trifft Maatis anders, seit er den Weg des Respekts gewaehlt hat.",
                     "Nicht Macht, sondern Grenze erscheint ihm ploetzlich als das, was die Welt traegt.",
                     "Er spuert: Manche Siege werden erst wahr, wenn sie niemanden entwürdigen.",
@@ -692,6 +863,10 @@ class Plugin:
                 "key": "truth_boss_insight",
                 "music": "quest2_reflection.mp3",
                 "lines": [
+                    "🔎 Maatis can see the last boss before him once more, but this time without fog.",
+                    "Its weaknesses, its patterns, even the moment of collapse become clearer than before.",
+                    "Truth suddenly no longer feels cold, but like light with direction.",
+                ] if self._language() == "en" else [
                     "🔎 Maatis kann den letzten Boss noch einmal vor sich sehen, aber diesmal ohne Nebel.",
                     "Seine Schwaechen, seine Muster, sogar der Moment des Kippens werden klarer als zuvor.",
                     "Wahrheit fuehlt sich ploetzlich nicht kalt an, sondern wie Licht mit Richtung.",
@@ -703,6 +878,10 @@ class Plugin:
                 "key": "protect_boss_mercy",
                 "music": "story1_theme.mp3",
                 "lines": [
+                    "🛡️ Maatis looks back on the battle and does not recoil from his own hardness.",
+                    "He won without separating protection from life itself.",
+                    "Perhaps that is precisely the difference between violence and carried strength.",
+                ] if self._language() == "en" else [
                     "🛡️ Maatis denkt an den Kampf zurück und erschrickt nicht ueber seine eigene Haerte.",
                     "Er hat gesiegt, ohne Schutz vom Leben zu trennen.",
                     "Vielleicht ist genau das der Unterschied zwischen Gewalt und getragener Kraft.",
@@ -714,6 +893,10 @@ class Plugin:
                 "key": "remember_world_echo",
                 "music": "story3_theme.mp3",
                 "lines": [
+                    "🌌 Between two breaths, Maatis feels that the world is truly answering.",
+                    "Not loudly, more like a memory returning from outside himself.",
+                    "His vow was not only a sentence. It has already left traces in the whole.",
+                ] if self._language() == "en" else [
                     "🌌 Zwischen zwei Atemzuegen hat Maatis das Gefuehl, dass die Welt wirklich antwortet.",
                     "Nicht laut, eher wie eine Erinnerung, die von aussen zurueckkehrt.",
                     "Sein Geluebde war nicht nur ein Satz. Es hat inzwischen Spuren im Ganzen hinterlassen.",
@@ -731,7 +914,7 @@ class Plugin:
         if c == "/storyreset":
             self.state = self._default_state()
             self._save_state()
-            return True, "🔄 Story-Progress zurückgesetzt."
+            return True, self._t("story_reset")
 
         if c == "/journal":
             return True, self._render_journal()
@@ -780,7 +963,7 @@ class Plugin:
         if not lines:
             return
 
-        print("\n🫀 Innere Szene\n")
+        print("\n" + self._t("reflection_scene") + "\n")
         if music:
             self._start_music_once(music)
         for line in lines:
@@ -794,8 +977,8 @@ class Plugin:
             self._append_journal_entry(
                 key=f"reflection:{key}",
                 kind="reflection",
-                title="Innere Szene",
-                summary=lines[0] if lines else "Maatis haelt inne.",
+                title=self._t("reflection_title"),
+                summary=lines[0] if lines else self._t("reflection_summary"),
                 detail=lines[-1] if len(lines) > 1 else "",
             )
             self._save_state()
@@ -814,8 +997,8 @@ class Plugin:
                 key=f"story:{entry['id']}",
                 kind="story",
                 title=entry.get("name", f"Story {entry['id']}"),
-                summary="Eine neue Szene hat Maatis' Weg erweitert.",
-                detail=f"Ausgeloest durch {entry.get('module', 'story')}.",
+                summary=self._t("story_summary"),
+                detail=self._t("story_detail", module=entry.get('module', 'story')),
             )
             self._save_state()
 
@@ -840,4 +1023,4 @@ class Plugin:
         return reply
 
     def on_startup(self, context=None):
-        print("📖 StoryLoader Plugin geladen – Story-Engine aktiv.")
+        print(self._t("startup"))

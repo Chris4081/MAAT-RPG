@@ -7,12 +7,74 @@ import json
 from pathlib import Path
 from colorama import Fore, Style
 from .backend_router import load_backend
+from .rpg_i18n import get_language
 
 # -------------------------------------------------------------
 # ROOT + MODEL_DIR
 # -------------------------------------------------------------
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+
+LLM_TEXT = {
+    "de": {
+        "perf_saved": "💾 Performance gespeichert: {path}",
+        "perf_save_fail": "⚠ Konnte Performance nicht speichern: {error}",
+        "model_saved": "💾 Modell gespeichert: {model} → {path}",
+        "model_save_fail": "⚠ Konnte Modell nicht speichern: {error}",
+        "no_models": "❌ Keine Modelle gefunden!",
+        "auto_model": "🌿 Auto-Load: Verwende gespeichertes Modell: {model}",
+        "model_header": "🌿 MAAT-KI — Modell auswaehlen",
+        "choose": "\n🔢 Auswahl: ",
+        "invalid_number": "Bitte eine gueltige Zahl eingeben.",
+        "auto_perf": "🌿 Auto-Load Performance: n_ctx={n_ctx} temp={temp} top_p={top_p} backend={backend}",
+        "perf_header": "⚙️ Performance-Modus",
+        "perf_1": "[1] HIGH       (20k Kontext, stabil)",
+        "perf_2": "[2] MEDIUM     (16k)",
+        "perf_3": "[3] LOW        (12k)",
+        "perf_4": "[4] ULTRA LOW  (10k wenig Speicher)",
+        "perf_chosen": "⚙️ Performance gewaehlt: n_ctx={n_ctx} temp={temp} top_p={top_p} backend={backend}",
+        "llm_loading": "🧠 LLM wird geladen …",
+        "llm_model": "   Modell:  {model}",
+        "llm_backend": "   Backend: {backend}",
+        "llm_ctx": "   Kontext: {ctx}",
+        "backend_fallback": "⚠ Backend-Fehler, fallback auf llama.cpp:\n{error}",
+        "llama_missing": "❌ llama-cpp-python fehlt!",
+    },
+    "en": {
+        "perf_saved": "💾 Performance saved: {path}",
+        "perf_save_fail": "⚠ Could not save performance: {error}",
+        "model_saved": "💾 Model saved: {model} → {path}",
+        "model_save_fail": "⚠ Could not save model: {error}",
+        "no_models": "❌ No models found!",
+        "auto_model": "🌿 Auto-load: using saved model: {model}",
+        "model_header": "🌿 MAAT-KI — Choose model",
+        "choose": "\n🔢 Choice: ",
+        "invalid_number": "Please enter a valid number.",
+        "auto_perf": "🌿 Auto-load performance: n_ctx={n_ctx} temp={temp} top_p={top_p} backend={backend}",
+        "perf_header": "⚙️ Performance mode",
+        "perf_1": "[1] HIGH       (20k context, stable)",
+        "perf_2": "[2] MEDIUM     (16k)",
+        "perf_3": "[3] LOW        (12k)",
+        "perf_4": "[4] ULTRA LOW  (10k low memory)",
+        "perf_chosen": "⚙️ Chosen performance: n_ctx={n_ctx} temp={temp} top_p={top_p} backend={backend}",
+        "llm_loading": "🧠 Loading LLM …",
+        "llm_model": "   Model:   {model}",
+        "llm_backend": "   Backend: {backend}",
+        "llm_ctx": "   Context: {ctx}",
+        "backend_fallback": "⚠ Backend error, falling back to llama.cpp:\n{error}",
+        "llama_missing": "❌ llama-cpp-python is missing!",
+    },
+}
+
+
+def _llm_lang() -> str:
+    return get_language(tuple(LLM_TEXT.keys()))
+
+
+def _lt(key: str, **kwargs) -> str:
+    lang = _llm_lang()
+    template = LLM_TEXT.get(lang, LLM_TEXT["de"]).get(key, LLM_TEXT["de"].get(key, key))
+    return template.format(**kwargs) if kwargs else template
 
 def _app_support_dir() -> str:
     env = os.environ.get("MAAT_APP_SUPPORT_DIR")
@@ -82,11 +144,11 @@ def save_perf(perf: dict):
             json.dump(perf, f, indent=2)
         print(
             Fore.CYAN
-            + f"💾 Performance gespeichert: {path}"
+            + _lt("perf_saved", path=path)
             + Style.RESET_ALL
         )
     except Exception as e:
-        print(Fore.RED + f"⚠ Konnte Performance nicht speichern: {e}" + Style.RESET_ALL)
+        print(Fore.RED + _lt("perf_save_fail", error=e) + Style.RESET_ALL)
 
 # -------------------------------------------------------------
 # MODEL SAVE / LOAD
@@ -110,11 +172,11 @@ def save_last_model_choice(model_name: str):
             f.write(model_name.strip())
         print(
             Fore.CYAN
-            + f"💾 Modell gespeichert: {model_name} → {path}"
+            + _lt("model_saved", model=model_name, path=path)
             + Style.RESET_ALL
         )
     except Exception as e:
-        print(Fore.RED + f"⚠ Konnte Modell nicht speichern: {e}" + Style.RESET_ALL)
+        print(Fore.RED + _lt("model_save_fail", error=e) + Style.RESET_ALL)
 
 # -------------------------------------------------------------
 # MODEL LISTING
@@ -144,27 +206,27 @@ def auto_select_model(model_dir: str = None) -> str:
 
     models = list_available_models(model_dir)
     if not models:
-        print(Fore.RED + "❌ Keine Modelle gefunden!" + Style.RESET_ALL)
+        print(Fore.RED + _lt("no_models") + Style.RESET_ALL)
         raise SystemExit(1)
 
     saved = load_saved_model_name()
     if saved and saved in models:
         print(
             Fore.GREEN
-            + f"🌿 Auto-Load: Verwende gespeichertes Modell: {saved}"
+            + _lt("auto_model", model=saved)
             + Style.RESET_ALL
         )
         return os.path.join(model_dir, saved)
 
     print("──────────────────────────────────────────────")
-    print("🌿 MAAT-KI — Modell auswählen")
+    print(_lt("model_header"))
     print("──────────────────────────────────────────────")
 
     for i, m in enumerate(models, 1):
         print(f"[{i}] {m}")
 
     while True:
-        choice = input("\n🔢 Auswahl: ").strip()
+        choice = input(_lt("choose")).strip()
         try:
             idx = int(choice) - 1
             if 0 <= idx < len(models):
@@ -174,7 +236,7 @@ def auto_select_model(model_dir: str = None) -> str:
         except Exception:
             pass
 
-        print(Fore.RED + "Bitte eine gültige Zahl eingeben." + Style.RESET_ALL)
+        print(Fore.RED + _lt("invalid_number") + Style.RESET_ALL)
 
 # -------------------------------------------------------------
 # PERFORMANCE SELECTION
@@ -185,22 +247,24 @@ def choose_performance() -> dict:
     if isinstance(saved, dict):
         print(
             Fore.GREEN
-            + f"🌿 Auto-Load Performance: "
-              f"n_ctx={saved.get('n_ctx')} "
-              f"temp={saved.get('temperature')} "
-              f"top_p={saved.get('top_p')} "
-              f"backend={saved.get('backend', 'llama')}"
+            + _lt(
+                "auto_perf",
+                n_ctx=saved.get("n_ctx"),
+                temp=saved.get("temperature"),
+                top_p=saved.get("top_p"),
+                backend=saved.get("backend", "llama"),
+            )
             + Style.RESET_ALL
         )
         return saved
 
     print("\n──────────────────────────────────────────────")
-    print("⚙️ Performance-Modus")
+    print(_lt("perf_header"))
     print("──────────────────────────────────────────────")
-    print("[1] HIGH       (20k Kontext, stabil)")
-    print("[2] MEDIUM     (16k)")
-    print("[3] LOW        (12k)")
-    print("[4] ULTRA LOW  (10k wenig Speicher)")
+    print(_lt("perf_1"))
+    print(_lt("perf_2"))
+    print(_lt("perf_3"))
+    print(_lt("perf_4"))
 
     profiles = {
         "1": dict(n_ctx=20000, temperature=1.0, top_p=0.9),
@@ -209,7 +273,7 @@ def choose_performance() -> dict:
         "4": dict(n_ctx=10000, temperature=0.8, top_p=0.9),
     }
 
-    choice = input("\n🔢 Auswahl: ").strip()
+    choice = input(_lt("choose")).strip()
     perf = profiles.get(choice, profiles["1"])
 
     perf["backend"] = "llama"
@@ -218,11 +282,13 @@ def choose_performance() -> dict:
 
     print(
         Fore.CYAN
-        + f"⚙️ Performance gewählt: "
-          f"n_ctx={perf['n_ctx']} "
-          f"temp={perf['temperature']} "
-          f"top_p={perf['top_p']} "
-          f"backend={perf['backend']}"
+        + _lt(
+            "perf_chosen",
+            n_ctx=perf["n_ctx"],
+            temp=perf["temperature"],
+            top_p=perf["top_p"],
+            backend=perf["backend"],
+        )
         + Style.RESET_ALL
     )
 
@@ -241,10 +307,10 @@ def load_llm(model_path: str, perf: dict):
     gpu_layers = int(perf.get("gpu_layers", 0))
 
     print("──────────────────────────────────────────────")
-    print("🧠 LLM wird geladen …")
-    print(f"   Modell:  {model_path}")
-    print(f"   Backend: {backend}")
-    print(f"   Kontext: {max_ctx}")
+    print(_lt("llm_loading"))
+    print(_lt("llm_model", model=model_path))
+    print(_lt("llm_backend", backend=backend))
+    print(_lt("llm_ctx", ctx=max_ctx))
     print("──────────────────────────────────────────────")
 
     try:
@@ -267,7 +333,7 @@ def load_llm(model_path: str, perf: dict):
     except Exception as e:
         print(
             Fore.RED
-            + f"⚠ Backend-Fehler, fallback auf llama.cpp:\n{e}"
+            + _lt("backend_fallback", error=e)
             + Style.RESET_ALL
         )
 
@@ -277,7 +343,7 @@ def load_llm(model_path: str, perf: dict):
         try:
             from llama_cpp import Llama
         except ImportError:
-            print(Fore.RED + "❌ llama-cpp-python fehlt!" + Style.RESET_ALL)
+            print(Fore.RED + _lt("llama_missing") + Style.RESET_ALL)
             raise SystemExit(1)
 
         llm = Llama(

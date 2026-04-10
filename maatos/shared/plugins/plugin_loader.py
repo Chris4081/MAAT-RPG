@@ -211,7 +211,10 @@ class PluginManager:
                     router.register(
                         cmd,
                         make_handler(plugin, cmd),
-                        description="Plugin Command"
+                        description={
+                            "de": "Plugin-Befehl",
+                            "en": "Plugin command",
+                        }
                     )
 
             # Variante 3: Fallback — command() existiert, aber keine Liste angegeben
@@ -220,7 +223,10 @@ class PluginManager:
                 router.register(
                     fallback_cmd,
                     make_handler(plugin, fallback_cmd),
-                    description="Fallback Plugin Command"
+                    description={
+                        "de": "Fallback-Plugin-Befehl",
+                        "en": "Fallback plugin command",
+                    }
                 )
 
     # ---------------------------------------------------------

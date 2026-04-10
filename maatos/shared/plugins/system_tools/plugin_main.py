@@ -35,14 +35,14 @@ class Plugin:
     type = "chat"
 
     commands = {
-        "/model": "Modellverwaltung & Modell-Selector",
-        "/restart": "Software neu starten",
-        "/safe-restart": "Speichern + Neustart",
-        "/profile": "Profil-Befehle",
-        "/plugins": "Plugin-Management",
-        "/sysinfo": "Systemdiagnose",
-        "/meminfo": "RAM/VRAM Verbrauch",
-        "/update": "git pull + Restart"
+        "/model": {"de": "Modellverwaltung und Modell-Auswahl.", "en": "Model management and model selection."},
+        "/restart": {"de": "Startet die Software neu.", "en": "Restarts the software."},
+        "/safe-restart": {"de": "Speichern und neu starten.", "en": "Save and restart."},
+        "/profile": {"de": "Profil-Befehle.", "en": "Profile commands."},
+        "/plugins": {"de": "Plugin-Management.", "en": "Plugin management."},
+        "/sysinfo": {"de": "Systemdiagnose.", "en": "System diagnostics."},
+        "/meminfo": {"de": "RAM-/VRAM-Verbrauch.", "en": "RAM/VRAM usage."},
+        "/update": {"de": "git pull und Neustart.", "en": "git pull and restart."}
     }
 
     def __init__(self):

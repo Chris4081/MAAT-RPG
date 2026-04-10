@@ -10,12 +10,48 @@ MAAT-KI CommandRouter v2.2
 ✓ Freundliche Fehlermeldung bei unbekannten /Kommandos
 """
 
+from .rpg_i18n import get_language
+
+
+ROUTER_TEXT = {
+    "de": {
+        "plugin_command": "Plugin-Befehl",
+        "fallback_plugin_command": "Fallback-Plugin-Befehl",
+        "plugin_missing_handler": "⚠️ Plugin `{plugin}` hat keinen command()-Handler.",
+        "unknown_command": "❓ **Unbekannter Befehl:** `{command}`\nNutze `/help` für alle verfügbaren Kommandos.",
+        "system_header": "📘 Verfügbare System-Kommandos:\n",
+        "plugin_header": "\n🔌 Plugin-Kommandos:",
+    },
+    "en": {
+        "plugin_command": "Plugin command",
+        "fallback_plugin_command": "Fallback plugin command",
+        "plugin_missing_handler": "⚠️ Plugin `{plugin}` has no command() handler.",
+        "unknown_command": "❓ **Unknown command:** `{command}`\nUse `/help` to see all available commands.",
+        "system_header": "📘 Available system commands:\n",
+        "plugin_header": "\n🔌 Plugin commands:",
+    },
+}
+
 class CommandRouter:
 
     def __init__(self):
         self.commands = {}        # "/help": { handler, desc }
         self.aliases = {}         # "/h": "/help"
         self.plugin_cmd_map = {}  # "/say": { plugin, desc }
+
+    def _lang(self):
+        return get_language(tuple(ROUTER_TEXT.keys()))
+
+    def _t(self, key, **kwargs):
+        lang = self._lang()
+        template = ROUTER_TEXT.get(lang, ROUTER_TEXT["de"]).get(key, ROUTER_TEXT["de"].get(key, key))
+        return template.format(**kwargs) if kwargs else template
+
+    def _resolve_desc(self, desc):
+        if isinstance(desc, dict):
+            lang = self._lang()
+            return desc.get(lang) or desc.get("de") or next(iter(desc.values()), "")
+        return desc or ""
 
     # ---------------------------------------------------
     # SYSTEM-COMMAND REGISTRIEREN
@@ -40,7 +76,10 @@ class CommandRouter:
         """
         self.plugin_cmd_map[cmd] = {
             "plugin": plugin_instance,
-            "desc": description or "Plugin Command"
+            "desc": description or {
+                "de": self._t("plugin_command"),
+                "en": self._t("plugin_command"),
+            }
         }
 
     # ---------------------------------------------------
@@ -104,8 +143,7 @@ class CommandRouter:
                 return f"{res}" if res else ""
 
             return (
-                f"⚠️ Plugin `{plugin.__class__.__name__}` "
-                f"hat keinen command()-Handler."
+                self._t("plugin_missing_handler", plugin=plugin.__class__.__name__)
             )
 
         # ---------------------------------------------------
@@ -114,24 +152,23 @@ class CommandRouter:
         clean = base.lstrip("/")
 
         return (
-            f"❓ **Unbekannter Befehl:** `{clean}`\n"
-            f"Nutze `/help` für alle verfügbaren Kommandos."
+            self._t("unknown_command", command=clean)
         )
 
     # ---------------------------------------------------
     # ALLE COMMANDS LISTEN
     # ---------------------------------------------------
     def help_text(self):
-        out = ["📘 Verfügbare System-Kommandos:\n"]
+        out = [self._t("system_header")]
 
         # SYSTEM COMMANDS
         for cmd, info in self.commands.items():
-            out.append(f"{cmd} — {info['desc']}")
+            out.append(f"{cmd} — {self._resolve_desc(info['desc'])}")
 
         # PLUGIN COMMANDS (nur Basis, z.B. /say)
         if self.plugin_cmd_map:
-            out.append("\n🔌 Plugin-Kommandos:")
+            out.append(self._t("plugin_header"))
             for cmd, info in self.plugin_cmd_map.items():
-                out.append(f"{cmd} — {info['desc']}")
+                out.append(f"{cmd} — {self._resolve_desc(info['desc'])}")
 
         return "\n".join(out)

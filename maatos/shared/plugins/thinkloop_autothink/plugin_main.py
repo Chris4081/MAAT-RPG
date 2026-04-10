@@ -21,13 +21,13 @@ class Plugin:
     type = "chat"
 
     commands = {
-        "/think": "Auto-Think Hilfe & Status",
-        "/think on": "Auto-Think einschalten (jede Eingabe wird tiefer analysiert)",
-        "/think off": "Auto-Think ausschalten",
-        "/think status": "Status von Auto-Think anzeigen",
-        "/think debug on": "Debug-Modus: zeige Analyse & finalen Prompt bei jeder Eingabe",
-        "/think debug off": "Debug-Modus deaktivieren",
-        "/think debug once": "Debug-Modus einmalig für die nächste Eingabe",
+        "/think": {"de": "Auto-Think Hilfe und Status.", "en": "Auto-Think help and status."},
+        "/think on": {"de": "Schaltet Auto-Think ein (jede Eingabe wird tiefer analysiert).", "en": "Turns Auto-Think on (each input is analyzed more deeply)."},
+        "/think off": {"de": "Schaltet Auto-Think aus.", "en": "Turns Auto-Think off."},
+        "/think status": {"de": "Zeigt den Auto-Think-Status.", "en": "Shows the Auto-Think status."},
+        "/think debug on": {"de": "Aktiviert den Debug-Modus mit Analyse und finalem Prompt.", "en": "Enables debug mode with analysis and final prompt."},
+        "/think debug off": {"de": "Deaktiviert den Debug-Modus.", "en": "Disables debug mode."},
+        "/think debug once": {"de": "Aktiviert den Debug-Modus einmalig fuer die naechste Eingabe.", "en": "Enables debug mode once for the next input."},
     }
 
     def __init__(self):
