@@ -10,9 +10,12 @@ Diese Datei beschreibt die sichtbaren Funktionen, Systeme und Kommandos des aktu
 
 - Zweisprachiger Start von MAAT-OS Loader und MAAT-RPG
 - Sprachwahl beim Start und im Menü
+- Sprachumschaltung auch für Loader, Modellwahl, Intro, HUD und Systemmeldungen
 - Titelbildschirm `Version 0.2` mit Enter-Schritt
 - Persistenter Spielstand in `Application Support`
 - Lokales Modell-Setup mit Modell-Auswahl und Downloader
+- Modell-Downloader mit Resume-/Prüf-Logik
+- Architekturgetrennte Setup-Pfade für Intel und Apple Silicon
 - Say-TTS mit Sprach-Standardstimmen `Anna` und `Samantha`
 - Musiksystem für Menü, Intro und Kämpfe
 - Plugin-Architektur mit Command Router
@@ -22,12 +25,18 @@ Diese Datei beschreibt die sichtbaren Funktionen, Systeme und Kommandos des aktu
 ### Gameplay
 
 - Geführte Demo-Kämpfe ohne spielerischen Vorteil
+- Guide-Kämpfe mit Erklärung für `/fight`, `/fightboss` und `/fightfinal`
 - Zufallskämpfe nach der Einführung
 - Boss- und Finalbosskämpfe mit Auren, Charge und Spezialangriffen
+- Boss-HUD mit Aura, Phase, Spezialname und Charge-Anzeige
+- Phase-2-System für späte Bosse
 - Resonanz-System mit `MAAT Impuls`
 - Fokus-System mit Heilung und Schild
+- Schwachstellen-System pro Runde
 - Shop mit Heiltränken und Schutz-Siegeln
+- Schutz-Siegel aktivieren Startschild in echten Kämpfen
 - Kampf-Erfolge und Kampfanalyse
+- Pfadabhängige Kampfmodifikatoren und Belohnungen
 - Pfadprofil, Rang und Motiv für Maatis
 - Story-Entscheidungen mit späteren Konsequenzen
 - Journal und Boss-Codex
@@ -38,11 +47,23 @@ Diese Datei beschreibt die sichtbaren Funktionen, Systeme und Kommandos des aktu
 
 - Cinematic Intro für MAAT-RPG
 - Hauptstory mit Zwischenakten und inneren Reflexionen
+- Entscheidungsszenen mit mehreren Antwortpfaden
 - Mehrsprachige Story-Szenen und Journal-Einträge
 - Reaktive Welt auf Basis des Pfadprofils
 - Boss-Reaktionen auf Maatis’ Weg
 - Beziehungsanzeige zwischen Maatis und MAAT-KI
+- Pfadprofil entwickelt Titel, Rang und Motiv aus Entscheidungen
+- Konsequenznetz zwischen Story, Kampf, Journal und Rewards
 - Lore-, Origin- und Identitätsansichten
+
+### MAAT-OS und Systemfluss
+
+- App-Loader mit Sprachwahl vor dem eigentlichen Spiel
+- MAAT-RPG-Menü mit Musik, Titelbildschirm und Progress-Anzeige
+- Startdiagnose für Python, Backends und Modellordner
+- Soft-Reset des Gesprächskontexts nach Demo- und Testkämpfen
+- Saubere Trennung zwischen Chat-Kontext und Kampf-Kontext
+- Lokalisierte Ladebalken und Startmeldungen
 
 ### Wichtige Kommandos
 
@@ -151,6 +172,19 @@ Diese Datei beschreibt die sichtbaren Funktionen, Systeme und Kommandos des aktu
 - Profilabhängige Boss-Reaktionen
 - Journal-Einträge aus Story-, Boss- und Quest-Ereignissen
 - Auto-Think, BKI und MAAT-Analyse-Plugins
+- Automatische Battle-Kontext-Bereinigung nach Guide-Kämpfen
+- Sprach-Fallback über gespeicherte Sprache oder Systemsprache
+- Schutz gegen unnötige Plugin-Loader-Warnungen beim Start
+
+### Zusätzliche Nutzerfunktionen
+
+- Zweisprachige Questnamen und Questbeschreibungen
+- Zweisprachige Achievements und Battle-Logs
+- Zweisprachiger Shop, HUD, Titelbildschirm und Intro
+- Zweisprachige Modellwahl und Downloader-Dialogs
+- Zweisprachige MAAT-OS-Infoseiten im Menü
+- Boss-Codex-Einträge beim ersten Treffen
+- Journal dokumentiert Storyweg, Konsequenzen und Boss-Begegnungen
 
 ### Hinweise
 
@@ -165,9 +199,12 @@ Diese Datei beschreibt die sichtbaren Funktionen, Systeme und Kommandos des aktu
 
 - Bilingual startup for the MAAT-OS loader and MAAT-RPG
 - Language selection at startup and in the menu
+- Language switching also covers loader, model selection, intro, HUD, and system messages
 - `Version 0.2` title screen with Enter step
 - Persistent save state in `Application Support`
 - Local model setup with model selection and downloader
+- Model downloader with resume and verification logic
+- Architecture-specific setup paths for Intel and Apple Silicon
 - Say-TTS with language-specific default voices `Anna` and `Samantha`
 - Music system for menu, intro, and battles
 - Plugin architecture with command router
@@ -177,12 +214,18 @@ Diese Datei beschreibt die sichtbaren Funktionen, Systeme und Kommandos des aktu
 ### Gameplay
 
 - Guided demo battles with no gameplay advantage
+- Guide battles with explanations for `/fight`, `/fightboss`, and `/fightfinal`
 - Random battles after the introduction
 - Boss and final boss fights with auras, charge, and special attacks
+- Boss HUD with aura, phase, special name, and charge display
+- Phase-2 system for later bosses
 - Resonance system with `MAAT Impulse`
 - Focus system with healing and shield
+- Per-turn weakness system
 - Shop with healing potions and warding sigils
+- Warding sigils grant a starting shield in real battles
 - Combat achievements and battle analysis
+- Path-dependent combat modifiers and rewards
 - Path profile, rank, and motive for Maatis
 - Story choices with later consequences
 - Journal and boss codex
@@ -193,11 +236,23 @@ Diese Datei beschreibt die sichtbaren Funktionen, Systeme und Kommandos des aktu
 
 - Cinematic intro for MAAT-RPG
 - Main story with interludes and inner reflections
+- Choice scenes with multiple answer paths
 - Multilingual story scenes and journal entries
 - Reactive world based on the path profile
 - Boss reactions to Maatis' path
 - Relationship display between Maatis and MAAT-KI
+- Path profile develops title, rank, and motive from decisions
+- Consequence network linking story, battle, journal, and rewards
 - Lore, origin, and identity views
+
+### MAAT-OS and System Flow
+
+- App loader with language selection before the actual game
+- MAAT-RPG menu with music, title screen, and progress display
+- Startup diagnostics for Python, backends, and model folders
+- Soft reset of conversation context after demo and test battles
+- Clean separation between chat context and battle context
+- Localized loading bars and startup messages
 
 ### Key Commands
 
@@ -306,6 +361,19 @@ Diese Datei beschreibt die sichtbaren Funktionen, Systeme und Kommandos des aktu
 - Profile-dependent boss reactions
 - Journal entries from story, boss, and quest events
 - Auto-Think, BKI, and MAAT analysis plugins
+- Automatic battle-context cleanup after guide battles
+- Language fallback via saved language or system language
+- Protection against unnecessary plugin-loader warnings at startup
+
+### Additional Player-Facing Features
+
+- Bilingual quest names and quest descriptions
+- Bilingual achievements and battle logs
+- Bilingual shop, HUD, title screen, and intro
+- Bilingual model selection and downloader dialogs
+- Bilingual MAAT-OS info pages in the menu
+- Boss codex entries on first encounter
+- Journal records story path, consequences, and boss encounters
 
 ### Notes
 
