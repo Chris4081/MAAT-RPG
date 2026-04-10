@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-MAAT-WikiFetcher v4.1 — DB-Cache + Auto-Kontext + Debug
---------------------------------------------------------
+MAAT-WikiFetcher v4.2 — DB-Cache + Auto-Kontext + Debug + User-Agent
+----------------------------------------------------------------------
 ✓ Holt Artikel aus deutscher Wikipedia
 ✓ SQLite-Cache in /data/wiki_cache.db
 ✓ /wiki <begriff>  → holt aus Cache oder live & speichert
@@ -12,14 +12,45 @@ MAAT-WikiFetcher v4.1 — DB-Cache + Auto-Kontext + Debug
 ✓ Auto-Kontext: Wenn im User-Text z. B. "Mona Lisa" vorkommt
   und im Cache ist, wird ein kurzer Wiki-Kontext intern
   vor die Eingabe gehängt.
+✓ v4.2: Wikimedia-konformer User-Agent gesetzt
+  (Pflicht laut foundation.wikimedia.org/wiki/Policy:API_usage_guidelines)
 """
 
 import os
 import sqlite3
 import wikipedia
+import requests
 import re
 from datetime import datetime
 from shared.core.maat_paths import data_file, state_file, log_file
+
+
+# ─── Wikimedia User-Agent (Pflicht) ──────────────────────────────────────────
+# Wikimedia verlangt einen identifizierenden User-Agent für alle API-Zugriffe.
+# Format: "<ProjectName>/<Version> (<URL>; <contact>)"
+# Quelle: https://foundation.wikimedia.org/wiki/Policy:API_usage_guidelines
+_USER_AGENT = (
+    "MAAT-RPG/1.0 "
+    "(https://github.com/Chris4081/MAAT-RPG; "
+    "https://maat-research.com)"
+)
+
+# Wikipedia-Library nutzt intern requests — wir ersetzen die Session
+def _patch_wikipedia_session():
+    """
+    Setzt den Wikimedia-konformen User-Agent auf der internen
+    requests.Session der wikipedia-Library.
+    Muss einmal beim Import aufgerufen werden.
+    """
+    try:
+        session = requests.Session()
+        session.headers.update({"User-Agent": _USER_AGENT})
+        wikipedia.session = session
+    except Exception as e:
+        print(f"[WikiFetcher] Warnung: User-Agent konnte nicht gesetzt werden: {e}")
+
+_patch_wikipedia_session()
+# ─────────────────────────────────────────────────────────────────────────────
 
 
 class Plugin:
@@ -29,11 +60,26 @@ class Plugin:
     # COMMANDS – für CommandRouter (/help)
     # -----------------------------------------------------
     commands = {
-        "/wiki": {"de": "Ruft Wikipedia-Artikel ab und cached sie (/wiki <Begriff>).", "en": "Fetches and caches Wikipedia articles (/wiki <term>)."},
-        "/wiki cache": {"de": "Zeigt die letzten Cache-Eintraege.", "en": "Shows the latest cache entries."},
-        "/wiki debug on": {"de": "Schaltet Wiki-Debug ein (zeigt Kontext im Terminal).", "en": "Turns wiki debug on (shows context in the terminal)."},
-        "/wiki debug off": {"de": "Schaltet Wiki-Debug aus.", "en": "Turns wiki debug off."},
-        "/wiki debug once": {"de": "Aktiviert Wiki-Debug nur fuer die naechste Eingabe.", "en": "Enables wiki debug only for the next input."},
+        "/wiki": {
+            "de": "Ruft Wikipedia-Artikel ab und cached sie (/wiki <Begriff>).",
+            "en": "Fetches and caches Wikipedia articles (/wiki <term>)."
+        },
+        "/wiki cache": {
+            "de": "Zeigt die letzten Cache-Eintraege.",
+            "en": "Shows the latest cache entries."
+        },
+        "/wiki debug on": {
+            "de": "Schaltet Wiki-Debug ein (zeigt Kontext im Terminal).",
+            "en": "Turns wiki debug on (shows context in the terminal)."
+        },
+        "/wiki debug off": {
+            "de": "Schaltet Wiki-Debug aus.",
+            "en": "Turns wiki debug off."
+        },
+        "/wiki debug once": {
+            "de": "Aktiviert Wiki-Debug nur fuer die naechste Eingabe.",
+            "en": "Enables wiki debug only for the next input."
+        },
     }
 
     def __init__(self):
@@ -87,7 +133,6 @@ class Plugin:
                 "  • /wiki debug once  – Debug nur für die nächste Eingabe\n"
             )
 
-        # Subcommand /wiki debug ...
         sub = parts[1].lower()
 
         # /wiki debug ...
@@ -159,12 +204,10 @@ class Plugin:
         if not text:
             return (False, user_input)
 
-        # Treffer aus dem Cache holen
         hits = self._match_in_text(text)
         if not hits:
             return (False, user_input)
 
-        # Max. 3 Snippets je ~300 Zeichen
         lines = []
         MAX_SNIPPETS = 3
         MAX_LEN = 300
@@ -186,15 +229,12 @@ class Plugin:
             + text
         )
 
-        # Debug-Output im Terminal
         if self.debug or self.debug_once:
             print("\n🧪 [WIKI-DEBUG] Kontext, der an das Modell geht:\n")
             print(wiki_block)
             print("\n🧪 [WIKI-DEBUG ENDE]\n")
             self.debug_once = False
 
-        # handled=False → andere Plugins dürfen noch ran,
-        # user_input wird aber durch wiki_block ersetzt
         return (False, wiki_block)
 
     # -----------------------------------------------------
@@ -219,13 +259,9 @@ class Plugin:
         conn.close()
 
     # -----------------------------------------------------
-    # CACHE LOOKUP (für /wiki)
+    # CACHE LOOKUP
     # -----------------------------------------------------
     def _lookup_cache(self, query):
-        """
-        Sucht nach exaktem raw_query ODER exaktem Titel (case-insensitive).
-        Gibt (title, summary, url) oder None zurück.
-        """
         q = query.strip().lower()
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
@@ -241,17 +277,12 @@ class Plugin:
         )
         row = c.fetchone()
         conn.close()
-        return row  # (title, summary, url) oder None
+        return row
 
     # -----------------------------------------------------
-    # MATCH IN TEXT (für before_chat)
+    # MATCH IN TEXT
     # -----------------------------------------------------
     def _match_in_text(self, text, limit=5):
-        """
-        Prüft, ob der User-Text bekannte Wiki-Begriffe enthält.
-        Es wird auf raw_query UND Titel gematcht (Substring, case-insensitive).
-        Gibt Liste von (title, summary, url) zurück.
-        """
         t = text.lower()
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
@@ -270,13 +301,12 @@ class Plugin:
             if raw_query:
                 cand_list.append(raw_query.lower())
             if title:
-                # auch bereinigten Titel verwenden (z.B. ohne Klammern)
                 cand_list.append(self._clean_title(title).lower())
 
             for cand in cand_list:
                 if cand and cand in t:
                     matches.append((title, summary, url))
-                    break  # diesen Eintrag nur einmal hinzufügen
+                    break
 
             if len(matches) >= limit:
                 break
@@ -300,7 +330,6 @@ class Plugin:
             conn.commit()
             conn.close()
         except Exception:
-            # Cache darf niemals den Chat crashen
             pass
 
     # -----------------------------------------------------
@@ -339,7 +368,7 @@ class Plugin:
     def _clean_title(self, title):
         if not title:
             return ""
-        title = re.sub(r"\(.*?\)", "", title)  # entferne Klammern
+        title = re.sub(r"\(.*?\)", "", title)
         title = title.replace("–", "-")
         return title.strip()
 
@@ -354,7 +383,7 @@ class Plugin:
             summary = wikipedia.summary(q, sentences=3, auto_suggest=True)
             page = wikipedia.page(q, auto_suggest=True)
             return page, summary
-        except:
+        except Exception:
             pass
 
         # 2. Suche
@@ -364,9 +393,8 @@ class Plugin:
                 return None, None
 
             best = results[0]
-
             summary = wikipedia.summary(best, sentences=3, auto_suggest=False)
             page = wikipedia.page(best, auto_suggest=False)
             return page, summary
-        except:
+        except Exception:
             return None, None
