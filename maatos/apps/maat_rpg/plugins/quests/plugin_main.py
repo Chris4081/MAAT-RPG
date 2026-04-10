@@ -300,6 +300,9 @@ class Plugin:
             quest["desc"] = loc["en_desc"]
         return quest
 
+    def _quest_name(self, quest: dict) -> str:
+        return self._quest_display(quest).get("name", quest.get("id", "Quest"))
+
     def _story_state_path(self) -> str:
         return state_file("story_state.json")
 
@@ -598,7 +601,10 @@ class Plugin:
             if active_q.get("type") in ("counter", "daily_streak"):
                 active_q["progress"] = 0
             self.qstate["active"].append(active_q)
-            return self._t(f"✅ Quest '{active_q['name']}' angenommen.", f"✅ Quest '{active_q['name']}' accepted.")
+            return self._t(
+                f"✅ Quest '{self._quest_name(active_q)}' angenommen.",
+                f"✅ Quest '{self._quest_name(active_q)}' accepted.",
+            )
 
         # ----------------------------
         # /quest info <id|nr>

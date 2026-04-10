@@ -60,6 +60,8 @@ TEXT = {
         "menu_info": "[4] Info MAAT-OS",
         "menu_exit": "[5] Beenden",
         "menu_shortcuts": "Direkt im Spiel wichtig: /journal  /erfolge  /xp  /maatbond",
+        "menu_hint_restart": "Wenn MAAT-KI ein Problem beim Antworten hat, starte das System einfach mit /restart neu.",
+        "menu_hint_language": "Tipp: Sage MAAT-KI, in welcher Sprache er mit dir sprechen soll.",
         "choice": "Auswahl: ",
         "start_msg": "🌿 MAAT-RPG startet... Viel Erfolg, Wanderer.",
         "bye": "Auf Wiedersehen im Aeon der MAAT.",
@@ -123,6 +125,8 @@ TEXT = {
         "menu_info": "[4] MAAT-OS info",
         "menu_exit": "[5] Quit",
         "menu_shortcuts": "Useful in game: /journal  /erfolge  /xp  /maatbond",
+        "menu_hint_restart": "If MAAT-KI has trouble answering, simply restart the system with /restart.",
+        "menu_hint_language": "Tip: Tell MAAT-KI which language it should speak with you.",
         "choice": "Choice: ",
         "start_msg": "🌿 MAAT-RPG is starting... Walk well, wanderer.",
         "bye": "Farewell in the Aeon of MAAT.",
@@ -945,6 +949,8 @@ class Plugin:
         print(f"  {self._t('menu_exit')}")
         print()
         print(Fore.GREEN + self._t("menu_shortcuts") + Style.RESET_ALL)
+        print(Fore.CYAN + self._t("menu_hint_restart") + Style.RESET_ALL)
+        print(Fore.CYAN + self._t("menu_hint_language") + Style.RESET_ALL)
         print()
 
         choice = input(Fore.GREEN + self._t("choice") + Style.RESET_ALL).strip()

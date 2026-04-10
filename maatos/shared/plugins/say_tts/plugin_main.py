@@ -12,6 +12,7 @@ import subprocess
 import queue
 import threading
 import platform
+import re
 import time
 from shared.core.rpg_i18n import get_language
 
@@ -41,6 +42,8 @@ class Plugin:
 
         # Stream-Buffer für Token
         self.buffer = ""
+        self._think_buffer = ""
+        self._inside_think = False
 
         # Sequenzieller TTS-Queue
         self.tts_queue = queue.Queue()
@@ -63,6 +66,14 @@ class Plugin:
     def _sync_voice_with_language(self):
         if not self.voice_is_manual:
             self.voice = self._default_voice()
+
+    def _prepare_tts_text(self, text: str) -> str:
+        cleaned = (text or "").strip()
+        if self._lang() == "de":
+            cleaned = re.sub(r"<think>.*?</think>", "", cleaned, flags=re.IGNORECASE | re.DOTALL)
+            cleaned = re.sub(r"</?think>", "", cleaned, flags=re.IGNORECASE)
+            cleaned = re.sub(r"\n{2,}", "\n", cleaned).strip()
+        return cleaned
 
     # ----------------------------------------------------
     # Startup
@@ -111,18 +122,50 @@ class Plugin:
 
     def _speak(self, text: str):
         """ Text in Queue einreihen (wird SEQUENZIELL gesprochen). """
-        if self.enabled:
+        prepared = self._prepare_tts_text(text)
+        if self.enabled and prepared:
             self._sync_voice_with_language()
-            self.tts_queue.put(text.strip())
+            self.tts_queue.put(prepared)
 
     # ----------------------------------------------------
     # STREAMING LOGIK
     # ----------------------------------------------------
     def before_stream(self, text):
         self.buffer = ""
+        self._think_buffer = ""
+        self._inside_think = False
 
     def on_token(self, token):
         if not self.enabled:
+            return
+
+        if self._lang() == "de":
+            self._think_buffer += token
+
+            while self._think_buffer:
+                if self._inside_think:
+                    end_idx = self._think_buffer.lower().find("</think>")
+                    if end_idx == -1:
+                        return
+                    self._think_buffer = self._think_buffer[end_idx + len("</think>"):]
+                    self._inside_think = False
+                    continue
+
+                start_idx = self._think_buffer.lower().find("<think>")
+                visible = self._think_buffer if start_idx == -1 else self._think_buffer[:start_idx]
+
+                if visible:
+                    self.buffer += visible
+                    if any(self.buffer.endswith(end) for end in [".", "!", "?", "…"]):
+                        self._speak(self.buffer)
+                        self.buffer = ""
+
+                if start_idx == -1:
+                    self._think_buffer = ""
+                    return
+
+                self._think_buffer = self._think_buffer[start_idx + len("<think>"):]
+                self._inside_think = True
             return
 
         self.buffer += token
@@ -134,9 +177,14 @@ class Plugin:
 
     def after_stream(self, full_text):
         """ Reste sprechen """
+        if self._lang() == "de" and self._think_buffer and not self._inside_think:
+            self.buffer += self._think_buffer
+            self._think_buffer = ""
         if self.enabled and self.buffer.strip():
             self._speak(self.buffer)
         self.buffer = ""
+        self._think_buffer = ""
+        self._inside_think = False
 
     # ----------------------------------------------------
     # CHAT BEFEHLE

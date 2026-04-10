@@ -13,6 +13,7 @@ MAAT-OS | Model Downloader Plugin (resumable)
 
 import json
 import os
+import platform
 import sys
 import time
 import threading
@@ -27,12 +28,64 @@ from shared.core.rpg_i18n import get_language
 # ==========================================================
 # CONFIG
 # ==========================================================
-MODEL_NAME = "Qwen3-14B-Claude-4.5-Opus-Distill.q3_k_m.gguf"
-MODEL_URL = (
-    "https://huggingface.co/TeichAI/"
-    "Qwen3-14B-Claude-4.5-Opus-High-Reasoning-Distill-GGUF/"
-    "resolve/main/Qwen3-14B-Claude-4.5-Opus-Distill.q3_k_m.gguf?download=true"
-)
+TEICHAI_LOW_MODEL_SPEC = {
+    "tier": "q3",
+    "family": "teichai_qwen",
+    "label": "TeichAI Qwen3-14B Claude Distill Q3_K_M",
+    "name": "Qwen3-14B-Claude-4.5-Opus-Distill.q3_k_m.gguf",
+    "repo_id": "TeichAI/Qwen3-14B-Claude-4.5-Opus-High-Reasoning-Distill-GGUF",
+    "filename": "Qwen3-14B-Claude-4.5-Opus-Distill.q3_k_m.gguf",
+    "url": (
+        "https://huggingface.co/TeichAI/"
+        "Qwen3-14B-Claude-4.5-Opus-High-Reasoning-Distill-GGUF/"
+        "resolve/main/Qwen3-14B-Claude-4.5-Opus-Distill.q3_k_m.gguf?download=true"
+    ),
+    "aliases": ("qwen3-14b-claude-4.5-opus-distill", "teichai", "q3_k_m", "q3", "14b"),
+}
+
+TEICHAI_MID_MODEL_SPEC = {
+    "tier": "q4",
+    "family": "teichai_qwen",
+    "label": "TeichAI Qwen3-14B Claude Distill Q4_K_M",
+    "name": "Qwen3-14B-Claude-4.5-Opus-Distill.q4_k_m.gguf",
+    "repo_id": "TeichAI/Qwen3-14B-Claude-4.5-Opus-High-Reasoning-Distill-GGUF",
+    "filename": "Qwen3-14B-Claude-4.5-Opus-Distill.q4_k_m.gguf",
+    "url": (
+        "https://huggingface.co/TeichAI/"
+        "Qwen3-14B-Claude-4.5-Opus-High-Reasoning-Distill-GGUF/"
+        "resolve/main/Qwen3-14B-Claude-4.5-Opus-Distill.q4_k_m.gguf?download=true"
+    ),
+    "aliases": ("qwen3-14b-claude-4.5-opus-distill", "teichai", "q4_k_m", "q4", "14b"),
+}
+
+TEICHAI_HIGH_MODEL_SPEC = {
+    "tier": "q5",
+    "family": "teichai_qwen",
+    "label": "TeichAI Qwen3-14B Claude Distill Q5_K_M",
+    "name": "Qwen3-14B-Claude-4.5-Opus-Distill.q5_k_m.gguf",
+    "repo_id": "TeichAI/Qwen3-14B-Claude-4.5-Opus-High-Reasoning-Distill-GGUF",
+    "filename": "Qwen3-14B-Claude-4.5-Opus-Distill.q5_k_m.gguf",
+    "url": (
+        "https://huggingface.co/TeichAI/"
+        "Qwen3-14B-Claude-4.5-Opus-High-Reasoning-Distill-GGUF/"
+        "resolve/main/Qwen3-14B-Claude-4.5-Opus-Distill.q5_k_m.gguf?download=true"
+    ),
+    "aliases": ("qwen3-14b-claude-4.5-opus-distill", "teichai", "q5_k_m", "q5", "14b"),
+}
+
+LLAMA_ALT_MODEL_SPEC = {
+    "tier": "q4",
+    "family": "llama_alt",
+    "label": "Meta-Llama-3.1-8B-Instruct-128k Q4_0",
+    "name": "Meta-Llama-3.1-8B-Instruct-128k-Q4_0.gguf",
+    "repo_id": "GPT4All-Community/Meta-Llama-3.1-8B-Instruct-128k-GGUF",
+    "filename": "Meta-Llama-3.1-8B-Instruct-128k-Q4_0.gguf",
+    "url": (
+        "https://huggingface.co/GPT4All-Community/Meta-Llama-3.1-8B-Instruct-128k-GGUF/"
+        "resolve/main/Meta-Llama-3.1-8B-Instruct-128k-Q4_0.gguf?download=true"
+    ),
+    "aliases": ("meta-llama-3.1-8b", "llama-3.1-8b", "gpt4all-community", "q4_0", "llama"),
+}
 
 CHUNK_SIZE = 1024 * 1024          # 1 MB
 BAR_WIDTH = 40
@@ -70,6 +123,28 @@ DOWNLOADER_TEXT = {
         "download_error": "\n❌ Fehler beim Download:\n{error}\n",
         "progress_kept": "💾 Der bisherige Fortschritt wurde behalten und kann spaeter fortgesetzt werden.\n",
         "no_model_exit": "MAAT-OS: Kein Modell verfuegbar.",
+        "system_profile": "🧠 Systemprofil: {arch}, ca. {ram_gb} GB RAM",
+        "family_title": "🌐 Modellfamilie waehlen",
+        "family_prompt": "Auswahl [1/2, Enter = Empfehlung]: ",
+        "family_1": "[1] TeichAI Qwen3-14B Claude Distill (empfohlen)",
+        "family_2": "[2] Meta-Llama-3.1-8B Instruct 128k (Alternative ohne Qwen)",
+        "recommend_q3": "💡 Empfehlung: TeichAI Qwen3-14B Q3_K_M fuer Intel oder Macs mit 16 GB RAM und weniger.",
+        "recommend_q4": "💡 Empfehlung: TeichAI Qwen3-14B Q4_K_M fuer Apple Silicon ab 17 GB RAM.",
+        "recommend_q5": "💡 Empfehlung: TeichAI Qwen3-14B Q5_K_M fuer Apple Silicon mit 32 GB RAM oder mehr.",
+        "recommend_llama": "💡 Alternative: Meta-Llama-3.1-8B Q4_0 fuer Nutzer, die kein Qwen-Modell moechten.",
+        "using_local": "\n✔ Lokales Modell gefunden: {model}\n",
+        "using_local_path": "📁 Verwende: {path}\n",
+        "using_fallback_local": "🌿 Es wird ein bereits vorhandenes lokales Modell verwendet, kein neuer Download noetig.",
+        "gguf_hint": "🧩 Format: GGUF fuer llama.cpp / lokale Ausfuehrung",
+        "quant_hint": "⚙️ Empfohlene Quantisierung: {label}",
+        "hub_hint": "☁️ Download ueber Hugging Face Hub mit Resume-Unterstuetzung",
+        "hub_start": "🤗 Download von Hugging Face startet …",
+        "download_header": "🌿 MAAT-RPG Modell-Download",
+        "tip_header": "💡 MAAT-Hinweise waehrend des Downloads",
+        "tip_1": "• MAAT-RPG laeuft lokal auf deinem Mac.",
+        "tip_2": "• /journal zeigt Maatis' Weg und Entscheidungen.",
+        "tip_3": "• Guide-Kaempfe veraendern deinen Spielstand nicht.",
+        "tip_4": "• Sprache kannst du spaeter im Menue umstellen.",
     },
     "en": {
         "resume_at": "🔁 Resuming at {size}",
@@ -99,6 +174,28 @@ DOWNLOADER_TEXT = {
         "download_error": "\n❌ Download error:\n{error}\n",
         "progress_kept": "💾 Your current progress was preserved and can be resumed later.\n",
         "no_model_exit": "MAAT-OS: No model available.",
+        "system_profile": "🧠 System profile: {arch}, about {ram_gb} GB RAM",
+        "family_title": "🌐 Choose model family",
+        "family_prompt": "Choice [1/2, Enter = recommended]: ",
+        "family_1": "[1] TeichAI Qwen3-14B Claude Distill (recommended)",
+        "family_2": "[2] Meta-Llama-3.1-8B Instruct 128k (non-Qwen alternative)",
+        "recommend_q3": "💡 Recommendation: TeichAI Qwen3-14B Q3_K_M for Intel or Macs with 16 GB RAM and below.",
+        "recommend_q4": "💡 Recommendation: TeichAI Qwen3-14B Q4_K_M for Apple Silicon with 17 GB RAM or more.",
+        "recommend_q5": "💡 Recommendation: TeichAI Qwen3-14B Q5_K_M for Apple Silicon with 32 GB RAM or more.",
+        "recommend_llama": "💡 Alternative: Meta-Llama-3.1-8B Q4_0 for users who do not want a Qwen model.",
+        "using_local": "\n✔ Local model found: {model}\n",
+        "using_local_path": "📁 Using: {path}\n",
+        "using_fallback_local": "🌿 An existing local model will be used, no new download is required.",
+        "gguf_hint": "🧩 Format: GGUF for llama.cpp / local execution",
+        "quant_hint": "⚙️ Recommended quantization: {label}",
+        "hub_hint": "☁️ Download via Hugging Face Hub with resume support",
+        "hub_start": "🤗 Starting download from Hugging Face …",
+        "download_header": "🌿 MAAT-RPG model download",
+        "tip_header": "💡 MAAT hints while downloading",
+        "tip_1": "• MAAT-RPG runs locally on your Mac.",
+        "tip_2": "• /journal shows Maatis' path and decisions.",
+        "tip_3": "• Guide battles do not change your progression.",
+        "tip_4": "• You can change the language later in the menu.",
     },
 }
 
@@ -129,6 +226,129 @@ def get_models_dir() -> Path:
 
     path.mkdir(parents=True, exist_ok=True)
     return path
+
+
+def _detect_ram_gb() -> int:
+    try:
+        if sys.platform == "darwin":
+            raw = subprocess.check_output(["sysctl", "-n", "hw.memsize"], text=True).strip()
+            return max(0, int(int(raw) / (1024 ** 3)))
+    except Exception:
+        pass
+    return 0
+
+
+def _system_profile() -> dict:
+    arch = platform.machine().lower()
+    ram_gb = _detect_ram_gb()
+    return {"arch": arch, "ram_gb": ram_gb}
+
+
+def _recommended_spec() -> dict:
+    family = _preferred_family()
+    profile = _system_profile()
+    arch = profile["arch"]
+    ram_gb = profile["ram_gb"]
+    if family == "llama_alt":
+        return LLAMA_ALT_MODEL_SPEC
+    if arch != "arm64" or (ram_gb and ram_gb <= 16) or ram_gb == 0:
+        return TEICHAI_LOW_MODEL_SPEC
+    if ram_gb >= 32:
+        return TEICHAI_HIGH_MODEL_SPEC
+    return TEICHAI_MID_MODEL_SPEC
+
+
+def _preferred_family() -> str:
+    settings_path = Path.home() / "Library" / "Application Support" / "MAAT-RPG" / "state" / "settings_state.json"
+    try:
+        data = json.loads(settings_path.read_text(encoding="utf-8"))
+        family = data.get("model_family")
+        if family in ("teichai_qwen", "llama_alt"):
+            return family
+    except Exception:
+        pass
+    return "teichai_qwen"
+
+
+def _save_preferred_family(family: str):
+    settings_path = Path.home() / "Library" / "Application Support" / "MAAT-RPG" / "state" / "settings_state.json"
+    settings_path.parent.mkdir(parents=True, exist_ok=True)
+    data = {}
+    try:
+        data = json.loads(settings_path.read_text(encoding="utf-8"))
+        if not isinstance(data, dict):
+            data = {}
+    except Exception:
+        data = {}
+    data["model_family"] = family
+    settings_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def _choose_family() -> str:
+    current = _preferred_family()
+    print()
+    print(Fore.CYAN + Style.BRIGHT + _dt("family_title") + Style.RESET_ALL)
+    print(_dt("family_1"))
+    print(_dt("family_2"))
+    choice = input(_dt("family_prompt")).strip()
+    if choice == "2":
+        current = "llama_alt"
+    elif choice == "1":
+        current = "teichai_qwen"
+    _save_preferred_family(current)
+    return current
+
+
+def _has_any_local_model(models_dir: Path) -> bool:
+    return _find_any_local_model(models_dir) is not None
+
+
+def _find_local_model(models_dir: Path, spec: dict) -> Optional[Path]:
+    aliases = tuple(a.lower() for a in spec.get("aliases", ()))
+    exact = models_dir / spec["name"]
+    if exact.exists() and exact.stat().st_size > 0:
+        return exact
+    for path in sorted(models_dir.glob("*.gguf")):
+        name = path.name.lower()
+        if any(alias in name for alias in aliases):
+            return path
+    return None
+
+
+def _find_any_local_model(models_dir: Path) -> Optional[Path]:
+    for path in sorted(models_dir.glob("*.gguf")):
+        if path.exists() and path.stat().st_size > 0:
+            return path
+    return None
+
+
+def _print_download_panel(spec: dict):
+    print(Fore.CYAN + Style.BRIGHT + _dt("download_header") + Style.RESET_ALL)
+    print(_dt("quant_hint", label=spec["label"]))
+    print(_dt("gguf_hint"))
+    print(_dt("hub_hint"))
+    print()
+    print(Fore.YELLOW + _dt("tip_header") + Style.RESET_ALL)
+    print(_dt("tip_1"))
+    print(_dt("tip_2"))
+    print(_dt("tip_3"))
+    print(_dt("tip_4"))
+    print()
+
+
+def _print_recommendation(chosen_family: str, spec: dict, profile: dict):
+    print(_dt("system_profile", arch=profile["arch"], ram_gb=profile["ram_gb"] or "?"))
+    if chosen_family == "llama_alt":
+        print(_dt("recommend_llama"))
+    elif spec["tier"] == "q5":
+        print(_dt("recommend_q5"))
+    elif spec["tier"] == "q4":
+        print(_dt("recommend_q4"))
+    else:
+        print(_dt("recommend_q3"))
+    print(_dt("quant_hint", label=spec["label"]))
+    print(_dt("gguf_hint"))
+    print(_dt("hub_hint"))
 
 
 # ==========================================================
@@ -359,19 +579,46 @@ def resumable_download(url: str, final_path: Path):
 # ==========================================================
 # CORE
 # ==========================================================
-def ensure_model(plugin_dir: str) -> bool:
+def ensure_model(plugin_dir: str, force_open: bool = False) -> bool:
     models_dir = get_models_dir()
-    final_path = models_dir / MODEL_NAME
+    chosen_family = _preferred_family()
+    spec = _recommended_spec()
+    final_path = models_dir / spec["name"]
+    part_path = final_path.with_suffix(final_path.suffix + ".part")
+    meta_path = final_path.with_suffix(final_path.suffix + ".progress.json")
+    profile = _system_profile()
+
+    local_match = _find_local_model(models_dir, spec)
+    if local_match and not force_open:
+        print(Fore.GREEN + _dt("using_local", model=local_match.name) + Style.RESET_ALL)
+        print(_dt("using_local_path", path=local_match))
+        return True
+
+    fallback_local = _find_any_local_model(models_dir)
+    if fallback_local and not force_open:
+        print(Fore.GREEN + _dt("using_local", model=fallback_local.name) + Style.RESET_ALL)
+        print(_dt("using_local_path", path=fallback_local))
+        print(_dt("using_fallback_local"))
+        return True
+
+    if force_open:
+        current_local = local_match or fallback_local
+        if current_local:
+            print(Fore.GREEN + _dt("using_local", model=current_local.name) + Style.RESET_ALL)
+            print(_dt("using_local_path", path=current_local))
+            print()
+
+    chosen_family = _choose_family()
+    spec = _recommended_spec()
+    final_path = models_dir / spec["name"]
     part_path = final_path.with_suffix(final_path.suffix + ".part")
     meta_path = final_path.with_suffix(final_path.suffix + ".progress.json")
 
-    if final_path.exists() and final_path.stat().st_size > 0:
-        print(Fore.GREEN + _dt("model_found", model=MODEL_NAME) + Style.RESET_ALL)
-        print(_dt("path", path=final_path))
-        return True
+    _print_recommendation(chosen_family, spec, profile)
 
-    print(Fore.RED + _dt("missing_model") + Style.RESET_ALL)
-    print(_dt("required", model=MODEL_NAME))
+    if not force_open:
+        print(Fore.RED + _dt("missing_model") + Style.RESET_ALL)
+    print(_dt("required", model=spec["name"]))
     print(_dt("source"))
     print(_dt("target", path=models_dir))
 
@@ -399,9 +646,11 @@ def ensure_model(plugin_dir: str) -> bool:
     clear()
     print(Fore.CYAN + _dt("loading") + Style.RESET_ALL)
     print(_dt("wait"))
+    _print_download_panel(spec)
 
     try:
-        resumable_download(MODEL_URL, final_path)
+        print(Fore.CYAN + _dt("hub_start") + Style.RESET_ALL)
+        resumable_download(spec["url"], final_path)
         music.stop()
 
         print(Fore.GREEN + _dt("done") + Style.RESET_ALL)

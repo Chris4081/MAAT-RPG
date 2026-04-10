@@ -92,6 +92,17 @@ COMBAT_ACHIEVEMENTS = {
     "ult_finisher": "🌌 Resonanz-Finisher",
 }
 
+ACHIEVEMENT_TITLE_EN = {
+    "mona lisa": "🖼️ Mystery of the Eternal Muse",
+    "maat": "✨ Child of Order",
+    "wahrheit": "🔍 Seeker of Truth",
+    "harmonie": "🌿 Keeper of Harmony",
+    "balance": "⚖️ Warden of Balance",
+    "respekt": "🕊️ Voice of Respect",
+    "hallo": "😊 Friendly Greeting",
+    "danke": "🙏 Gratitude as Strength",
+}
+
 
 
 # ========================================================
@@ -117,6 +128,11 @@ class Plugin:
 
     def _t(self, de: str, en: str) -> str:
         return en if self._lang() == "en" else de
+
+    def _achievement_title(self, word: str, title: str) -> str:
+        if self._lang() != "en":
+            return title
+        return ACHIEVEMENT_TITLE_EN.get(word, title)
 
     # --------------------------------------------------------
     # PERSISTENZ
@@ -168,7 +184,7 @@ class Plugin:
 
         for word in unlocked:
             title, reward = TRIGGERS.get(word, ("", 0))
-            lines.append(f"✨ {title} (+{reward} XP)")
+            lines.append(f"✨ {self._achievement_title(word, title)} (+{reward} XP)")
 
         if combat:
             if unlocked:
@@ -212,7 +228,7 @@ class Plugin:
                     self.state["unlocked"].append(word)
                     self.state["count"] += 1
 
-                    new_unlocks.append((title, reward))
+                    new_unlocks.append((word, title, reward))
                     total_reward_xp += reward
 
         self._save()
@@ -254,8 +270,8 @@ class Plugin:
 
         en = get_language(("de", "en")) == "en"
         print("\n🏆 New achievement unlocked!" if en else "\n🏆 Neuer Erfolg freigeschaltet!")
-        for title, reward in unlocks:
-            print(f"✨ {title} (+{reward} XP)")
+        for word, title, reward in unlocks:
+            print(f"✨ {self._achievement_title(word, title)} (+{reward} XP)")
 
         for lvl in levelups:
             print(f"🌟 Level up! You are now level {lvl}!" if en else f"🌟 Level-Up! Du bist jetzt Level {lvl}!")

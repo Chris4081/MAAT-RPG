@@ -410,8 +410,13 @@ def start_classic():
             print(Fore.YELLOW + (f"⚠️ YAML could not be loaded: {e}\n" if _ui_language() == "en" else f"⚠️ YAML konnte nicht geladen werden: {e}\n") + Style.RESET_ALL)
             return None
 
-    profile_path = os.path.join(ROOT, "profiles", "maat_rpg.yaml")
+    profile_name = "maat_rpg_en.yaml" if _ui_language() == "en" else "maat_rpg.yaml"
+    profile_path = os.path.join(ROOT, "profiles", profile_name)
     profile = load_yaml_profile(profile_path) or {}
+    if not profile and profile_name != "maat_rpg.yaml":
+        fallback_path = os.path.join(ROOT, "profiles", "maat_rpg.yaml")
+        profile = load_yaml_profile(fallback_path) or {}
+        profile_path = fallback_path
     if profile:
         print(Fore.GREEN + (f"✅ YAML profile loaded: {profile_path}\n" if _ui_language() == "en" else f"✅ YAML-Profil geladen: {profile_path}\n") + Style.RESET_ALL)
     else:

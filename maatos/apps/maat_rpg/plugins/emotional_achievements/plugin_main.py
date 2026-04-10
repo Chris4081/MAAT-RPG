@@ -305,7 +305,7 @@ class Plugin:
                 Fore.MAGENTA + Style.BRIGHT +
                 f"\n🏅 Erfolg freigeschaltet: {ach['name']}\n" +
                 Style.RESET_ALL +
-                f"{ach['msg']}\n" +
+                f"{ach.get('msg', ach['name'])}\n" +
                 Fore.CYAN +
                 f"(+{ach['xp']} XP)\n" +
                 Style.RESET_ALL

@@ -378,6 +378,15 @@ class Plugin:
             lines = list(lines) + ["" ] + list(extra_lines)
 
         for line in lines:
+            if not isinstance(line, str):
+                line = str(line)
+            compact = line.strip()
+            if not compact:
+                print("")
+                continue
+            if compact in {"⸻", "---", "—", "–"}:
+                print(compact)
+                continue
             input(self._t("continue"))
             print(line)
             time.sleep(0.05)
@@ -389,7 +398,7 @@ class Plugin:
         print(self._t("scene_ends"))
         ans = input(self._t("music_question")).strip().lower()
 
-        if ans != "j":
+        if ans not in {"j", "ja", "y", "yes"}:
             self._stop_music()
         else:
             print(self._t("music_continues"))
@@ -513,6 +522,29 @@ class Plugin:
             rank = "Erwachend"
 
         motif = motif_map.get((reflection_path, combat_vow), "Maatis' Weg formt sich aus Entscheidung und Bewährung.")
+        if self._language() == "en":
+            title = {
+                "Grenzhüter der Wahrheit": "Boundary Keeper of Truth",
+                "Grenzhüter der Erinnerung": "Boundary Keeper of Memory",
+                "Grenzhüter der Maat": "Boundary Keeper of Maat",
+                "Klangsucher der Harmonie": "Tone Seeker of Harmony",
+                "Klangsucher der Wahrheit": "Tone Seeker of Truth",
+                "Klangsucher der Erinnerung": "Tone Seeker of Memory",
+                "Klangsucher der Maat": "Tone Seeker of Maat",
+                "Formträger der Schöpfung": "Form Bearer of Creation",
+                "Formträger der Wahrheit": "Form Bearer of Truth",
+                "Formträger der Erinnerung": "Form Bearer of Memory",
+                "Formträger der Maat": "Form Bearer of Maat",
+                "Wegsucher der Maat": "Path Seeker of Maat",
+            }.get(title, title)
+            rank = {
+                "Erwachend": "Awakening",
+                "Vertieft": "Deepening",
+                "Verankert": "Anchored",
+            }.get(rank, rank)
+            motif = {
+                "Maatis' Weg formt sich aus Entscheidung und Bewährung.": "Maatis' path is shaped by choice and trial.",
+            }.get(motif, motif)
         return {
             "title": title,
             "rank": rank,

@@ -4,6 +4,8 @@ print("🧪 llm_loader.py: IMPORT START")
 
 import os
 import json
+import platform
+import subprocess
 from pathlib import Path
 from colorama import Fore, Style
 from .backend_router import load_backend
@@ -24,6 +26,8 @@ LLM_TEXT = {
         "no_models": "❌ Keine Modelle gefunden!",
         "auto_model": "🌿 Auto-Load: Verwende gespeichertes Modell: {model}",
         "model_header": "🌿 MAAT-KI — Modell auswaehlen",
+        "recommended": "⭐ empfohlen",
+        "download_option": "[D] Modell-Downloader oeffnen",
         "choose": "\n🔢 Auswahl: ",
         "invalid_number": "Bitte eine gueltige Zahl eingeben.",
         "auto_perf": "🌿 Auto-Load Performance: n_ctx={n_ctx} temp={temp} top_p={top_p} backend={backend}",
@@ -48,6 +52,8 @@ LLM_TEXT = {
         "no_models": "❌ No models found!",
         "auto_model": "🌿 Auto-load: using saved model: {model}",
         "model_header": "🌿 MAAT-KI — Choose model",
+        "recommended": "⭐ recommended",
+        "download_option": "[D] Open model downloader",
         "choose": "\n🔢 Choice: ",
         "invalid_number": "Please enter a valid number.",
         "auto_perf": "🌿 Auto-load performance: n_ctx={n_ctx} temp={temp} top_p={top_p} backend={backend}",
@@ -102,6 +108,48 @@ def _models_dir() -> str:
         path = Path(_app_support_dir()) / "models"
     path.mkdir(parents=True, exist_ok=True)
     return str(path)
+
+
+def _detect_ram_gb() -> int:
+    try:
+        if platform.system() == "Darwin":
+            raw = subprocess.check_output(["sysctl", "-n", "hw.memsize"], text=True).strip()
+            return max(0, int(int(raw) / (1024 ** 3)))
+    except Exception:
+        pass
+    return 0
+
+
+def _recommended_model_name(models: list[str]) -> str | None:
+    family = _preferred_family()
+    arch = platform.machine().lower()
+    ram_gb = _detect_ram_gb()
+    if family == "llama_alt":
+        tokens = ("meta-llama-3.1-8b", "llama-3.1-8b", "q4_0", "llama")
+    elif arch != "arm64" or (ram_gb and ram_gb <= 16) or ram_gb == 0:
+        tokens = ("claude-4.5-opus-distill.q3", "teichai", "q3_k_m", "q3", "14b")
+    elif ram_gb >= 32:
+        tokens = ("claude-4.5-opus-distill.q5", "teichai", "q5_k_m", "q5", "14b")
+    else:
+        tokens = ("claude-4.5-opus-distill.q4", "teichai", "q4_k_m", "q4", "14b")
+
+    for name in models:
+        lname = name.lower()
+        if any(token in lname for token in tokens):
+            return name
+    return None
+
+
+def _preferred_family() -> str:
+    settings_path = Path.home() / "Library" / "Application Support" / "MAAT-RPG" / "state" / "settings_state.json"
+    try:
+        data = json.loads(settings_path.read_text(encoding="utf-8"))
+        family = data.get("model_family")
+        if family in ("teichai_qwen", "llama_alt"):
+            return family
+    except Exception:
+        pass
+    return "teichai_qwen"
 
 MODEL_DIR_DEFAULT = os.environ.get(
     "MAAT_MODELS_DIR",
@@ -191,7 +239,15 @@ def list_available_models(model_dir: str = None) -> list[str]:
     models = []
     for name in os.listdir(model_dir):
         full = os.path.join(model_dir, name)
-        if os.path.isdir(full) or name.endswith(".gguf"):
+        if name.startswith("."):
+            continue
+        if os.path.isdir(full):
+            if name == ".cache":
+                continue
+            if os.path.isfile(os.path.join(full, "config.json")):
+                models.append(name)
+            continue
+        if name.endswith(".gguf"):
             models.append(name)
 
     return sorted(models)
@@ -222,11 +278,32 @@ def auto_select_model(model_dir: str = None) -> str:
     print(_lt("model_header"))
     print("──────────────────────────────────────────────")
 
+    recommended = _recommended_model_name(models)
     for i, m in enumerate(models, 1):
-        print(f"[{i}] {m}")
+        suffix = f" {_lt('recommended')}" if recommended == m else ""
+        print(f"[{i}] {m}{suffix}")
+    print(_lt("download_option"))
 
     while True:
         choice = input(_lt("choose")).strip()
+        if choice.lower() == "d":
+            from apps.maat_rpg.plugins.model_downloader.plugin_main import ensure_model
+
+            plugin_dir = os.path.join(ROOT, "apps", "maat_rpg", "plugins", "model_downloader")
+            if ensure_model(plugin_dir, force_open=True):
+                models = list_available_models(model_dir)
+                if not models:
+                    print(Fore.RED + _lt("no_models") + Style.RESET_ALL)
+                    raise SystemExit(1)
+                print("──────────────────────────────────────────────")
+                print(_lt("model_header"))
+                print("──────────────────────────────────────────────")
+                recommended = _recommended_model_name(models)
+                for i, m in enumerate(models, 1):
+                    suffix = f" {_lt('recommended')}" if recommended == m else ""
+                    print(f"[{i}] {m}{suffix}")
+                print(_lt("download_option"))
+            continue
         try:
             idx = int(choice) - 1
             if 0 <= idx < len(models):

@@ -14,6 +14,7 @@ import threading
 import tty
 import termios
 import select
+import re
 from colorama import Fore, Style
 
 from .backend_router import stream_chat as backend_stream_chat
@@ -232,7 +233,17 @@ def stream_to_console(generator):
     old_settings = termios.tcgetattr(fd)
 
     full = ""
+    pending = ""
+    inside_think = False
     print(Fore.GREEN, end="")
+
+    def flush_visible(text: str):
+        nonlocal full
+        if not text:
+            return
+        sys.stdout.write(text)
+        sys.stdout.flush()
+        full += text
 
     try:
         # Terminal in cbreak-Modus → Tasten sofort lesbar
@@ -250,10 +261,32 @@ def stream_to_console(generator):
                     print(Style.RESET_ALL + "\n⏹️ Stream mit ESC abgebrochen.\n")
                     return full
 
-            # Normale Ausgabe
-            sys.stdout.write(tok)
-            sys.stdout.flush()
-            full += tok
+            pending += tok
+
+            while pending:
+                lower = pending.lower()
+
+                if inside_think:
+                    end_idx = lower.find("</think>")
+                    if end_idx == -1:
+                        pending = pending[-7:] if len(pending) > 7 else pending
+                        break
+                    pending = pending[end_idx + len("</think>"):]
+                    inside_think = False
+                    continue
+
+                start_idx = lower.find("<think>")
+                if start_idx == -1:
+                    safe = pending[:-6] if len(pending) > 6 else ""
+                    if safe:
+                        flush_visible(safe)
+                        pending = pending[len(safe):]
+                    break
+
+                visible = pending[:start_idx]
+                flush_visible(visible)
+                pending = pending[start_idx + len("<think>"):]
+                inside_think = True
 
     except Exception as e:
         print(Style.RESET_ALL + Fore.RED + f"[STREAM PRINT ERROR] {e}" + Style.RESET_ALL)
@@ -261,6 +294,10 @@ def stream_to_console(generator):
     finally:
         # Terminal-Einstellungen zurücksetzen
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
+    if pending and not inside_think:
+        pending = re.sub(r"</?think>", "", pending, flags=re.IGNORECASE)
+        flush_visible(pending)
 
     print(Style.RESET_ALL + "\n")
     return full

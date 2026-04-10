@@ -20,7 +20,7 @@
       "profile": "maat_rpg_story2.json",
       "trigger": {
         "type": "message_count",
-        "messages": 15,
+        "messages": 10,
         "position": "before"
       }
     },

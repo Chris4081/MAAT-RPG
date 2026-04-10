@@ -75,7 +75,11 @@ class DungeonState:
         if os.path.isfile(self.path):
             try:
                 with open(self.path, "r", encoding="utf-8") as f:
-                    return json.load(f)
+                    data = json.load(f)
+                    if isinstance(data, dict):
+                        merged = self._default()
+                        merged.update(data)
+                        return merged
             except Exception:
                 pass
         return self._default()
@@ -284,6 +288,8 @@ class Plugin:
 
     def before_chat(self, user_input, context=None):
         d = self.dungeon.state.data
+        d.setdefault("msg", 0)
+        d.setdefault("unlocked", False)
         d["msg"] += 1
         if not d["unlocked"] and d["msg"] >= Dungeon.UNLOCK_AT:
             d["unlocked"] = True

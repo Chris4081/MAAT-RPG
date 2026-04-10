@@ -371,9 +371,17 @@ def _localize_path_profile(profile: dict | None) -> dict:
     title_map = {
         "Grenzhüter der Wahrheit": "Boundary Keeper of Truth",
         "Grenzhüter der Erinnerung": "Boundary Keeper of Memory",
+        "Grenzhüter der Maat": "Boundary Keeper of Maat",
         "Klangsucher der Harmonie": "Tone Seeker of Harmony",
+        "Klangsucher der Wahrheit": "Tone Seeker of Truth",
+        "Klangsucher der Erinnerung": "Tone Seeker of Memory",
+        "Klangsucher der Maat": "Tone Seeker of Maat",
         "Formträger der Schöpfung": "Form Bearer of Creation",
+        "Formträger der Wahrheit": "Form Bearer of Truth",
+        "Formträger der Erinnerung": "Form Bearer of Memory",
+        "Formträger der Maat": "Form Bearer of Maat",
         "Wegsucher": "Path Seeker",
+        "Wegsucher der Maat": "Path Seeker of Maat",
     }
     rank_map = {
         "Erwachend": "Awakening",
@@ -384,6 +392,7 @@ def _localize_path_profile(profile: dict | None) -> dict:
         "Wahrheit darf Grenzen nicht verletzen.": "Truth must not violate boundaries.",
         "Erinnerung darf nicht zu Besitz werden.": "Memory must not become possession.",
         "Harmonie ohne Wahrheit bleibt fragil.": "Harmony without truth remains fragile.",
+        "Maatis' Weg formt sich aus Entscheidung und Bewährung.": "Maatis' path is shaped by choice and trial.",
     }
 
     title = profile.get("title")
@@ -478,25 +487,31 @@ def _lu_banner(level: int):
     """
     Fettes LEVEL UP Banner.
     """
+    en = _battle_ui_language() == "en"
     print()
     print(Fore.YELLOW + Style.BRIGHT + " ╔══════════════════════════════╗")
     print(" ║          LEVEL UP!           ║")
     print(" ╚══════════════════════════════╝" + Style.RESET_ALL)
     time.sleep(0.15)
 
-    print(Fore.CYAN + Style.BRIGHT + f"     🌟 NEUES LEVEL: {level} 🌟" + Style.RESET_ALL)
+    line = f"     🌟 {'NEW LEVEL' if en else 'NEUES LEVEL'}: {level} 🌟"
+    print(Fore.CYAN + Style.BRIGHT + line + Style.RESET_ALL)
     print()
     time.sleep(0.25)
 
 
 def _lu_title_line(level: int):
-    title = get_title_for_level(level)
-    print(Fore.GREEN + Style.BRIGHT + f"     Titel entfaltet: {title}" + Style.RESET_ALL)
+    en = _battle_ui_language() == "en"
+    title = _localize_level_title(get_title_for_level(level))
+    label = "Title unfolds" if en else "Titel entfaltet"
+    print(Fore.GREEN + Style.BRIGHT + f"     {label}: {title}" + Style.RESET_ALL)
     time.sleep(0.2)
 
 
 def _lu_stat_line(max_hp: int):
-    print(Fore.WHITE + Style.BRIGHT + f"     Max-HP steigen auf {max_hp}" + Style.RESET_ALL)
+    en = _battle_ui_language() == "en"
+    line = f"     {'Max HP rise to' if en else 'Max-HP steigen auf'} {max_hp}"
+    print(Fore.WHITE + Style.BRIGHT + line + Style.RESET_ALL)
     time.sleep(0.2)
 
 
