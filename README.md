@@ -41,11 +41,30 @@ Die vollständige zweisprachige Übersicht aller Systeme, Features und Kommandos
 
 ---
 
+### 🌟 Highlights
+
+- **Bilingual by design**  
+  Deutsch und Englisch ziehen sich durch Loader, Menü, Intro, HUD, Shop und Story.
+
+- **Narrative combat with identity**  
+  Bosskämpfe reagieren auf Maatis’ Pfadprofil, Auren, Phasen und Entscheidungen.
+
+- **Local-first AI architecture**  
+  Modelle, Memory, Analyse und Spielsysteme laufen lokal und modular über MAAT-OS.
+
+- **Guided onboarding**  
+  Intro, Guide-Kämpfe und klare Testmodi machen das System zugänglich, ohne den Spielstand zu verfälschen.
+
+- **Reactive worldbuilding**  
+  Journal, Boss-Codex, Quests und Konsequenznetz machen Entscheidungen dauerhaft sichtbar.
+
+---
+
 ### 🖥️ Systemanforderungen
 
 **macOS**
 - macOS **12 Monterey** oder neuer
-- Apple Silicon (M1 / M2 / M3 empfohlen)
+- Apple Silicon (M3 / M4 / M5 empfohlen)
 - *(Intel Mac: experimentell unterstützt)*
 
 **Hardware**
@@ -138,7 +157,7 @@ Everything runs locally on your Mac
 | ⚔️ | **Combat System** | Normal / Boss / Final battles |
 | 🧭 | **Game World** | Dungeons, Quests, Achievements & Level System |
 | 🎶 | **Atmosphere** | Dynamic combat music & cinematic events |
-| 🧩 | **Plugins** | Memory, BKI , Emotion, MAAT Analysis.. |
+| 🧩 | **Plugins** | Memory, BKI, Emotion, MAAT Analysis... |
 | 🛡️ | **Stability** | Automatic context management (no overflow) |
 | 🔌 | **Architecture** | MAAT-OS – modular, extensible, local-first |
 
@@ -148,11 +167,30 @@ The full bilingual overview of all systems, features, and commands is available 
 
 ---
 
+### 🌟 Highlights
+
+- **Bilingual by design**  
+  German and English run through the loader, menu, intro, HUD, shop, and story.
+
+- **Narrative combat with identity**  
+  Boss encounters react to Maatis' path profile, auras, phases, and decisions.
+
+- **Local-first AI architecture**  
+  Models, memory, analysis, and game systems run locally through the modular MAAT-OS structure.
+
+- **Guided onboarding**  
+  Intro, guide battles, and clear test modes make the system accessible without distorting progression.
+
+- **Reactive worldbuilding**  
+  Journal, boss codex, quests, and the consequence network make decisions persist inside the world.
+
+---
+
 ### 🖥️ System Requirements
 
 **macOS**
 - macOS **12 Monterey** or newer
-- Apple Silicon (M1 / M2 / M3 recommended)
+- Apple Silicon (M3 / M4 / M5 recommended)
 - *(Intel Mac: experimentally supported)*
 
 **Hardware**
