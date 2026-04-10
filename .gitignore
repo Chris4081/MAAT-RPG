@@ -22,7 +22,7 @@ logs/
 # Backup files
 *.bak
 
-# Temp / Editor junk (optional aber empfehlenswert)
+# Temp 
 *.tmp
 *.swp
 *.orig
