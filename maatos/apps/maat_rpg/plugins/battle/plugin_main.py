@@ -977,7 +977,7 @@ class BattleCore:
             choices = context.get("story_choices")
             if isinstance(choices, dict):
                 return dict(choices)
-        story_state = self._load_story_state()
+        story_state = self.core._load_story_state()
         choices = story_state.get("choices")
         return dict(choices) if isinstance(choices, dict) else {}
 
