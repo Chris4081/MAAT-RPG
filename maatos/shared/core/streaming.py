@@ -17,6 +17,7 @@ import select
 from colorama import Fore, Style
 
 from .backend_router import stream_chat as backend_stream_chat
+from .rpg_i18n import get_language
 
 
 # =====================================================================
@@ -52,6 +53,10 @@ RAINBOW = [
 ]
 RESET = "\033[0m"
 
+
+def _stream_lang() -> str:
+    return get_language(("de", "en"))
+
 def rainbow_progress(stop_event: threading.Event):
     """Animierter Ladebalken."""
     idx = 0
@@ -62,7 +67,8 @@ def rainbow_progress(stop_event: threading.Event):
         for i in range(bar_len):
             bar += RAINBOW[(idx + i) % len(RAINBOW)] + "█" + RESET
 
-        sys.stdout.write(f"\r⏳ Lade Modell… {bar}")
+        prefix = "⏳ Loading model… " if _stream_lang() == "en" else "⏳ Lade Modell… "
+        sys.stdout.write(f"\r{prefix}{bar}")
         sys.stdout.flush()
         idx = (idx + 1) % len(RAINBOW)
         time.sleep(0.10)

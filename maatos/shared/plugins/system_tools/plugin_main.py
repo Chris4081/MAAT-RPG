@@ -23,7 +23,6 @@ import platform
 from datetime import datetime
 
 from shared.core.maat_paths import get_models_dir, get_data_dir, get_logs_dir
-print("✅ system_tools plugin_main.py importiert")
 # Nur Model-Liste aus llm_loader holen
 try:
     from shared.core.llm_loader import list_available_models
@@ -46,7 +45,6 @@ class Plugin:
     }
 
     def __init__(self):
-        print("✅ system_tools Plugin initialisiert")
         # root_dir nur noch für git pull / Projektlesepfade
         self.root_dir = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "..", "..", "..")

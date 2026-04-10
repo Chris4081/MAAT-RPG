@@ -252,12 +252,13 @@ class Plugin:
         # ⛔ NICHT an reply anhängen!
         # ✅ Stattdessen direkt ins Terminal drucken
 
-        print("\n🏆 Neuer Erfolg freigeschaltet!")
+        en = get_language(("de", "en")) == "en"
+        print("\n🏆 New achievement unlocked!" if en else "\n🏆 Neuer Erfolg freigeschaltet!")
         for title, reward in unlocks:
             print(f"✨ {title} (+{reward} XP)")
 
         for lvl in levelups:
-            print(f"🌟 Level-Up! Du bist jetzt Level {lvl}!")
+            print(f"🌟 Level up! You are now level {lvl}!" if en else f"🌟 Level-Up! Du bist jetzt Level {lvl}!")
 
         print("")
 
@@ -267,4 +268,8 @@ class Plugin:
     # STARTUP
     # --------------------------------------------------------
     def on_startup(self, context=None):
-        print("🏆 Achievement-System geladen – /erfolge zeigt deinen Fortschritt.")
+        print(
+            "🏆 Achievement system loaded – /erfolge shows your progress."
+            if get_language(("de", "en")) == "en"
+            else "🏆 Achievement-System geladen – /erfolge zeigt deinen Fortschritt."
+        )

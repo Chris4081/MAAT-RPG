@@ -58,6 +58,7 @@ BATTLE_TEXT = {
         "status_principles": "Wiederhergestellte Maat-Prinzipien",
         "status_gold": "Gold",
         "status_potions": "Heiltraenke",
+        "status_sigils": "Schutz-Siegel",
         "status_achievements": "Kampf-Erfolge",
         "status_tip": "Tipp: Die XP-Leiste siehst du im Terminal nach jeder Nachricht. 🌀",
         "hud_wins": "Siege",
@@ -71,11 +72,16 @@ BATTLE_TEXT = {
         "shop_amount_positive": "Die Anzahl muss groesser als 0 sein.",
         "shop_not_enough": "Du hast nicht genug Gold. ({gold} / {cost})",
         "shop_buy": "🛒 Du kaufst {amount} Heiltrank/Heiltraenke fuer {cost} Gold.\nGold: {gold} | Traenke: {potions}",
+        "shop_buy_sigil": "🛒 Du kaufst {amount} Schutz-Siegel fuer {cost} Gold.\nGold: {gold} | Siegel: {sigils}",
         "shop_title": "🏪 **MAAT-RPG Laden**",
         "shop_inventory": "Heiltraenke im Inventar: {potions}",
+        "shop_inventory_sigils": "Schutz-Siegel im Inventar: {sigils}",
         "shop_items": "Verfuegbare Items:",
         "shop_potion_item": "  • Heiltrank – 25 Gold (stellt 50% deiner Max-HP wieder her)",
-        "shop_buy_hint": "Kaufen mit: `/shop buy potion 1` oder `/shop buy potion 3`",
+        "shop_sigil_item": "  • Schutz-Siegel – 40 Gold (verleiht im naechsten echten Kampf ein Start-Schild)",
+        "shop_buy_hint": "Kaufen mit: `/shop buy potion 1`, `/shop buy potion 3` oder `/shop buy sigil 1`",
+        "shop_unknown_item": "Dieses Item gibt es hier nicht. Verfuegbar: `potion`, `sigil`.",
+        "sigil_activate": "🛡 Ein Schutz-Siegel entfaellt und umhuellt Maatis. Start-Schild: {guard}. (Verbleibend: {sigils})",
         "summary_win": "📘 Kampfanalyse: Sieg, weil {reasons}.",
         "summary_loss": "📘 Kampfanalyse: Niederlage gegen {enemy}, weil {reasons}.",
         "reason_phase2_win": "du hast auch die zweite Bossphase getragen",
@@ -93,6 +99,12 @@ BATTLE_TEXT = {
         "boss_warning": "⚠ Warnung: Die Spezialattacke baut sich auf.",
         "phase_1": "PHASE 1",
         "phase_2": "PHASE 2",
+        "fight_fizzle": "⏳ Der Kampf zerfasert. MAAT ordnet die Kraefte neu und beendet die Begegnung.",
+        "fight_fizzle_log": "Kampf wurde aus Stabilitaetsgruenden beendet.",
+        "hud_player": "DU",
+        "hud_resonance": "Resonanz",
+        "hud_guard": "Schild",
+        "hud_weakness": "Schwachstelle",
         "action_attack": "1) Angriff",
         "action_skills": "2) Skills",
         "action_focus": "3) Fokus",
@@ -115,6 +127,12 @@ BATTLE_TEXT = {
         "aura_silence": "⚠ Schweige-Aura: Skills geraten unter Druck.",
         "aura_sealed": "⚠ Siegel-Aura: ein Teil deines Schadens wird versiegelt.",
         "aura_judgment": "⚠ Urteils-Aura: Flucht und Hast werden haerter bestraft.",
+        "aura_shatter_focus_bonus": " Die Zersplitterungs-Aura bricht auf und schenkt dir +{bonus} Bonus-HP.",
+        "aura_silence_dampen": " Die Schweige-Aura daempft deine Resonanz um 10.",
+        "aura_counter_wave": " Konterwelle +{bonus}.",
+        "aura_wildfire_backlash": " Wildfeuer schlaegt zurueck +{bonus}.",
+        "aura_judgment_escape": " Urteil trifft deine Flucht +{bonus}.",
+        "aura_resist_reduce": " Innere Haltung mildert {reduction}.",
         "special_fraktur": "💠 {title} wirkt **{special}**! Klangsplitter zerreissen die Ordnung. Du verlierst {dmg} HP und dein Schild sinkt um {guard}.",
         "special_spiegel": "🪞 {title} entfesselt **{special}**! Deine Bewegung wird gespiegelt. {dmg} Schaden, Resonanz -{resonance}.",
         "special_nova": "🔥 {title} zündet **{special}**! Rohe Schoepfung ueberflutet die Arena. {dmg} Schaden. Die Schwachstelle springt auf Schoepfungskraft.",
@@ -123,6 +141,38 @@ BATTLE_TEXT = {
         "special_achsenbruch": "🌌 {title} nutzt **{special}**! Die Achsen kippen. {dmg} Schaden und dein Schild bricht an.",
         "special_genesis": "🌠 {title} entfacht **{special}**! {dmg} Schaden, Resonanz -15.",
         "special_default": "💥 {title} entfesselt **{special}** und trifft dich fuer {dmg}.",
+        "attack_principle_crit": " (Harmonie-Krit! +{bonus} Bonus-Schaden)",
+        "attack_use": "⚔ Du setzt **{attack}** ein → {damage} Schaden!{crit}{weakness} Resonanz {resonance}/100.",
+        "skill_back": "{index}) Zurueck",
+        "skill_hit": "✨ Skill **{skill}** trifft fuer {damage} Schaden!{weakness} Resonanz {resonance}/100.",
+        "focus_use": "🌀 Du sammelst Resonanz: +{heal} HP, Schild {guard}. Resonanz jetzt {resonance}/100.",
+        "ult_not_ready": "❌ Resonanz noch nicht voll. Du brauchst 100/100.",
+        "ult_use": "🌌 MAAT-Impuls bricht hervor! {damage} Schaden, {heal} Heilung, Schild gestaerkt.",
+        "guard_absorb": " 🛡 Schild absorbiert {blocked}.",
+        "aura_sealed_reduce": " Die Aura versiegelt einen Teil deiner Kraft (-{reduction}).",
+        "weakness_resonance": " Resonanztreffer gegen {weakness}! (+{bonus})",
+        "flee_success": "😅 Du kannst entkommen!",
+        "flee_fail": "❌ Flucht fehlgeschlagen!",
+        "enemy_hit": "💥 {enemy} trifft dich fuer {damage} Schaden!{guard}{aura} Resonanz {resonance}/100.",
+        "victory_line": "\n🏆 Du hast **{enemy}** besiegt!",
+        "fight_intro": "🎮 **{enemy}** erscheint! (Typ: {ftype})",
+        "fight_type_normal": "NORMAL",
+        "fight_type_boss": "BOSS",
+        "fight_type_final": "FINAL",
+        "reward_xp": "XP erhalten: {xp} (Basis: {base}) (Level {old} → {new})",
+        "reward_gold": "💰 Gold erhalten: {gold} (Basis: {base}, gesamt: {total})",
+        "reward_levelup": "🌟 LEVEL UP! Deine Kraft ist gewachsen.",
+        "reward_potion_find": "🧪 Du findest einen Heiltrank! (Chance: {chance}) (Tränke: {potions})",
+        "log_player_attack": "Spieler nutzt {attack}: {damage} Schaden",
+        "log_player_focus": "Spieler nutzt Fokus.",
+        "log_player_potion_used": "Spieler nutzt Heiltrank.",
+        "log_player_potion_skip": "Heiltrank nicht genutzt.",
+        "log_player_fled": "Spieler ist erfolgreich geflohen.",
+        "log_player_flee_fail": "Fluchtversuch fehlgeschlagen.",
+        "log_enemy_hit": "Gegner trifft: {damage} Schaden (Balance aktiv)",
+        "log_victory": "Sieg über {enemy}",
+        "log_skill_hit": "Skill {skill}: {damage} Schaden",
+        "log_ult": "MAAT-Impuls: {damage} Schaden, {heal} Heilung",
     },
     "en": {
         "guide_hint_final_1": "📘 Guide: Start calmly with Focus. This lets you learn resonance and shielding without pressure.",
@@ -158,6 +208,7 @@ BATTLE_TEXT = {
         "status_principles": "Restored Maat Principles",
         "status_gold": "Gold",
         "status_potions": "Healing Potions",
+        "status_sigils": "Warding Sigils",
         "status_achievements": "Combat Achievements",
         "status_tip": "Tip: You can see the XP bar in the terminal after every message. 🌀",
         "hud_wins": "Victories",
@@ -171,11 +222,16 @@ BATTLE_TEXT = {
         "shop_amount_positive": "The amount must be greater than 0.",
         "shop_not_enough": "You do not have enough gold. ({gold} / {cost})",
         "shop_buy": "🛒 You buy {amount} healing potion(s) for {cost} gold.\nGold: {gold} | Potions: {potions}",
+        "shop_buy_sigil": "🛒 You buy {amount} warding sigil(s) for {cost} gold.\nGold: {gold} | Sigils: {sigils}",
         "shop_title": "🏪 **MAAT-RPG Shop**",
         "shop_inventory": "Healing potions in inventory: {potions}",
+        "shop_inventory_sigils": "Warding sigils in inventory: {sigils}",
         "shop_items": "Available items:",
         "shop_potion_item": "  • Healing Potion – 25 gold (restores 50% of your max HP)",
-        "shop_buy_hint": "Buy with: `/shop buy potion 1` or `/shop buy potion 3`",
+        "shop_sigil_item": "  • Warding Sigil – 40 gold (grants a starting shield in the next real battle)",
+        "shop_buy_hint": "Buy with: `/shop buy potion 1`, `/shop buy potion 3`, or `/shop buy sigil 1`",
+        "shop_unknown_item": "That item is not sold here. Available: `potion`, `sigil`.",
+        "sigil_activate": "🛡 A warding sigil unfolds around Maatis. Starting shield: {guard}. (Remaining: {sigils})",
         "summary_win": "📘 Battle analysis: victory, because {reasons}.",
         "summary_loss": "📘 Battle analysis: defeat against {enemy}, because {reasons}.",
         "reason_phase2_win": "you endured the second boss phase as well",
@@ -193,6 +249,12 @@ BATTLE_TEXT = {
         "boss_warning": "⚠ Warning: The special attack is building.",
         "phase_1": "PHASE 1",
         "phase_2": "PHASE 2",
+        "fight_fizzle": "⏳ The battle frays apart. MAAT reorders the forces and ends the encounter.",
+        "fight_fizzle_log": "Battle ended for stability reasons.",
+        "hud_player": "YOU",
+        "hud_resonance": "Resonance",
+        "hud_guard": "Shield",
+        "hud_weakness": "Weakness",
         "action_attack": "1) Attack",
         "action_skills": "2) Skills",
         "action_focus": "3) Focus",
@@ -215,6 +277,12 @@ BATTLE_TEXT = {
         "aura_silence": "⚠ Silence Aura: skills come under pressure.",
         "aura_sealed": "⚠ Seal Aura: part of your damage is sealed away.",
         "aura_judgment": "⚠ Judgment Aura: escape and haste are punished more harshly.",
+        "aura_shatter_focus_bonus": " The shatter aura breaks open and grants you +{bonus} bonus HP.",
+        "aura_silence_dampen": " The silence aura dampens your resonance by 10.",
+        "aura_counter_wave": " Counterwave +{bonus}.",
+        "aura_wildfire_backlash": " Wildfire lashes back +{bonus}.",
+        "aura_judgment_escape": " Judgment strikes your escape +{bonus}.",
+        "aura_resist_reduce": " Inner stance softens {reduction}.",
         "special_fraktur": "💠 {title} casts **{special}**! Sound shards tear through order. You lose {dmg} HP and your shield drops by {guard}.",
         "special_spiegel": "🪞 {title} unleashes **{special}**! Your motion is reflected back at you. {dmg} damage, resonance -{resonance}.",
         "special_nova": "🔥 {title} ignites **{special}**! Raw creation floods the arena. {dmg} damage. The weakness shifts to Creation.",
@@ -223,6 +291,38 @@ BATTLE_TEXT = {
         "special_achsenbruch": "🌌 {title} uses **{special}**! The axes tilt. {dmg} damage and your shield fractures.",
         "special_genesis": "🌠 {title} unleashes **{special}**! {dmg} damage, resonance -15.",
         "special_default": "💥 {title} releases **{special}** and hits you for {dmg}.",
+        "attack_principle_crit": " (Harmony crit! +{bonus} bonus damage)",
+        "attack_use": "⚔ You use **{attack}** → {damage} damage!{crit}{weakness} Resonance {resonance}/100.",
+        "skill_back": "{index}) Back",
+        "skill_hit": "✨ Skill **{skill}** hits for {damage} damage!{weakness} Resonance {resonance}/100.",
+        "focus_use": "🌀 You gather resonance: +{heal} HP, shield {guard}. Resonance now {resonance}/100.",
+        "ult_not_ready": "❌ Resonance is not full yet. You need 100/100.",
+        "ult_use": "🌌 MAAT impulse bursts forth! {damage} damage, {heal} healing, shield strengthened.",
+        "guard_absorb": " 🛡 Shield absorbs {blocked}.",
+        "aura_sealed_reduce": " The aura seals away part of your power (-{reduction}).",
+        "weakness_resonance": " Resonance strike against {weakness}! (+{bonus})",
+        "flee_success": "😅 You manage to escape!",
+        "flee_fail": "❌ Escape failed!",
+        "enemy_hit": "💥 {enemy} hits you for {damage} damage!{guard}{aura} Resonance {resonance}/100.",
+        "victory_line": "\n🏆 You defeated **{enemy}**!",
+        "fight_intro": "🎮 **{enemy}** appears! (Type: {ftype})",
+        "fight_type_normal": "NORMAL",
+        "fight_type_boss": "BOSS",
+        "fight_type_final": "FINAL",
+        "reward_xp": "XP gained: {xp} (Base: {base}) (Level {old} → {new})",
+        "reward_gold": "💰 Gold gained: {gold} (Base: {base}, total: {total})",
+        "reward_levelup": "🌟 LEVEL UP! Your strength has grown.",
+        "reward_potion_find": "🧪 You find a healing potion! (Chance: {chance}) (Potions: {potions})",
+        "log_player_attack": "Player uses {attack}: {damage} damage",
+        "log_player_focus": "Player uses Focus.",
+        "log_player_potion_used": "Player uses Healing Potion.",
+        "log_player_potion_skip": "Healing potion not used.",
+        "log_player_fled": "Player escaped successfully.",
+        "log_player_flee_fail": "Escape attempt failed.",
+        "log_enemy_hit": "Enemy hits: {damage} damage (Balance active)",
+        "log_victory": "Victory over {enemy}",
+        "log_skill_hit": "Skill {skill}: {damage} damage",
+        "log_ult": "MAAT impulse: {damage} damage, {heal} healing",
     },
 }
 
@@ -237,6 +337,110 @@ def _battle_text(key: str, **kwargs) -> str:
     if kwargs:
         return template.format(**kwargs)
     return template
+
+
+def _principle_names() -> dict[str, str]:
+    if _battle_ui_language() == "en":
+        return {
+            "Harmonie": "Harmony",
+            "Balance": "Balance",
+            "Schöpfungskraft": "Creation",
+            "Verbundenheit": "Connectedness",
+            "Respekt": "Respect",
+            "Skill": "Skill",
+        }
+    return {
+        "Harmonie": "Harmonie",
+        "Balance": "Balance",
+        "Schöpfungskraft": "Schöpfungskraft",
+        "Verbundenheit": "Verbundenheit",
+        "Respekt": "Respekt",
+        "Skill": "Skill",
+    }
+
+
+def _principle_label(name: str) -> str:
+    return _principle_names().get(name, name)
+
+
+def _localize_path_profile(profile: dict | None) -> dict:
+    profile = dict(profile or {})
+    if _battle_ui_language() != "en":
+        return profile
+
+    title_map = {
+        "Grenzhüter der Wahrheit": "Boundary Keeper of Truth",
+        "Grenzhüter der Erinnerung": "Boundary Keeper of Memory",
+        "Klangsucher der Harmonie": "Tone Seeker of Harmony",
+        "Formträger der Schöpfung": "Form Bearer of Creation",
+        "Wegsucher": "Path Seeker",
+    }
+    rank_map = {
+        "Erwachend": "Awakening",
+        "Vertieft": "Deepening",
+        "Verankert": "Anchored",
+    }
+    motif_map = {
+        "Wahrheit darf Grenzen nicht verletzen.": "Truth must not violate boundaries.",
+        "Erinnerung darf nicht zu Besitz werden.": "Memory must not become possession.",
+        "Harmonie ohne Wahrheit bleibt fragil.": "Harmony without truth remains fragile.",
+    }
+
+    title = profile.get("title")
+    rank = profile.get("rank")
+    motif = profile.get("motif")
+    if title:
+        profile["title"] = title_map.get(title, title)
+    if rank:
+        profile["rank"] = rank_map.get(rank, rank)
+    if motif:
+        profile["motif"] = motif_map.get(motif, motif)
+    return profile
+
+
+def _localize_enemy_name(name: str) -> str:
+    if _battle_ui_language() != "en" or not name:
+        return name
+
+    replacements = [
+        ("Pharao der Dissonanz", "Pharaoh of Dissonance"),
+        ("Wächter der Gebrochenen Harmonie", "Warden of Broken Harmony"),
+        ("Archon des Abgrunds", "Archon of the Abyss"),
+        ("Fürst der Zersplitterten Zeit", "Prince of Shattered Time"),
+        ("Hüter der Leeren Sonne", "Keeper of the Empty Sun"),
+        ("Avatar der Balance", "Avatar of Balance"),
+        ("Herz der Schöpfung", "Heart of Creation"),
+        ("Krone der Resonanz", "Crown of Resonance"),
+        ("Achse des Äons", "Axis of the Aeon"),
+        ("Licht der MAAT", "Light of MAAT"),
+        ("Schatten", "Shadow"),
+        ("Echo", "Echo"),
+        ("Staub", "Dust"),
+        ("Gefallener", "Fallen"),
+        ("Verlorener", "Lost"),
+        ("Gebrochener", "Broken"),
+        ("Resonanter", "Resonant"),
+        ("Stiller", "Silent"),
+        ("Astraler", "Astral"),
+        ("Wanderer", "Wanderer"),
+        ("Wächter", "Warden"),
+        ("Bestie", "Beast"),
+        ("Phantom", "Phantom"),
+        ("Beobachter", "Watcher"),
+        ("Idol", "Idol"),
+        ("Konstrukt", "Construct"),
+        ("Funke", "Spark"),
+        (" der Dissonanz", " of Dissonance"),
+        (" der Leere", " of the Void"),
+        (" der Vergessenen Sande", " of the Forgotten Sands"),
+        (" des Risses", " of the Rift"),
+        (" der Echos", " of Echoes"),
+    ]
+
+    localized = name
+    for old, new in replacements:
+        localized = localized.replace(old, new)
+    return localized
 
 
 
@@ -373,6 +577,7 @@ class BattleState:
                 "skills": [],
                 "gold": 0,
                 "potions": 0,
+                "sigils": 0,
             },
             "stats": {
                 "messages_total": 0,
@@ -421,6 +626,7 @@ class BattleState:
                 p.setdefault("skills", [])
                 p.setdefault("gold", 0)
                 p.setdefault("potions", 0)
+                p.setdefault("sigils", 0)
 
                 data.setdefault("stats", {})
                 s = data["stats"]
@@ -698,6 +904,17 @@ def get_title_for_level(level: int) -> str:
     return "Suchender im Äon der Maat"
 
 
+def _localize_level_title(title: str) -> str:
+    if _battle_ui_language() != "en":
+        return title
+    return {
+        "Äonischer Resonanzmeister": "Aeonic Resonance Master",
+        "Hüter der Harmonie": "Keeper of Harmony",
+        "Maat-Krieger": "Maat Warrior",
+        "Suchender im Äon der Maat": "Seeker in the Aeon of Maat",
+    }.get(title, title)
+
+
 # =====================================================
 # ⚔️ KAMPF-KERN
 # =====================================================
@@ -785,6 +1002,47 @@ class BattleCore:
             "detail": detail,
         })
 
+    def _register_boss_codex_entry(self, enemy_name: str, boss_profile: dict, ftype: str):
+        if ftype not in ("boss", "final"):
+            return
+        story_state = self._load_story_state()
+        key = f"codex:{ftype}:{boss_profile.get('title', enemy_name)}"
+        journal = story_state.setdefault("journal", [])
+        for entry in journal:
+            if entry.get("key") == key:
+                return
+
+        aura_cycle = boss_profile.get("aura_cycle") or ["none"]
+        aura_name = aura_cycle[0]
+        aura_map = {
+            "none": "Keine feste Aura" if _battle_ui_language() != "en" else "No fixed aura",
+            "shatter": "Zersplitterung" if _battle_ui_language() != "en" else "Shatter",
+            "counter": "Konter" if _battle_ui_language() != "en" else "Counter",
+            "wildfire": "Wildfeuer" if _battle_ui_language() != "en" else "Wildfire",
+            "silence": "Schweigen" if _battle_ui_language() != "en" else "Silence",
+            "sealed": "Siegel" if _battle_ui_language() != "en" else "Seal",
+            "judgment": "Urteil" if _battle_ui_language() != "en" else "Judgment",
+        }
+        aura_label = aura_map.get(aura_name, aura_name)
+        summary = (
+            f"Erste Begegnung mit {enemy_name}. Seine Praesenz wurde im Codex vermerkt."
+            if _battle_ui_language() != "en"
+            else f"First encounter with {enemy_name}. Its presence has been recorded in the codex."
+        )
+        detail = (
+            f"Aura: {aura_label} | Spezial: {boss_profile.get('special', 'Unbekannt')} | Eintritt: {boss_profile.get('intro', '')}"
+            if _battle_ui_language() != "en"
+            else f"Aura: {aura_label} | Special: {boss_profile.get('special', 'Unknown')} | Entry: {boss_profile.get('intro', '')}"
+        )
+        self._append_story_journal_entry(
+            story_state,
+            key=key,
+            title=(f"Boss-Codex: {enemy_name}" if _battle_ui_language() != "en" else f"Boss Codex: {enemy_name}"),
+            summary=summary,
+            detail=detail,
+        )
+        self._save_story_state(story_state)
+
     def _get_story_path_profile(self, context: dict | None = None) -> dict:
         if isinstance(context, dict):
             profile = context.get("story_path_profile")
@@ -841,9 +1099,10 @@ class BattleCore:
         if not profile:
             return []
 
-        title = profile.get("title", "Wegsucher")
-        rank = profile.get("rank", "Erwachend")
-        motif = profile.get("motif", "")
+        localized = _localize_path_profile(profile)
+        title = localized.get("title", "Wegsucher")
+        rank = localized.get("rank", "Erwachend")
+        motif = localized.get("motif", "")
         if _battle_ui_language() == "en":
             lines = [f"🜂 {title} enters the arena. His path is now {rank.lower()}."]
         else:
@@ -962,7 +1221,7 @@ class BattleCore:
         if aura == "sealed":
             reduction = max(2, int(round(damage * 0.2)))
             damage = max(1, damage - reduction)
-            return damage, f" Die Aura versiegelt einen Teil deiner Kraft (-{reduction})."
+            return damage, _battle_text("aura_sealed_reduce", reduction=reduction)
 
         if weakness and attack_type == weakness:
             bonus = max(2, int(round(damage * 0.25)))
@@ -970,7 +1229,7 @@ class BattleCore:
             bonus = max(2, int(round(bonus * bonus_mult)))
             turn_state["flow_chain"] = turn_state.get("flow_chain", 0) + 1
             turn_state["weakness_hits"] = turn_state.get("weakness_hits", 0) + 1
-            return damage + bonus, f" Resonanztreffer gegen {weakness}! (+{bonus})"
+            return damage + bonus, _battle_text("weakness_resonance", weakness=_principle_label(weakness), bonus=bonus)
 
         turn_state["flow_chain"] = 0
         return damage, ""
@@ -980,26 +1239,41 @@ class BattleCore:
         turn_state["resonance"] = max(0, min(100, turn_state.get("resonance", 0) + amount))
         return turn_state["resonance"]
 
+    def _apply_starting_sigil(self, turn_state: dict, context: dict | None = None) -> str:
+        if not isinstance(context, dict) or context.get("guide_mode"):
+            return ""
+        player = self.state.state["player"]
+        sigils = int(player.get("sigils", 0) or 0)
+        if sigils <= 0:
+            return ""
+        player["sigils"] = sigils - 1
+        base_guard = max(10, 8 + int(player.get("level", 1)) * 2)
+        turn_state["guard"] = max(int(turn_state.get("guard", 0)), base_guard)
+        self.state.save()
+        return _battle_text("sigil_activate", guard=turn_state["guard"], sigils=player["sigils"])
+
     def _use_focus(self, player_hp: int, max_hp: int, turn_state: dict) -> tuple[int, str]:
         heal = max(6, int(max_hp * 0.08)) + int(turn_state.get("focus_heal_bonus", 0))
         new_hp = min(max_hp, player_hp + heal)
         base_guard = 8 + int(max_hp * 0.05) + int(turn_state.get("focus_guard_bonus", 0))
         turn_state["guard"] = max(turn_state.get("guard", 0), base_guard)
         resonance = self._gain_resonance(turn_state, 30)
-        return new_hp, (
-            f"🌀 Du sammelst Resonanz: +{heal} HP, Schild {turn_state['guard']}."
-            f" Resonanz jetzt {resonance}/100."
+        return new_hp, _battle_text(
+            "focus_use",
+            heal=heal,
+            guard=turn_state["guard"],
+            resonance=resonance,
         )
 
     def _use_ult(self, level: int, max_hp: int, turn_state: dict) -> tuple[int, int, str]:
         if turn_state.get("resonance", 0) < 100:
-            return 0, 0, "❌ Resonanz noch nicht voll. Du brauchst 100/100."
+            return 0, 0, _battle_text("ult_not_ready")
         turn_state["resonance"] = 0
         turn_state["guard"] = max(turn_state.get("guard", 0), 12 + level * 2)
         damage = 32 + level * 5 + random.randint(4, 10)
         damage = int(round(damage * float(turn_state.get("ult_damage_mult", 1.0))))
         heal = max(8, int(max_hp * 0.12))
-        return damage, heal, f"🌌 MAAT-Impuls bricht hervor! {damage} Schaden, {heal} Heilung, Schild gestärkt."
+        return damage, heal, _battle_text("ult_use", damage=damage, heal=heal)
 
     def _apply_guard(self, incoming: int, turn_state: dict) -> tuple[int, str]:
         guard = max(0, int(turn_state.get("guard", 0)))
@@ -1007,7 +1281,7 @@ class BattleCore:
             return incoming, ""
         blocked = min(guard, incoming)
         turn_state["guard"] = max(0, guard - blocked)
-        return max(0, incoming - blocked), f" 🛡 Schild absorbiert {blocked}."
+        return max(0, incoming - blocked), _battle_text("guard_absorb", blocked=blocked)
 
     def _boss_profile(self, ftype: str, boss_idx: int, final_idx: int) -> dict:
         if ftype == "boss":
@@ -1256,10 +1530,10 @@ class BattleCore:
         if choice == "3" and aura == "shatter":
             bonus = max(4, int(max_hp * 0.05))
             player_hp = min(max_hp, player_hp + bonus)
-            return player_hp, f" Die Zersplitterungs-Aura bricht auf und schenkt dir +{bonus} Bonus-HP."
+            return player_hp, _battle_text("aura_shatter_focus_bonus", bonus=bonus)
         if choice == "2" and aura == "silence":
             turn_state["resonance"] = max(0, turn_state.get("resonance", 0) - 10)
-            return player_hp, " Die Schweige-Aura dämpft deine Resonanz um 10."
+            return player_hp, _battle_text("aura_silence_dampen")
         return player_hp, ""
 
     def _modify_incoming_damage(self, dmg_in: int, turn_state: dict, choice: str) -> tuple[int, str]:
@@ -1268,20 +1542,20 @@ class BattleCore:
         if aura == "counter" and choice == "1":
             bonus = max(2, int(round(dmg_in * 0.25)))
             dmg_in += bonus
-            extra = f" Konterwelle +{bonus}."
+            extra = _battle_text("aura_counter_wave", bonus=bonus)
         elif aura == "wildfire" and choice == "5":
             bonus = max(3, int(round(dmg_in * 0.35)))
             dmg_in += bonus
-            extra = f" Wildfeuer schlägt zurück +{bonus}."
+            extra = _battle_text("aura_wildfire_backlash", bonus=bonus)
         elif aura == "judgment" and choice == "6":
             bonus = max(4, int(round(dmg_in * 0.4)))
             dmg_in += bonus
-            extra = f" Urteil trifft deine Flucht +{bonus}."
+            extra = _battle_text("aura_judgment_escape", bonus=bonus)
         aura_resist = turn_state.get("aura_resist", {})
         if aura in aura_resist:
             reduction = max(1, int(round(dmg_in * float(aura_resist[aura]))))
             dmg_in = max(1, dmg_in - reduction)
-            extra += f" Innere Haltung mildert {reduction}."
+            extra += _battle_text("aura_resist_reduce", reduction=reduction)
         return dmg_in, extra
 
     def _build_charge_bar(self, current: int, maximum: int = 3, width: int = 12) -> str:
@@ -1919,18 +2193,12 @@ class BattleCore:
         # BOSSE / FINALBOSSE
         # -------------------------------
         if guide_mode:
-            if random.random() < base_potion_chance:
-                p["potions"] = p.get("potions", 0) + 1
-                potion_msg = _battle_text("guide_bonus_potion", potions=p["potions"])
             self.state.state["flags"]["needs_heal"] = False
             self.state.save()
-            lines = [
+            return "\n".join([
                 _battle_text("guide_complete"),
                 _battle_text("guide_reward_note"),
-            ]
-            if potion_msg:
-                lines.append(potion_msg)
-            return "\n".join(lines)
+            ])
 
         stats["fights_won"] += 1
 
@@ -2028,7 +2296,11 @@ class BattleCore:
         # Trank-Drop-Chance von Respekt beeinflusst
         if random.random() < potion_chance:
             p["potions"] = p.get("potions", 0) + 1
-            potion_msg = f"🧪 Du findest einen Heiltrank! (Chance: {potion_chance:.0%}) (Tränke: {p['potions']})"
+            potion_msg = _battle_text(
+                "reward_potion_find",
+                chance=f"{potion_chance:.0%}",
+                potions=p["potions"],
+            )
 
         consequence_lines = []
         turn_state = context.get("battle_turn_state", {}) if isinstance(context, dict) else {}
@@ -2106,11 +2378,11 @@ class BattleCore:
         # -------------------------------
         # TEXT ZUSAMMENBAUEN
         # -------------------------------
-        lines = [f"XP erhalten: {xp_effective} (Basis: {xp_reward}) (Level {old_lvl} → {new_lvl})"]
-        lines.append(f"💰 Gold erhalten: {gold_reward} (Basis: {gold_base}, gesamt: {p['gold']})")
+        lines = [_battle_text("reward_xp", xp=xp_effective, base=xp_reward, old=old_lvl, new=new_lvl)]
+        lines.append(_battle_text("reward_gold", gold=gold_reward, base=gold_base, total=p["gold"]))
 
         if new_lvl > old_lvl:
-            lines.append("🌟 LEVEL UP! Deine Kraft ist gewachsen.")
+            lines.append(_battle_text("reward_levelup"))
         if skill_msg:
             lines.append(skill_msg)
         if potion_msg:
@@ -2176,6 +2448,8 @@ class BattleCore:
             final_idx = s["stats"]["final_wins"]
             enemy_name = generate_enemy_name()
 
+        enemy_name = _localize_enemy_name(enemy_name)
+
         enemy_hp, enemy_dmg_base, xp_reward = self._enemy_stats(ftype)
         max_enemy_hp = enemy_hp
         player_hp = p["hp"]
@@ -2185,6 +2459,8 @@ class BattleCore:
         story_choices = story_mods.get("choices", {})
         story_path_profile = self._get_story_path_profile(context)
         boss_profile = self._boss_profile(ftype, boss_idx, final_idx)
+        self._register_boss_codex_entry(enemy_name, boss_profile, ftype)
+        sigil_line = self._apply_starting_sigil(turn_state, context)
 
         attack_mult *= story_mods.get("attack_mult", 1.0)
         defense_mult *= story_mods.get("defense_mult", 1.0)
@@ -2227,7 +2503,8 @@ class BattleCore:
             if isinstance(narrative_prepend, str) and narrative_prepend.strip():
                 self._slow_line(narrative_prepend.strip(), delay_char=0.008, delay_line=0.3)
                 log_lines.append(narrative_prepend.strip())
-        intro = f"🎮 **{enemy_name}** erscheint! (Typ: {ftype.upper()})"
+        fight_type = _battle_text(f"fight_type_{ftype}", ftype=ftype.upper())
+        intro = _battle_text("fight_intro", enemy=enemy_name, ftype=fight_type)
         log_lines.append(intro)
         self._slow_line(intro)
         for presence_line in self._path_presence_lines(story_path_profile):
@@ -2248,6 +2525,9 @@ class BattleCore:
             reset = Style.RESET_ALL if color else ""
             self._slow_line(color + f"✧ {reactive_entrance}" + reset, delay_char=0.009, delay_line=0.25)
             log_lines.append(reactive_entrance)
+        if sigil_line:
+            self._slow_line(Fore.BLUE + sigil_line + Style.RESET_ALL, delay_char=0.008, delay_line=0.2)
+            log_lines.append(sigil_line)
         for extra_line in story_mods.get("intro_lines", []):
             self._slow_line(Fore.GREEN + extra_line + Style.RESET_ALL, delay_char=0.008, delay_line=0.25)
             log_lines.append(extra_line)
@@ -2259,6 +2539,7 @@ class BattleCore:
             "4": "Verbundenheit",
             "5": "Respekt",
         }
+        principle_names = _principle_names()
 
         try:
             turn_counter = 0
@@ -2266,9 +2547,9 @@ class BattleCore:
             while player_hp > 0 and enemy_hp > 0:
                 turn_counter += 1
                 if turn_counter > max_turns:
-                    line = "⏳ Der Kampf zerfasert. MAAT ordnet die Kräfte neu und beendet die Begegnung."
+                    line = _battle_text("fight_fizzle")
                     self._slow_line(line)
-                    log_lines.append("Kampf wurde aus Stabilitätsgründen beendet.")
+                    log_lines.append(_battle_text("fight_fizzle_log"))
                     if guide_mode:
                         self._restore_guide_state(original_player_hp, stats_snapshot)
                     else:
@@ -2289,12 +2570,12 @@ class BattleCore:
                 turn_state["weakness"] = self._choose_enemy_weakness()
                 aura_text = self._apply_enemy_aura(boss_profile, turn_state, turn_counter)
                 print("\n------------------------------------------")
-                print(f"DU           HP: {player_hp}/{p['max_hp']}")
+                print(f"{_battle_text('hud_player')}           HP: {player_hp}/{p['max_hp']}")
                 print(f"{enemy_name} HP: {enemy_hp}")
-                print(f"Resonanz: {turn_state.get('resonance', 0)}/100")
+                print(f"{_battle_text('hud_resonance')}: {turn_state.get('resonance', 0)}/100")
                 if turn_state.get("guard", 0) > 0:
-                    print(f"Schild: {turn_state['guard']}")
-                print(f"Schwachstelle: {turn_state['weakness']}")
+                    print(f"{_battle_text('hud_guard')}: {turn_state['guard']}")
+                print(f"{_battle_text('hud_weakness')}: {_principle_label(turn_state['weakness'])}")
                 if aura_text:
                     print(aura_text)
                 if ftype in ("boss", "final"):
@@ -2320,11 +2601,11 @@ class BattleCore:
                     # ANGRIFF → Prinzip wählen
                     while True:
                         print("\n" + _battle_text("attack_menu"))
-                        print("1) Harmonie")
-                        print("2) Balance")
-                        print("3) Schöpfungskraft")
-                        print("4) Verbundenheit")
-                        print("5) Respekt")
+                        print(f"1) {principle_names['Harmonie']}")
+                        print(f"2) {principle_names['Balance']}")
+                        print(f"3) {principle_names['Schöpfungskraft']}")
+                        print(f"4) {principle_names['Verbundenheit']}")
+                        print(f"5) {principle_names['Respekt']}")
                         print(_battle_text("attack_back"))
                         sub = self._prompt(_battle_text("attack_choose"), context=context, default="6")
                         if sub == "6":
@@ -2348,19 +2629,23 @@ class BattleCore:
                         if random.random() < crit_chance:
                             bonus = max(1, int(final_dmg * 0.20))  # +20% als Bonus
                             final_dmg += bonus
-                            crit_txt = f" (Harmonie-Crit! +{bonus} Bonus-Schaden)"
+                            crit_txt = _battle_text("attack_principle_crit", bonus=bonus)
 
                         final_dmg = max(1, int(round(final_dmg)))
 
                         final_dmg, weakness_txt = self._apply_enemy_weakness(atk_type, final_dmg, turn_state)
                         resonance = self._gain_resonance(turn_state, 18)
                         enemy_hp -= final_dmg
-                        line = (
-                            f"⚔ Du setzt **{atk_type}** ein → {final_dmg} Schaden!"
-                            f"{crit_txt}{weakness_txt} Resonanz {resonance}/100."
+                        line = _battle_text(
+                            "attack_use",
+                            attack=_principle_label(atk_type),
+                            damage=final_dmg,
+                            crit=crit_txt,
+                            weakness=weakness_txt,
+                            resonance=resonance,
                         )
                         self._slow_line(line)
-                        log_lines.append(f"Spieler nutzt {atk_type}: {final_dmg} Schaden")
+                        log_lines.append(_battle_text("log_player_attack", attack=_principle_label(atk_type), damage=final_dmg))
 
                         break  # danach zurück ins Hauptmenü
 
@@ -2374,7 +2659,7 @@ class BattleCore:
                         print("\n" + _battle_text("skills_menu"))
                         for i, sk in enumerate(p["skills"], 1):
                             print(f"{i}) {sk}")
-                        print(f"{len(p['skills'])+1}) Zurück")
+                        print(_battle_text("skill_back", index=len(p["skills"]) + 1))
                         sub = self._prompt(_battle_text("skills_choose"), context=context, default=str(len(p["skills"]) + 1))
                         try:
                             idx = int(sub) - 1
@@ -2389,12 +2674,15 @@ class BattleCore:
                                 final_dmg, weakness_txt = self._apply_enemy_weakness("Skill", final_dmg, turn_state)
                                 resonance = self._gain_resonance(turn_state, 24)
                                 enemy_hp -= final_dmg
-                                line = (
-                                    f"✨ Skill **{sk}** trifft für {final_dmg} Schaden!"
-                                    f"{weakness_txt} Resonanz {resonance}/100."
+                                line = _battle_text(
+                                    "skill_hit",
+                                    skill=sk,
+                                    damage=final_dmg,
+                                    weakness=weakness_txt,
+                                    resonance=resonance,
                                 )
                                 self._slow_line(line)
-                                log_lines.append(f"Skill {sk}: {final_dmg} Schaden")
+                                log_lines.append(_battle_text("log_skill_hit", skill=sk, damage=final_dmg))
                         except ValueError:
                             print(_battle_text("invalid_input"))
 
@@ -2404,7 +2692,7 @@ class BattleCore:
                     if extra_txt:
                         line += extra_txt
                     self._slow_line(line)
-                    log_lines.append("Spieler nutzt Fokus.")
+                    log_lines.append(_battle_text("log_player_focus"))
 
                 elif choice == "4":
                     potion_msg = self._use_potion_in_fight(turn_state)
@@ -2414,7 +2702,7 @@ class BattleCore:
                     if extra_txt:
                         potion_msg += extra_txt
                     self._slow_line(potion_msg)
-                    log_lines.append("Spieler nutzt Heiltrank." if "regenerierst" in potion_msg else "Heiltrank nicht genutzt.")
+                    log_lines.append(_battle_text("log_player_potion_used") if ("regenerierst" in potion_msg or "restore" in potion_msg) else _battle_text("log_player_potion_skip"))
                     player_hp = p["hp"]
 
                 elif choice == "5":
@@ -2426,14 +2714,14 @@ class BattleCore:
                         p["hp"] = player_hp
                         if enemy_hp <= 0:
                             turn_state["ult_finisher"] = True
-                        log_lines.append(f"MAAT-Impuls: {final_dmg} Schaden, {heal} Heilung")
+                        log_lines.append(_battle_text("log_ult", damage=final_dmg, heal=heal))
 
                 elif choice == "6":
                     # FLUCHT
                     if random.random() < 0.5:
-                        line = "😅 Du kannst entkommen!"
+                        line = _battle_text("flee_success")
                         self._slow_line(line)
-                        log_lines.append("Spieler ist erfolgreich geflohen.")
+                        log_lines.append(_battle_text("log_player_fled"))
                         music.stop()
                         if guide_mode:
                             self._restore_guide_state(original_player_hp, stats_snapshot)
@@ -2443,9 +2731,9 @@ class BattleCore:
                             self.state.save()
                         return "\n".join(log_lines)
                     else:
-                        line = "❌ Flucht fehlgeschlagen!"
+                        line = _battle_text("flee_fail")
                         self._slow_line(line)
-                        log_lines.append("Fluchtversuch fehlgeschlagen.")
+                        log_lines.append(_battle_text("log_player_flee_fail"))
 
                 else:
                     print(_battle_text("invalid_choice"))
@@ -2490,9 +2778,16 @@ class BattleCore:
 
                     player_hp -= dmg_in
                     resonance = self._gain_resonance(turn_state, 12 if dmg_in > 0 else 6)
-                    line = f"💥 {enemy_name} trifft dich für {dmg_in} Schaden!{guard_txt}{aura_counter_txt} Resonanz {resonance}/100."
+                    line = _battle_text(
+                        "enemy_hit",
+                        enemy=enemy_name,
+                        damage=dmg_in,
+                        guard=guard_txt,
+                        aura=aura_counter_txt,
+                        resonance=resonance,
+                    )
                     self._slow_line(line)
-                    log_lines.append(f"Gegner trifft: {dmg_in} Schaden (Balance aktiv)")
+                    log_lines.append(_battle_text("log_enemy_hit", damage=dmg_in))
 
         finally:
             music.stop()
@@ -2505,9 +2800,9 @@ class BattleCore:
 
         if player_hp > 0 and enemy_hp <= 0:
             # Sieg
-            line = f"\n🏆 Du hast **{enemy_name}** besiegt!"
+            line = _battle_text("victory_line", enemy=enemy_name)
             self._slow_line(line)
-            log_lines.append(f"Sieg über {enemy_name}")
+            log_lines.append(_battle_text("log_victory", enemy=enemy_name))
 
             # Sieges-Jingle – benutze das bereits gewählte victory_track
             music.victory_jingle(victory_track)
@@ -2635,16 +2930,22 @@ class Plugin:
         if base == "/fight":
             demo_context = self._build_demo_context("normal", context)
             out = self.core.run_fight("normal", demo_context)
+            if isinstance(context, dict):
+                context["reset_conversation_after_battle"] = True
             return True, out
 
         if base == "/fightboss":
             demo_context = self._build_demo_context("boss", context)
             out = self.core.run_fight("boss", demo_context)
+            if isinstance(context, dict):
+                context["reset_conversation_after_battle"] = True
             return True, out
 
         if base == "/fightfinal":
             demo_context = self._build_demo_context("final", context)
             out = self.core.run_fight("final", demo_context)
+            if isinstance(context, dict):
+                context["reset_conversation_after_battle"] = True
             return True, out
 
         if base == "/usepotion":
@@ -2713,9 +3014,10 @@ class Plugin:
             p = s["player"]
             gold = p.get("gold", 0)
             potions = p.get("potions", 0)
+            sigils = p.get("sigils", 0)
 
             # Kaufversuch?
-            if len(parts) >= 4 and parts[1].lower() == "buy" and parts[2].lower() == "potion":
+            if len(parts) >= 4 and parts[1].lower() == "buy":
                 try:
                     amount = int(parts[3])
                 except ValueError:
@@ -2724,16 +3026,28 @@ class Plugin:
                 if amount <= 0:
                     return True, _battle_text("shop_amount_positive")
 
-                cost = 25 * amount
+                item = parts[2].lower()
+                if item == "potion":
+                    cost = 25 * amount
+                elif item == "sigil":
+                    cost = 40 * amount
+                else:
+                    return True, _battle_text("shop_unknown_item")
+
                 if gold < cost:
                     return True, _battle_text("shop_not_enough", gold=gold, cost=cost)
 
                 # Kauf durchführen
                 p["gold"] = gold - cost
-                p["potions"] = potions + amount
+                if item == "potion":
+                    p["potions"] = potions + amount
+                else:
+                    p["sigils"] = sigils + amount
                 self.core.state.save()
 
-                return True, _battle_text("shop_buy", amount=amount, cost=cost, gold=p["gold"], potions=p["potions"])
+                if item == "potion":
+                    return True, _battle_text("shop_buy", amount=amount, cost=cost, gold=p["gold"], potions=p["potions"])
+                return True, _battle_text("shop_buy_sigil", amount=amount, cost=cost, gold=p["gold"], sigils=p["sigils"])
 
             # Nur Shop-Übersicht
             lines = []
@@ -2741,9 +3055,11 @@ class Plugin:
             lines.append("")
             lines.append(f"{_battle_text('status_gold')}: {gold}")
             lines.append(_battle_text("shop_inventory", potions=potions))
+            lines.append(_battle_text("shop_inventory_sigils", sigils=sigils))
             lines.append("")
             lines.append(_battle_text("shop_items"))
             lines.append(_battle_text("shop_potion_item"))
+            lines.append(_battle_text("shop_sigil_item"))
             lines.append("")
             lines.append(_battle_text("shop_buy_hint"))
 
@@ -2868,8 +3184,8 @@ class Plugin:
         max_hp = int(p.get("max_hp", 0))
 
         bar = self._build_hp_bar(hp, max_hp, width=24)
-        title = p.get("title") or self._get_title_for_level(level)
-        story_profile = self.core._get_story_path_profile(context)
+        title = _localize_level_title(p.get("title") or self._get_title_for_level(level))
+        story_profile = _localize_path_profile(self.core._get_story_path_profile(context))
 
         fights = int(stats.get("fights_won", 0))
         boss_wins = int(stats.get("boss_wins", 0))
@@ -2889,7 +3205,7 @@ class Plugin:
             lines.append(
                 f"🜂 {_battle_text('hud_path')}: "
                 f"{story_profile.get('title', _battle_text('status_unknown'))} — "
-                f"{story_profile.get('rank', 'Erwachend')}"
+                f"{story_profile.get('rank', _battle_text('status_unknown'))}"
             )
 
         if restored > 0:
@@ -2912,6 +3228,8 @@ class Plugin:
         s = self.state.state
         stats = s["stats"]
         world = s["world"]
+        story_state = self._load_story_state()
+        played_story_ids = set(story_state.get("played", [])) if isinstance(story_state.get("played", []), list) else set()
 
         # Slash-Commands nicht anfassen
         if user_input.strip().startswith("/"):
@@ -2950,14 +3268,15 @@ class Plugin:
         stats["last_msg_ts"] = int(time.time())
 
         # -----------------------------------------------------
-        # Kampfmodus freischalten nach 32 Nachrichten
+        # Kampfmodus erst nach der Einfuehrung freischalten
         # -----------------------------------------------------
-        if not world["combat_unlocked"] and stats["messages_total"] >= 32:
+        intro_complete = 3 in played_story_ids
+        if not world["combat_unlocked"] and intro_complete:
             world["combat_unlocked"] = True
             self.state.save()
             print(
                 Fore.CYAN
-                + "\n⚔️ Kampfmodus freigeschaltet! Gegner können dich jetzt zufällig angreifen.\n"
+                + "\n⚔️ Kampfmodus freigeschaltet! Die Einfuehrung ist abgeschlossen. Gegner koennen dich jetzt zufaellig angreifen.\n"
                 + Style.RESET_ALL
             )
             return False, user_input
@@ -2969,13 +3288,13 @@ class Plugin:
             ms = stats["messages_since_last_fight"]
             trigger = False
 
-            # Zwischen 2–15 Nachrichten → 10% Chance
-            if 2 <= ms <= 15:
-                if random.randint(1, 10) == 1:
+            # Zwischen 3–8 Nachrichten → 20% Chance
+            if 3 <= ms <= 8:
+                if random.randint(1, 5) == 1:
                     trigger = True
 
-            # Ab 16 Nachrichten → garantiert
-            elif ms > 15:
+            # Ab 9 Nachrichten → garantiert
+            elif ms >= 9:
                 trigger = True
 
             if trigger:
@@ -3067,7 +3386,7 @@ class Plugin:
             "maat_fields",
             {"H": 0.8, "B": 0.8, "S": 0.9, "V": 0.7, "R": 1.0},
         )
-        if mode in ("normal", "final"):
+        if mode in ("normal", "boss", "final"):
             merged.setdefault("guide_mode", True)
             merged.setdefault("no_hp_loss", True)
 
@@ -3192,6 +3511,10 @@ class Plugin:
     def on_startup(self, context=None):
         print(
             Fore.GREEN
-            + "⚔️ MAAT RPG Battle-Plugin geladen – Zufallskämpfe, Deep XP, Bosse & Finalbosse aktiv."
+            + (
+                "⚔️ MAAT RPG Battle Plugin loaded – random battles, deep XP, bosses, and final bosses active."
+                if _battle_ui_language() == "en"
+                else "⚔️ MAAT RPG Battle-Plugin geladen – Zufallskämpfe, Deep XP, Bosse & Finalbosse aktiv."
+            )
             + Style.RESET_ALL
         )

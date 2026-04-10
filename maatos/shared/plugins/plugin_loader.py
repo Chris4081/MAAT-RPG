@@ -5,6 +5,15 @@ import os
 import json
 import importlib.util
 import inspect
+from shared.core.rpg_i18n import get_language
+
+
+def _lang():
+    return get_language(("de", "en"))
+
+
+def _t(de: str, en: str) -> str:
+    return en if _lang() == "en" else de
 
 
 class PluginManager:
@@ -29,7 +38,7 @@ class PluginManager:
             plugins = data.get("plugins", {})
             return plugins if isinstance(plugins, dict) else {}
         except Exception as e:
-            print(f"⚠ Plugin-Konfiguration konnte nicht geladen werden: {e}")
+            print(_t(f"⚠ Plugin-Konfiguration konnte nicht geladen werden: {e}", f"⚠ Plugin configuration could not be loaded: {e}"))
             return {}
 
     def _plugin_id_for_path(self, file_path):
@@ -48,7 +57,7 @@ class PluginManager:
     # LOAD
     # ---------------------------------------------------------
     def load_plugins(self):
-        print("🔍 Lade Plugins …")
+        print(_t("🔍 Lade Plugins …", "🔍 Loading plugins …"))
 
         self.plugins_chat.clear()
         self.plugins_stream.clear()
@@ -78,13 +87,13 @@ class PluginManager:
             plugin_id = self._plugin_id_for_path(file_path)
             if not self._is_enabled(plugin_id):
                 self.skipped_plugins.append(plugin_id)
-                print(f"⏭ Plugin deaktiviert: {plugin_id}")
+                print(_t(f"⏭ Plugin deaktiviert: {plugin_id}", f"⏭ Plugin disabled: {plugin_id}"))
                 return
 
             mod_name = "maat_plugin_" + os.path.basename(file_path).replace(".py", "")
             spec = importlib.util.spec_from_file_location(mod_name, file_path)
             if not spec or not spec.loader:
-                print(f"⚠ Konnte Modul nicht laden: {file_path}")
+                print(_t(f"⚠ Konnte Modul nicht laden: {file_path}", f"⚠ Could not load module: {file_path}"))
                 return
 
             module = importlib.util.module_from_spec(spec)
@@ -92,7 +101,6 @@ class PluginManager:
 
             PluginClass = getattr(module, "Plugin", None)
             if PluginClass is None or not inspect.isclass(PluginClass):
-                print(f"⚠ Keine Plugin-Klasse in: {file_path}")
                 return
 
             inst = PluginClass()
@@ -105,17 +113,17 @@ class PluginManager:
                 self.plugins_chat.append(inst)
 
         except Exception as e:
-            print(f"⚠ Plugin-Ladefehler in {file_path}: {e}")
+            print(_t(f"⚠ Plugin-Ladefehler in {file_path}: {e}", f"⚠ Plugin load error in {file_path}: {e}"))
 
     # ---------------------------------------------------------
     # INFO
     # ---------------------------------------------------------
     def _print_plugin_summary(self):
-        print("\n📦 Plugin-Übersicht:")
-        print(f"   • Chat-Plugins:     {len(self.plugins_chat)}")
-        print(f"   • Streaming-Plugins:{len(self.plugins_stream)}\n")
+        print(_t("\n📦 Plugin-Übersicht:", "\n📦 Plugin overview:"))
+        print(_t(f"   • Chat-Plugins:     {len(self.plugins_chat)}", f"   • Chat plugins:     {len(self.plugins_chat)}"))
+        print(_t(f"   • Streaming-Plugins:{len(self.plugins_stream)}\n", f"   • Streaming plugins:{len(self.plugins_stream)}\n"))
         if self.skipped_plugins:
-            print(f"   • Deaktiviert:      {', '.join(sorted(self.skipped_plugins))}\n")
+            print(_t(f"   • Deaktiviert:      {', '.join(sorted(self.skipped_plugins))}\n", f"   • Disabled:         {', '.join(sorted(self.skipped_plugins))}\n"))
 
     def print_plugin_summary(self):
         self._print_plugin_summary()

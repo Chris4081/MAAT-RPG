@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 import json
 from shared.core.rpg_i18n import get_language
+from shared.core.maat_paths import state_file
 
 # plugin_main.py (ganz oben, nach imports)
 
@@ -173,6 +174,81 @@ LOCKED_QUESTS = [
     },
 ]
 
+QUEST_I18N = {
+    "maat_person": {
+        "en_name": "Maat Value of a Person",
+        "en_desc": "Ask MAAT-KI to calculate the Maat value of a historical person.",
+    },
+    "first_win": {
+        "en_name": "First Victory",
+        "en_desc": "Win a battle in MAAT-RPG.",
+    },
+    "maat_mona": {
+        "en_name": "Maat Value of the Mona Lisa",
+        "en_desc": "Ask MAAT-KI to calculate the Maat value of the Mona Lisa.",
+    },
+    "maat_light": {
+        "en_name": "Light of Harmony",
+        "en_desc": "Ask MAAT-KI to explain the Maat value of light.",
+    },
+    "maat_elements": {
+        "en_name": "Four Elements of Maat",
+        "en_desc": "Ask MAAT-KI about the Maat values of water, fire, earth, and air.",
+    },
+    "energy_compare": {
+        "en_name": "Energy of the Future",
+        "en_desc": "Ask MAAT-KI to compare solar energy and nuclear power by Maat value.",
+    },
+    "maat_all_principles": {
+        "en_name": "Five Pillars of Maat",
+        "en_desc": "Write a message that includes all five principles.",
+    },
+    "daily_hello": {
+        "en_name": "Daily Hello",
+        "en_desc": "Write a hello to MAAT-KI on five consecutive days.",
+    },
+    "daily_reflect": {
+        "en_name": "Daily Reflection",
+        "en_desc": "Ask a self-reflection question on three consecutive days.",
+    },
+    "maat_self": {
+        "en_name": "Your Own Maat Value",
+        "en_desc": "Ask MAAT-KI to calculate your own Maat value.",
+    },
+    "maat_world": {
+        "en_name": "The Maat World Formula",
+        "en_desc": "Ask MAAT-KI about the Maat world formula and let it explain it.",
+    },
+    "maat_plp_project": {
+        "en_name": "PLP of a Project",
+        "en_desc": "Ask MAAT-KI to calculate the PLP of a project or idea.",
+    },
+    "maat_elements_compare": {
+        "en_name": "Elements in Balance",
+        "en_desc": "Ask MAAT-KI to compare the Maat values of water, fire, earth, and air.",
+    },
+    "maat_aeon_explain": {
+        "en_name": "Aeon of Maat",
+        "en_desc": "Ask MAAT-KI for an explanation of the Aeon of Maat.",
+    },
+    "daily_gratitude": {
+        "en_name": "Maat Gratitude",
+        "en_desc": "Write on three consecutive days what you are grateful for.",
+    },
+    "daily_learning": {
+        "en_name": "Daily Insight",
+        "en_desc": "Write on five consecutive days something you learned today.",
+    },
+    "three_wins": {
+        "en_name": "Maat Fighter",
+        "en_desc": "Win three battles of any kind in MAAT-RPG.",
+    },
+    "ten_wins": {
+        "en_name": "Keeper of Harmony",
+        "en_desc": "Win ten battles in MAAT-RPG.",
+    },
+}
+
 class Plugin:
     """
     MAAT-RPG Quest-Plugin
@@ -212,6 +288,119 @@ class Plugin:
 
     def _t(self, de: str, en: str) -> str:
         return en if self._lang() == "en" else de
+
+    def _quest_display(self, quest: dict) -> dict:
+        quest = dict(quest or {})
+        if self._lang() != "en":
+            return quest
+        loc = QUEST_I18N.get(quest.get("id"), {})
+        if loc.get("en_name"):
+            quest["name"] = loc["en_name"]
+        if loc.get("en_desc"):
+            quest["desc"] = loc["en_desc"]
+        return quest
+
+    def _story_state_path(self) -> str:
+        return state_file("story_state.json")
+
+    def _load_story_state(self) -> dict:
+        try:
+            with open(self._story_state_path(), "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return data if isinstance(data, dict) else {}
+        except Exception:
+            return {}
+
+    def _save_story_state(self, data: dict):
+        try:
+            with open(self._story_state_path(), "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+        except Exception:
+            pass
+
+    def _append_story_journal_entry(self, key: str, title: str, summary: str, detail: str = ""):
+        story_state = self._load_story_state()
+        journal = story_state.setdefault("journal", [])
+        for entry in journal:
+            if entry.get("key") == key:
+                return
+        journal.append({
+            "key": key,
+            "kind": "quest_reward",
+            "title": title,
+            "summary": summary,
+            "detail": detail,
+        })
+        self._save_story_state(story_state)
+
+    def _quest_path_bonus(self, quest: dict) -> tuple[int, list[str]]:
+        if self.state is None:
+            return 0, []
+
+        story_state = self._load_story_state()
+        choices = story_state.get("choices", {})
+        profile = story_state.get("path_profile") if isinstance(story_state.get("path_profile"), dict) else {}
+        player = self.state.state.get("player", {})
+        lines = []
+        extra_xp = 0
+
+        combat_vow = choices.get("combat_vow")
+        profile_title = profile.get("title", self._t("Maatis' Weg", "Maatis' path"))
+
+        if combat_vow == "protect":
+            player["sigils"] = int(player.get("sigils", 0) or 0) + 1
+            lines.append(self._t(
+                f"🛡️ {profile_title} antwortet auf die Quest: Du erhaeltst 1 Schutz-Siegel.",
+                f"🛡️ {profile_title} answers the quest: You receive 1 warding sigil.",
+            ))
+            self._append_story_journal_entry(
+                key=f"quest_reward:{quest.get('id')}:protect",
+                title=self._t("Quest-Echo des Schutzes", "Quest Echo of Protection"),
+                summary=self._t("Ein Questabschluss hat Maatis' Weg des Schutzes verstaerkt.", "A completed quest has strengthened Maatis' path of protection."),
+                detail=self._t("Als Folge traegt Maatis nun ein zusaetzliches Schutz-Siegel in den naechsten echten Kampf.", "As a result, Maatis now carries an additional warding sigil into the next real battle."),
+            )
+        elif combat_vow == "truth":
+            extra_xp = 10
+            lines.append(self._t(
+                f"🔎 {profile_title} liest auch in der Quest das Muster klarer: +10 Bonus-XP.",
+                f"🔎 {profile_title} reads the quest pattern more clearly as well: +10 bonus XP.",
+            ))
+            self._append_story_journal_entry(
+                key=f"quest_reward:{quest.get('id')}:truth",
+                title=self._t("Quest-Echo der Wahrheit", "Quest Echo of Truth"),
+                summary=self._t("Ein Questabschluss hat Maatis' Weg der Wahrheit geschaerft.", "A completed quest has sharpened Maatis' path of truth."),
+                detail=self._t("Die Belohnung fuehlt sich praeziser an, als haette Maatis im Ablauf selbst eine Struktur gelesen.", "The reward feels more precise, as if Maatis had read a structure in the quest itself."),
+            )
+        elif combat_vow == "remember":
+            player["potions"] = int(player.get("potions", 0) or 0) + 1
+            lines.append(self._t(
+                f"🌌 {profile_title} bewahrt den Ertrag der Quest: Du erhaeltst 1 Heiltrank.",
+                f"🌌 {profile_title} preserves the quest's gain: You receive 1 healing potion.",
+            ))
+            self._append_story_journal_entry(
+                key=f"quest_reward:{quest.get('id')}:remember",
+                title=self._t("Quest-Echo der Erinnerung", "Quest Echo of Memory"),
+                summary=self._t("Ein Questabschluss hat Maatis' Weg der Erinnerung vertieft.", "A completed quest has deepened Maatis' path of memory."),
+                detail=self._t("Die Quest hinterlaesst nicht nur XP, sondern eine mitgetragene Reserve fuer spaetere Pruefungen.", "The quest leaves behind not only XP, but a carried reserve for later trials."),
+            )
+
+        if lines and hasattr(self.state, "save"):
+            self.state.save()
+        return extra_xp, lines
+
+    def _quest_path_bonus_preview(self, quest: dict) -> str:
+        if self.state is None:
+            return ""
+        story_state = self._load_story_state()
+        choices = story_state.get("choices", {})
+        combat_vow = choices.get("combat_vow")
+        if combat_vow == "protect":
+            return self._t("Pfad-Bonus: +1 Schutz-Siegel bei Abschluss.", "Path bonus: +1 warding sigil on completion.")
+        if combat_vow == "truth":
+            return self._t("Pfad-Bonus: +10 Bonus-XP bei Abschluss.", "Path bonus: +10 bonus XP on completion.")
+        if combat_vow == "remember":
+            return self._t("Pfad-Bonus: +1 Heiltrank bei Abschluss.", "Path bonus: +1 healing potion on completion.")
+        return ""
 
     # -------------------------------------------------
     # STATE INITIALISIEREN
@@ -330,8 +519,9 @@ class Plugin:
                 lines.append(self._t("  (Keine)", "  (None)"))
             else:
                 for i, q in enumerate(self.qstate["available"], start=1):
+                    dq = self._quest_display(q)
                     lines.append(
-                        f"  {i}) [{q['id']}] {q['name']} — {q['desc']}"
+                        f"  {i}) [{dq['id']}] {dq['name']} — {dq['desc']}"
                     )
 
         if mode in ("all", "active"):
@@ -340,9 +530,10 @@ class Plugin:
                 lines.append(self._t("  (Keine)", "  (None)"))
             else:
                 for i, q in enumerate(self.qstate["active"], start=1):
+                    dq = self._quest_display(q)
                     progress = self._quest_progress_text(q)
                     lines.append(
-                        f"  {i}) [{q['id']}] {q['name']} — {progress}"
+                        f"  {i}) [{dq['id']}] {dq['name']} — {progress}"
                     )
 
         if mode in ("all", "done"):
@@ -351,7 +542,8 @@ class Plugin:
                 lines.append(self._t("  (Noch keine abgeschlossen)", "  (None completed yet)"))
             else:
                 for i, q in enumerate(self.qstate["completed"], start=1):
-                    lines.append(f"  {i}) [{q['id']}] {q['name']}")
+                    dq = self._quest_display(q)
+                    lines.append(f"  {i}) [{dq['id']}] {dq['name']}")
 
         return "\n".join(lines)
 
@@ -434,13 +626,17 @@ class Plugin:
             if not q:
                 return self._t(f"Keine Quest mit ID/Nummer '{qid}' gefunden.", f"No quest found with ID/number '{qid}'.")
 
+            dq = self._quest_display(q)
             lines = [
-                f"{self._t('📖 Quest', '📖 Quest')}: {q['name']}",
-                f"ID: {q['id']}",
-                f"{self._t('Beschreibung', 'Description')}: {q.get('desc','')}",
+                f"{self._t('📖 Quest', '📖 Quest')}: {dq['name']}",
+                f"ID: {dq['id']}",
+                f"{self._t('Beschreibung', 'Description')}: {dq.get('desc','')}",
                 f"{self._t('Typ', 'Type')}: {q.get('type','')}",
                 f"{self._t('Belohnung', 'Reward')}: {q.get('reward_xp',0)} XP",
             ]
+            preview = self._quest_path_bonus_preview(q)
+            if preview:
+                lines.append(preview)
             if q in self.qstate["active"]:
                 lines.append(f"{self._t('Status', 'Status')}: {self._t('AKTIV', 'ACTIVE')} — {self._quest_progress_text(q)}")
             elif q in self.qstate["completed"]:
@@ -544,8 +740,12 @@ class Plugin:
             # 🔓 neue Quests freischalten (z.B. ab 40 Nachrichten)
             unlocked = self._check_unlocks()
             for q in unlocked:
+                dq = self._quest_display(q)
                 completed_msgs.append(
-                    f"✨ Neue Quest freigeschaltet: {q['name']}  (Nutze /quests)"
+                    self._t(
+                        f"✨ Neue Quest freigeschaltet: {dq['name']}  (Nutze /quests)",
+                        f"✨ New quest unlocked: {dq['name']}  (Use /quests)",
+                    )
                 )
 
             # Daily-Hallo
@@ -658,15 +858,27 @@ class Plugin:
         self.qstate["completed"].append(quest)
 
         xp = int(quest.get("reward_xp", 0))
-        name = quest.get("name", quest.get("id", "Quest"))
-        msg = f"🏆 Quest abgeschlossen: {name}  (+{xp} XP)"
+        bonus_xp, bonus_lines = self._quest_path_bonus(quest)
+        xp_total = xp + bonus_xp
+        display_quest = self._quest_display(quest)
+        name = display_quest.get("name", quest.get("id", "Quest"))
+        msg = self._t(
+            f"🏆 Quest abgeschlossen: {name}  (+{xp_total} XP)",
+            f"🏆 Quest completed: {name}  (+{xp_total} XP)",
+        )
         completed_msgs.append(msg)
+        completed_msgs.extend(bonus_lines)
 
         # XP ins RPG-Level-System
         if self.state is not None and hasattr(self.state, "add_xp"):
             try:
-                old_lvl, new_lvl = self.state.add_xp(xp)
+                old_lvl, new_lvl = self.state.add_xp(xp_total)
                 if new_lvl > old_lvl:
-                    completed_msgs.append(f"🌟 LEVEL UP! Level {old_lvl} → {new_lvl}")
+                    completed_msgs.append(
+                        self._t(
+                            f"🌟 LEVEL UP! Level {old_lvl} → {new_lvl}",
+                            f"🌟 LEVEL UP! Level {old_lvl} → {new_lvl}",
+                        )
+                    )
             except Exception:
                 pass

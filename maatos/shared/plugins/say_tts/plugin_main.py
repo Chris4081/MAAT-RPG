@@ -13,10 +13,15 @@ import queue
 import threading
 import platform
 import time
+from shared.core.rpg_i18n import get_language
 
 
 class Plugin:
     type = "stream"
+    DEFAULT_VOICES = {
+        "de": "Anna",
+        "en": "Samantha",
+    }
 
     # ----------------------------------------------------
     # Plugin-Befehle (für CommandRouter / /help)
@@ -30,7 +35,8 @@ class Plugin:
 
     def __init__(self):
         self.enabled = False
-        self.voice = "Anna"
+        self.voice = self.DEFAULT_VOICES["de"]
+        self.voice_is_manual = False
         self.rate = 180
 
         # Stream-Buffer für Token
@@ -45,13 +51,36 @@ class Plugin:
         # TTS Worker (spricht IMMER EINEN Satz nach dem anderen)
         threading.Thread(target=self._tts_worker, daemon=True).start()
 
+    def _lang(self):
+        return get_language(("de", "en"))
+
+    def _t(self, de: str, en: str) -> str:
+        return en if self._lang() == "en" else de
+
+    def _default_voice(self) -> str:
+        return self.DEFAULT_VOICES.get(self._lang(), "Anna")
+
+    def _sync_voice_with_language(self):
+        if not self.voice_is_manual:
+            self.voice = self._default_voice()
+
     # ----------------------------------------------------
     # Startup
     # ----------------------------------------------------
     def on_startup(self):
-        choice = input("🔊 Say-TTS aktivieren? (J/N): ").strip().lower()
-        self.enabled = choice.startswith("j")
-        print("✔ Aktiviert\n" if self.enabled else "✖ Deaktiviert\n")
+        self._sync_voice_with_language()
+        choice = input(
+            self._t(
+                "🔊 Say-TTS aktivieren? (J/N): ",
+                "🔊 Enable Say-TTS? (Y/N): ",
+            )
+        ).strip().lower()
+        self.enabled = choice.startswith("j") or choice.startswith("y")
+        print(
+            self._t("✔ Aktiviert\n", "✔ Enabled\n")
+            if self.enabled
+            else self._t("✖ Deaktiviert\n", "✖ Disabled\n")
+        )
 
     # ----------------------------------------------------
     # Worker spricht ALLES nacheinander
@@ -83,6 +112,7 @@ class Plugin:
     def _speak(self, text: str):
         """ Text in Queue einreihen (wird SEQUENZIELL gesprochen). """
         if self.enabled:
+            self._sync_voice_with_language()
             self.tts_queue.put(text.strip())
 
     # ----------------------------------------------------
@@ -113,33 +143,50 @@ class Plugin:
     # ----------------------------------------------------
     def command(self, cmd, context=None):
         c = cmd.strip()
+        self._sync_voice_with_language()
 
         # /say → Hilfe anzeigen
         if c == "/say":
             text = (
-                "🎤 Say-TTS Plugin\n\n"
-                "Verfügbare Befehle:\n"
-                "• /say on – TTS aktivieren\n"
-                "• /say off – TTS deaktivieren\n"
-                "• /say voice <Name> – Stimme ändern (z.B. Anna, Markus)\n"
-                f"Aktuelle Stimme: {self.voice}\n"
-                f"Aktiver Status: {'AN' if self.enabled else 'AUS'}"
+                self._t(
+                    "🎤 Say-TTS Plugin\n\n"
+                    "Verfuegbare Befehle:\n"
+                    "• /say on - TTS aktivieren\n"
+                    "• /say off - TTS deaktivieren\n"
+                    "• /say voice <Name> - Stimme aendern (z.B. Anna, Markus)\n"
+                    f"Aktuelle Stimme: {self.voice}\n"
+                    f"Aktiver Status: {'AN' if self.enabled else 'AUS'}",
+                    "🎤 Say-TTS Plugin\n\n"
+                    "Available commands:\n"
+                    "• /say on - Enable TTS\n"
+                    "• /say off - Disable TTS\n"
+                    "• /say voice <Name> - Change the voice (e.g. Anna, Markus)\n"
+                    f"Current voice: {self.voice}\n"
+                    f"Current status: {'ON' if self.enabled else 'OFF'}",
+                )
             )
             return True, text
 
         if c == "/say on":
             self.enabled = True
-            return True, "🔊 Say-TTS aktiviert."
+            return True, self._t("🔊 Say-TTS aktiviert.", "🔊 Say-TTS enabled.")
 
         if c == "/say off":
             self.enabled = False
-            return True, "🔇 Say-TTS deaktiviert."
+            return True, self._t("🔇 Say-TTS deaktiviert.", "🔇 Say-TTS disabled.")
 
         if c.lower().startswith("/say voice "):
             self.voice = c[11:].strip()  # alles nach "/say voice " nehmen
             if not self.voice:
-                return True, "Bitte gib eine Stimme an, z.B.: /say voice Anna"
-            return True, f"🎤 Stimme gesetzt: {self.voice}"
+                return True, self._t(
+                    "Bitte gib eine Stimme an, z.B.: /say voice Anna",
+                    "Please provide a voice, e.g.: /say voice Anna",
+                )
+            self.voice_is_manual = True
+            return True, self._t(
+                f"🎤 Stimme gesetzt: {self.voice}",
+                f"🎤 Voice set: {self.voice}",
+            )
 
         # nichts gehandelt → weiter zum nächsten Plugin / Modell
         return False, None

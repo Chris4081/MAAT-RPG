@@ -37,8 +37,9 @@ TEXT = {
         "lang_german": "[1] Deutsch",
         "lang_english": "[2] English",
         "lang_invalid": "Ungueltige Auswahl. Bitte 1 oder 2 waehlen.",
-        "brand": "MAAT RPG // MAAT-OS",
+        "brand": "MAAT-OS / MAAT-RPG",
         "version": "Version 0.2 - Rueckkehr der Prinzipien",
+        "title_continue": "Druecke Enter zum Fortfahren",
         "fallback_title": "Suchender im Aeon der Maat",
         "fallback_rank": "Erwachend",
         "fallback_motif": "Die Welt tastet nach der Form, die Maatis annimmt.",
@@ -99,8 +100,9 @@ TEXT = {
         "lang_german": "[1] German",
         "lang_english": "[2] English",
         "lang_invalid": "Invalid choice. Please choose 1 or 2.",
-        "brand": "MAAT RPG // MAAT-OS",
+        "brand": "MAAT-OS / MAAT-RPG",
         "version": "Version 0.2 - Return of the Principles",
+        "title_continue": "Press enter to continue",
         "fallback_title": "Seeker in the Aeon of Maat",
         "fallback_rank": "Awakening",
         "fallback_motif": "The world is feeling for the shape Maatis is becoming.",
@@ -221,20 +223,58 @@ def _load_state(name: str) -> dict:
         return {}
 
 
+def _localize_path_profile(profile: dict, language: str) -> dict:
+    localized = dict(profile or {})
+    if language != "en":
+        return localized
+
+    title_map = {
+        "Grenzhüter der Wahrheit": "Boundary Keeper of Truth",
+        "Grenzhüter der Erinnerung": "Boundary Keeper of Memory",
+        "Klangsucher der Harmonie": "Tone Seeker of Harmony",
+        "Formträger der Schöpfung": "Form Bearer of Creation",
+        "Wegsucher": "Path Seeker",
+    }
+    rank_map = {
+        "Erwachend": "Awakening",
+        "Vertieft": "Deepening",
+        "Verankert": "Anchored",
+    }
+    motif_map = {
+        "Wahrheit darf Grenzen nicht verletzen.": "Truth must not violate boundaries.",
+        "Erinnerung darf nicht zu Besitz werden.": "Memory must not become possession.",
+        "Harmonie ohne Wahrheit bleibt fragil.": "Harmony without truth remains fragile.",
+    }
+
+    title = localized.get("title")
+    rank = localized.get("rank")
+    motif = localized.get("motif")
+    if title:
+        localized["title"] = title_map.get(title, title)
+    if rank:
+        localized["rank"] = rank_map.get(rank, rank)
+    if motif:
+        localized["motif"] = motif_map.get(motif, motif)
+    return localized
+
+
 def _menu_context() -> dict:
     story = _load_state("story_state.json")
     battle = _load_state("battle_state.json")
+    settings = _load_settings()
+    language = settings.get("language", "de")
 
     player = battle.get("player", {})
     stats = battle.get("stats", {})
     world = battle.get("world", {})
     achievements = battle.get("achievements", {})
     profile = story.get("path_profile") if isinstance(story.get("path_profile"), dict) else {}
+    profile = _localize_path_profile(profile, language)
 
     return {
-        "profile_title": profile.get("title", "Suchender im Äon der Maat"),
-        "profile_rank": profile.get("rank", "Erwachend"),
-        "profile_motif": profile.get("motif", "Die Welt tastet nach der Form, die Maatis annimmt."),
+        "profile_title": profile.get("title"),
+        "profile_rank": profile.get("rank"),
+        "profile_motif": profile.get("motif"),
         "level": int(player.get("level", 1) or 1),
         "xp": int(player.get("xp", 0) or 0),
         "gold": int(player.get("gold", 0) or 0),
@@ -250,18 +290,34 @@ def _menu_context() -> dict:
 def _render_progress_panel(language: str) -> str:
     t = TEXT.get(language, TEXT["de"])
     ctx = _menu_context()
+    profile_title = ctx["profile_title"] or t["fallback_title"]
+    profile_rank = ctx["profile_rank"] or t["fallback_rank"]
+    profile_motif = ctx["profile_motif"] or t["fallback_motif"]
     lines = [
         Fore.YELLOW + Style.BRIGHT + t["brand"] + Style.RESET_ALL,
         Fore.CYAN + Style.BRIGHT + t["version"] + Style.RESET_ALL,
         "",
-        Fore.MAGENTA + Style.BRIGHT + f"{t['profile']}: {ctx['profile_title']}" + Style.RESET_ALL,
-        f"{t['rank']}: {ctx['profile_rank']}",
-        f"{t['motif']}: {ctx['profile_motif']}",
+        Fore.MAGENTA + Style.BRIGHT + f"{t['profile']}: {profile_title}" + Style.RESET_ALL,
+        f"{t['rank']}: {profile_rank}",
+        f"{t['motif']}: {profile_motif}",
         "",
         Fore.CYAN + t["progress"] + Style.RESET_ALL,
         f"Level {ctx['level']}  |  XP {ctx['xp']}  |  {t['potions']} {ctx['potions']}  |  Gold {ctx['gold']}",
         f"{t['boss_wins']} {ctx['boss_wins']}  |  {t['final_wins']} {ctx['final_wins']}  |  {t['principles']} {ctx['principles_restored']}/5",
         f"{t['journal_entries']} {ctx['journal_entries']}  |  {t['combat_achievements']} {ctx['combat_achievements']}",
+    ]
+    return "\n".join(lines)
+
+
+def _render_title_screen(language: str) -> str:
+    t = TEXT.get(language, TEXT["de"])
+    lines = [
+        Fore.CYAN + Style.BRIGHT + PYRAMID + Style.RESET_ALL,
+        "",
+        Fore.YELLOW + Style.BRIGHT + t["brand"] + Style.RESET_ALL,
+        Fore.CYAN + Style.BRIGHT + t["version"] + Style.RESET_ALL,
+        "",
+        Fore.GREEN + Style.BRIGHT + t["title_continue"] + Style.RESET_ALL,
     ]
     return "\n".join(lines)
 
@@ -857,6 +913,7 @@ class Plugin:
         self.menu_music = MenuMusic(self.plugin_dir)
         self.settings = _load_settings()
         self.language = self.settings.get("language")
+        self._title_seen = False
 
     def _t(self, key: str) -> str:
         language = self.language if self.language in TEXT else "de"
@@ -869,11 +926,15 @@ class Plugin:
         _save_settings(self.settings)
         return language
 
+    def _show_title_screen(self):
+        clear_screen()
+        print(_render_title_screen(self.language or "de"))
+        input()
+        self._title_seen = True
+
     # ---------- Hauptmenü ----------
     def _show_menu_once(self) -> str:
         clear_screen()
-        print(Fore.CYAN + PYRAMID + Style.RESET_ALL)
-        print()
         print(_render_progress_panel(self.language or "de"))
         print()
         print(Fore.YELLOW + self._t("menu_intro") + "\n" + Style.RESET_ALL)
@@ -929,6 +990,9 @@ class Plugin:
             self._choose_language()
 
         self.menu_music.start()
+
+        if not self._title_seen:
+            self._show_title_screen()
 
         while True:
             choice = self._show_menu_once()

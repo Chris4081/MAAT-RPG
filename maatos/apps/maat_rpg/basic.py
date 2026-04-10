@@ -145,6 +145,7 @@ def load_last_messages_from_memory_v5(limit=15):
 # -------------------------------------------------
 def check_systemprompt(conversation):
     try:
+        language = _ui_language()
         sys_msg = None
         for msg in conversation:
             if msg.get("role") == "system":
@@ -152,19 +153,19 @@ def check_systemprompt(conversation):
                 break
 
         if not sys_msg:
-            print(Fore.RED + "⚠️ WARNUNG: Kein System-Prompt gefunden!" + Style.RESET_ALL)
+            print(Fore.RED + ("⚠️ WARNING: No system prompt found!" if language == "en" else "⚠️ WARNUNG: Kein System-Prompt gefunden!") + Style.RESET_ALL)
             return
 
         if "maat" not in sys_msg.lower():
-            print(Fore.YELLOW + "⚠️ WARNUNG: System-Prompt geladen, aber ohne Maat-Bezug!" + Style.RESET_ALL)
+            print(Fore.YELLOW + ("⚠️ WARNING: System prompt loaded, but without MAAT reference!" if language == "en" else "⚠️ WARNUNG: System-Prompt geladen, aber ohne Maat-Bezug!") + Style.RESET_ALL)
 
         if len(sys_msg.strip()) < 50:
-            print(Fore.YELLOW + "⚠️ WARNUNG: System-Prompt ist extrem kurz – manche Modelle ignorieren ihn." + Style.RESET_ALL)
+            print(Fore.YELLOW + ("⚠️ WARNING: System prompt is extremely short – some models may ignore it." if language == "en" else "⚠️ WARNUNG: System-Prompt ist extrem kurz – manche Modelle ignorieren ihn.") + Style.RESET_ALL)
         else:
-            print(Fore.GREEN + "✅ System-Prompt geladen und geprüft." + Style.RESET_ALL)
+            print(Fore.GREEN + ("✅ System prompt loaded and checked." if language == "en" else "✅ System-Prompt geladen und geprüft.") + Style.RESET_ALL)
 
     except Exception as e:
-        print(Fore.RED + f"⚠️ Fehler beim System-Prompt-Check: {e}" + Style.RESET_ALL)
+        print(Fore.RED + (f"⚠️ Error during system prompt check: {e}" if _ui_language() == "en" else f"⚠️ Fehler beim System-Prompt-Check: {e}") + Style.RESET_ALL)
 
 
 # -------------------------------------------------
@@ -290,6 +291,41 @@ def _title_text(language: str) -> dict:
     }
 
 
+def _localize_path_profile(profile: dict, language: str) -> dict:
+    localized = dict(profile or {})
+    if language != "en":
+        return localized
+
+    title_map = {
+        "Grenzhüter der Wahrheit": "Boundary Keeper of Truth",
+        "Grenzhüter der Erinnerung": "Boundary Keeper of Memory",
+        "Klangsucher der Harmonie": "Tone Seeker of Harmony",
+        "Formträger der Schöpfung": "Form Bearer of Creation",
+        "Wegsucher": "Path Seeker",
+    }
+    rank_map = {
+        "Erwachend": "Awakening",
+        "Vertieft": "Deepening",
+        "Verankert": "Anchored",
+    }
+    motif_map = {
+        "Wahrheit darf Grenzen nicht verletzen.": "Truth must not violate boundaries.",
+        "Erinnerung darf nicht zu Besitz werden.": "Memory must not become possession.",
+        "Harmonie ohne Wahrheit bleibt fragil.": "Harmony without truth remains fragile.",
+    }
+
+    title = localized.get("title")
+    rank = localized.get("rank")
+    motif = localized.get("motif")
+    if title:
+        localized["title"] = title_map.get(title, title)
+    if rank:
+        localized["rank"] = rank_map.get(rank, rank)
+    if motif:
+        localized["motif"] = motif_map.get(motif, motif)
+    return localized
+
+
 def _title_context() -> dict:
     language = _ui_language()
     text = _title_text(language)
@@ -300,6 +336,7 @@ def _title_context() -> dict:
     stats = battle_state.get("stats", {})
     world = battle_state.get("world", {})
     path_profile = story_state.get("path_profile", {}) if isinstance(story_state.get("path_profile"), dict) else {}
+    path_profile = _localize_path_profile(path_profile, language)
 
     title = path_profile.get("title", text["fallback_title"])
     rank = path_profile.get("rank", text["fallback_rank"])
@@ -359,7 +396,7 @@ def _render_title_screen() -> str:
 # -------------------------------------------------
 def start_classic():
     init(autoreset=True)
-    print(Fore.GREEN + "🌟 MAAT-KI RPG wird gestartet …\n" + Style.RESET_ALL)
+    print(Fore.GREEN + ("🌟 MAAT-KI RPG is starting …\n" if _ui_language() == "en" else "🌟 MAAT-KI RPG wird gestartet …\n") + Style.RESET_ALL)
 
     # -------------------------------------------------
     # LOAD YAML PROFILE
@@ -370,15 +407,15 @@ def start_classic():
             with open(path, "r", encoding="utf-8") as f:
                 return yaml.safe_load(f)
         except Exception as e:
-            print(Fore.YELLOW + f"⚠️ YAML konnte nicht geladen werden: {e}\n" + Style.RESET_ALL)
+            print(Fore.YELLOW + (f"⚠️ YAML could not be loaded: {e}\n" if _ui_language() == "en" else f"⚠️ YAML konnte nicht geladen werden: {e}\n") + Style.RESET_ALL)
             return None
 
     profile_path = os.path.join(ROOT, "profiles", "maat_rpg.yaml")
     profile = load_yaml_profile(profile_path) or {}
     if profile:
-        print(Fore.GREEN + f"✅ YAML-Profil geladen: {profile_path}\n" + Style.RESET_ALL)
+        print(Fore.GREEN + (f"✅ YAML profile loaded: {profile_path}\n" if _ui_language() == "en" else f"✅ YAML-Profil geladen: {profile_path}\n") + Style.RESET_ALL)
     else:
-        print(Fore.YELLOW + "⚠️ Kein YAML-Profil gefunden – nutze Standardprompt.\n" + Style.RESET_ALL)
+        print(Fore.YELLOW + ("⚠️ No YAML profile found – using standard prompt.\n" if _ui_language() == "en" else "⚠️ Kein YAML-Profil gefunden – nutze Standardprompt.\n") + Style.RESET_ALL)
 
     # -------------------------------------------------
     # BUILD SYSTEM PROMPT
@@ -478,7 +515,7 @@ def start_classic():
 
     if pm:
         pm.register_plugin_commands(command_router)
-        print("🔌 Plugin-Kommandos geladen.\n")
+        print("🔌 Plugin commands loaded.\n" if _ui_language() == "en" else "🔌 Plugin-Kommandos geladen.\n")
 
     # -------------------------------------------------
     # CHAT STATE + CONTEXT
@@ -540,9 +577,9 @@ def start_classic():
     battle_core = resolve_battle_core(pm)
     if battle_core:
         context["rpg"]["battle_core"] = battle_core
-        print(Fore.GREEN + "⚔️ BattleCore automatisch gefunden und gebunden." + Style.RESET_ALL)
+        print(Fore.GREEN + ("⚔️ BattleCore found and bound automatically." if _ui_language() == "en" else "⚔️ BattleCore automatisch gefunden und gebunden.") + Style.RESET_ALL)
     else:
-        print(Fore.YELLOW + "⚠️ Kein BattleCore gefunden (Plugin 'battle' prüfen)." + Style.RESET_ALL)
+        print(Fore.YELLOW + ("⚠️ No BattleCore found (check plugin 'battle')." if _ui_language() == "en" else "⚠️ Kein BattleCore gefunden (Plugin 'battle' prüfen).") + Style.RESET_ALL)
 
     # -------------------------------------------------
     # LOAD MODEL
@@ -550,10 +587,10 @@ def start_classic():
     model_path = auto_select_model(MODEL_DIR)
     perf = choose_performance()
 
-    print(Fore.CYAN + f"🤖 Lade Modell: {os.path.basename(model_path)} ({perf}) …" + Style.RESET_ALL)
+    print(Fore.CYAN + (f"🤖 Loading model: {os.path.basename(model_path)} ({perf}) …" if _ui_language() == "en" else f"🤖 Lade Modell: {os.path.basename(model_path)} ({perf}) …") + Style.RESET_ALL)
     llm = load_llm(model_path, perf)
     context["llm"] = llm
-    print(Fore.GREEN + "✅ Modell geladen.\n" + Style.RESET_ALL)
+    print(Fore.GREEN + ("✅ Model loaded.\n" if _ui_language() == "en" else "✅ Modell geladen.\n") + Style.RESET_ALL)
 
     try:
         subprocess.call("clear", shell=True)
@@ -567,8 +604,7 @@ def start_classic():
         pass
 
     ui_text = _title_text(_ui_language())
-    print(Fore.CYAN + f"\n🌿 {ui_text['active']}" + Style.RESET_ALL)
-    print(Fore.YELLOW + f"\n📘 {ui_text['tip']}\n" + Style.RESET_ALL)
+    print(Fore.CYAN + f"\n🌿 {ui_text['active']}\n" + Style.RESET_ALL)
 
     if not context["rpg"]["mode"]:
         msgs = load_last_messages_from_memory_v5(limit=15)
@@ -593,34 +629,16 @@ def start_classic():
                 print(evo_engine.get_status_text() if evo_engine else "⚠️ Self-Evolution Engine ist nicht aktiv.")
                 continue
 
-            # -------------------------------------------------
-            # RPG COMMANDS
-            # -------------------------------------------------
-            if context.get("rpg", {}).get("mode"):
-                if user_input.strip() == "/fight":
-                    bc = context["rpg"].get("battle_core")
-                    if bc:
-                        result = bc.run_fight("normal", context)
-                        print(result)
-
-                        conversation.append({
-                            "role": "assistant",
-                            "content": "Ein Kampf ist vorüber. Etwas hat sich verschoben."
-                        })
-
-                        context["rpg"]["messages_since_reset"] = 0
-                        soft_reset_conversation_keep_system(
-                            conversation,
-                            narrative_system_line="Die Welt atmet. Erinnerungen verblassen, Bedeutung bleibt."
-                        )
-                    else:
-                        print("⚠️ Kein BattleCore aktiv.")
-                    continue
-
             if command_router.match(user_input):
                 out = command_router.execute(user_input, context)
                 if out:
                     print(out)
+                if context.pop("reset_conversation_after_battle", False):
+                    context["rpg"]["messages_since_reset"] = 0
+                    soft_reset_conversation_keep_system(
+                        conversation,
+                        narrative_system_line="Die Welt atmet. Erinnerungen verblassen, Bedeutung bleibt."
+                    )
                 continue
 
             # BEFORE HOOKS
@@ -666,7 +684,15 @@ def start_classic():
 
                 if patch and patch.get("status") == "applied":
                     xp = patch.get("xp_gained", 50)
-                    print(Fore.GREEN + f"\n✨ KI hat sich selbst verbessert (+{xp} XP)\n" + Style.RESET_ALL)
+                    print(
+                        Fore.GREEN
+                        + (
+                            f"\n✨ AI improved itself (+{xp} XP)\n"
+                            if _ui_language() == "en"
+                            else f"\n✨ KI hat sich selbst verbessert (+{xp} XP)\n"
+                        )
+                        + Style.RESET_ALL
+                    )
 
             rpg = context.get("rpg")
             if rpg and rpg.get("mode"):

@@ -2,9 +2,6 @@
 set -euo pipefail
 clear
 
-echo "🌿 MAAT-RPG Setup"
-echo "-----------------"
-
 # -------------------------------------------------
 # Pfade
 # -------------------------------------------------
@@ -13,74 +10,115 @@ cd "$BASE_DIR" || exit 1
 
 APP_SUPPORT_DIR="$HOME/Library/Application Support/MAAT-RPG"
 ENV_DIR="$APP_SUPPORT_DIR/mos-env"
-REQ_FILE="$BASE_DIR/requirements.txt"
+REQ_BASE="$BASE_DIR/requirements.base.txt"
+REQ_INTEL="$BASE_DIR/requirements.intel.txt"
+REQ_ARM="$BASE_DIR/requirements.arm.txt"
 
 mkdir -p "$APP_SUPPORT_DIR" || exit 1
+
+detect_language() {
+python3 - <<'PY'
+from pathlib import Path
+import json
+import locale
+path = Path.home() / "Library" / "Application Support" / "MAAT-RPG" / "state" / "settings_state.json"
+try:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    lang = data.get("language", "de")
+    print("en" if lang == "en" else "de")
+except Exception:
+    loc = (locale.getdefaultlocale()[0] or "").lower()
+    print("en" if loc.startswith("en") else "de")
+PY
+}
+
+LANGUAGE="$(detect_language)"
+
+t() {
+    local de="$1"
+    local en="$2"
+    if [[ "$LANGUAGE" == "en" ]]; then
+        printf '%s\n' "$en"
+    else
+        printf '%s\n' "$de"
+    fi
+}
+
+t "🌿 MAAT-RPG Setup" "🌿 MAAT-RPG Setup"
+echo "-----------------"
 
 # -------------------------------------------------
 # Xcode Command Line Tools Check
 # -------------------------------------------------
-echo "🔍 Prüfe Xcode Command Line Tools..."
+t "🔍 Prüfe Xcode Command Line Tools..." "🔍 Checking Xcode Command Line Tools..."
 
 if ! xcode-select -p >/dev/null 2>&1; then
-    echo "⚠️ Xcode Command Line Tools fehlen."
-    echo "👉 Installation wird gestartet..."
+    t "⚠️ Xcode Command Line Tools fehlen." "⚠️ Xcode Command Line Tools are missing."
+    t "👉 Installation wird gestartet..." "👉 Starting installation..."
     xcode-select --install
-    echo "❗ Bitte Installation abschließen und danach Setup erneut starten."
+    t "❗ Bitte Installation abschließen und danach Setup erneut starten." "❗ Please finish the installation and run setup again afterwards."
     exit 1
 fi
 
 if ! command -v clang >/dev/null 2>&1; then
-    echo "❌ clang Compiler fehlt!"
-    echo "👉 Bitte Xcode Command Line Tools installieren:"
+    t "❌ clang Compiler fehlt!" "❌ clang compiler is missing!"
+    t "👉 Bitte Xcode Command Line Tools installieren:" "👉 Please install Xcode Command Line Tools:"
     echo "   xcode-select --install"
     exit 1
 fi
 
 if ! clang --version >/dev/null 2>&1; then
-    echo "❌ clang ist nicht nutzbar."
+    t "❌ clang ist nicht nutzbar." "❌ clang is not usable."
     exit 1
 fi
 
 echo 'int main(){return 0;}' > /tmp/maat_test.c
 if ! clang /tmp/maat_test.c -o /tmp/maat_test_bin >/dev/null 2>&1; then
-    echo "❌ Compiler-Test fehlgeschlagen."
-    echo "👉 Bitte Xcode Command Line Tools prüfen oder neu installieren:"
+    t "❌ Compiler-Test fehlgeschlagen." "❌ Compiler test failed."
+    t "👉 Bitte Xcode Command Line Tools prüfen oder neu installieren:" "👉 Please check or reinstall Xcode Command Line Tools:"
     echo "   xcode-select --install"
     rm -f /tmp/maat_test.c /tmp/maat_test_bin
     exit 1
 fi
 rm -f /tmp/maat_test.c /tmp/maat_test_bin
 
-echo "✅ Xcode Tools bereit"
+t "✅ Xcode Tools bereit" "✅ Xcode tools ready"
 
 # -------------------------------------------------
 # Python Check
 # -------------------------------------------------
 if ! command -v python3 >/dev/null 2>&1; then
-    echo "❌ Python 3 nicht gefunden."
-    echo "👉 Bitte installiere Python von:"
+    t "❌ Python 3 nicht gefunden." "❌ Python 3 was not found."
+    t "👉 Bitte installiere Python von:" "👉 Please install Python from:"
     echo "https://www.python.org/downloads/macos/"
     exit 1
 fi
 
 echo "🐍 Python: $(python3 --version)"
 
-echo "🔎 Prüfe Python-Version…"
-python3 - <<'EOF'
+if [[ "$LANGUAGE" == "en" ]]; then
+    PY_LANG="en"
+else
+    PY_LANG="de"
+fi
+
+t "🔎 Prüfe Python-Version…" "🔎 Checking Python version…"
+PY_LANG="$PY_LANG" python3 - <<'EOF'
 import sys
+import os
 major, minor = sys.version_info[:2]
+lang = os.environ.get("PY_LANG", "de")
 if (major, minor) < (3, 10):
-    print("❌ Python 3.10 oder neuer wird benötigt.")
+    print("❌ Python 3.10 or newer is required." if lang == "en" else "❌ Python 3.10 oder neuer wird benötigt.")
     raise SystemExit(1)
-print(f"✅ Python-Version ok: {major}.{minor}")
+print(f"✅ Python version ok: {major}.{minor}" if lang == "en" else f"✅ Python-Version ok: {major}.{minor}")
 EOF
 
 # -------------------------------------------------
 # Architektur erkennen
 # -------------------------------------------------
 ARCH="$(uname -m)"
-echo "🧠 Architektur: $ARCH"
+t "🧠 Architektur: $ARCH" "🧠 Architecture: $ARCH"
 
 IS_ARM=false
 if [[ "$ARCH" == "arm64" ]]; then
@@ -91,81 +129,88 @@ fi
 # Virtual Environment
 # -------------------------------------------------
 if [ ! -d "$ENV_DIR" ]; then
-    echo "📦 Erstelle virtuelles Environment…"
-    echo "📍 Ziel: $ENV_DIR"
+    t "📦 Erstelle virtuelles Environment…" "📦 Creating virtual environment…"
+    t "📍 Ziel: $ENV_DIR" "📍 Target: $ENV_DIR"
     python3 -m venv "$ENV_DIR" || exit 1
 fi
 
 if [ ! -f "$ENV_DIR/bin/activate" ]; then
-    echo "❌ Environment konnte nicht korrekt erstellt werden:"
+    t "❌ Environment konnte nicht korrekt erstellt werden:" "❌ Environment could not be created correctly:"
     echo "   $ENV_DIR"
     exit 1
 fi
 
-echo "🔌 Aktiviere Environment…"
+t "🔌 Aktiviere Environment…" "🔌 Activating environment…"
 source "$ENV_DIR/bin/activate" || exit 1
 
 # -------------------------------------------------
 # pip Update
 # -------------------------------------------------
-echo "⬆️  Aktualisiere pip…"
+t "⬆️  Aktualisiere pip…" "⬆️  Updating pip…"
 pip install --upgrade pip setuptools wheel || exit 1
 
 # -------------------------------------------------
 # Requirements prüfen
 # -------------------------------------------------
-if [ ! -f "$REQ_FILE" ]; then
-    echo "❌ requirements.txt nicht gefunden!"
-    echo "📍 Erwartet in: $REQ_FILE"
+if [ ! -f "$REQ_BASE" ]; then
+    t "❌ requirements.base.txt nicht gefunden!" "❌ requirements.base.txt not found!"
+    t "📍 Erwartet in:" "📍 Expected at:"
+    echo "   $REQ_BASE"
     exit 1
 fi
 
 # -------------------------------------------------
 # Intel / ARM getrennte Installation
 # -------------------------------------------------
-echo "📚 Installiere Abhängigkeiten…"
+t "📚 Installiere Abhängigkeiten…" "📚 Installing dependencies…"
 
 if [ "$IS_ARM" = false ]; then
-    echo "⚠️ Intel-Mac erkannt → mlx wird übersprungen"
-    TMP_REQ="/tmp/requirements_no_mlx.txt"
-    grep -vi "mlx" "$REQ_FILE" > "$TMP_REQ"
-    pip install -r "$TMP_REQ" || exit 1
+    t "⚠️ Intel-Mac erkannt → ARM-Zusatzpakete werden übersprungen" "⚠️ Intel Mac detected → ARM-only packages will be skipped"
+    pip install -r "$REQ_INTEL" || exit 1
 else
-    echo "🍏 Apple Silicon erkannt → mlx wird installiert"
-    pip install -r "$REQ_FILE" || exit 1
+    t "🍏 Apple Silicon erkannt → ARM-Paketliste wird verwendet" "🍏 Apple Silicon detected → ARM package set will be used"
+    pip install -r "$REQ_ARM" || exit 1
 fi
 
 # -------------------------------------------------
 # Kurztest
 # -------------------------------------------------
-echo "🧪 Prüfe Installation…"
-python3 - <<EOF
+ t "🧪 Prüfe Installation…" "🧪 Checking installation…"
+PY_LANG="$PY_LANG" python3 - <<EOF
+import os
 try:
     import colorama
     import yaml
-    print("✅ Basis-Pakete installiert")
+    print("✅ Base packages installed" if os.environ.get("PY_LANG") == "en" else "✅ Basis-Pakete installiert")
 except ImportError:
-    print("❌ Basis-Pakete fehlen – Installation unvollständig")
+    print("❌ Base packages are missing – installation is incomplete" if os.environ.get("PY_LANG") == "en" else "❌ Basis-Pakete fehlen – Installation unvollständig")
     raise SystemExit(1)
 EOF
 
-echo "🧠 Prüfe verfügbare Backends…"
-python3 - <<'EOF'
+ t "🧠 Prüfe verfügbare Backends…" "🧠 Checking available backends…"
+PY_LANG="$PY_LANG" python3 - <<'EOF'
 import platform
 import importlib.util
+import os
 
 arch = platform.machine()
 checks = {
     "llama_cpp": importlib.util.find_spec("llama_cpp") is not None,
     "mlx_lm": importlib.util.find_spec("mlx_lm") is not None,
 }
-print(f"   Architektur: {arch}")
-print(f"   llama_cpp: {'ok' if checks['llama_cpp'] else 'fehlt'}")
+lang = os.environ.get("PY_LANG", "de")
+print(f"   {'Architecture' if lang == 'en' else 'Architektur'}: {arch}")
+print(f"   llama_cpp: {'ok' if checks['llama_cpp'] else ('missing' if lang == 'en' else 'fehlt')}")
 if arch == "arm64":
-    print(f"   mlx_lm: {'ok' if checks['mlx_lm'] else 'fehlt'}")
+    print(f"   mlx_lm: {'ok' if checks['mlx_lm'] else ('missing' if lang == 'en' else 'fehlt')}")
 
 if not checks["llama_cpp"] and not (arch == "arm64" and checks["mlx_lm"]):
-    print("❌ Kein nutzbares LLM-Backend gefunden.")
+    if lang == "en":
+        print("❌ No usable LLM backend was found.")
+        print("   Installable backends for this build are: llama_cpp on all Macs, mlx_lm on Apple Silicon.")
+    else:
+        print("❌ Kein nutzbares LLM-Backend gefunden.")
+        print("   Nutzbare Backends fuer diesen Build sind: llama_cpp auf allen Macs, mlx_lm auf Apple Silicon.")
     raise SystemExit(1)
 EOF
 
@@ -173,8 +218,8 @@ EOF
 # Abschluss
 # -------------------------------------------------
 echo ""
-echo "✅ Installation abgeschlossen!"
-echo "👉 MAAT-RPG startet jetzt…"
+t "✅ Installation abgeschlossen!" "✅ Installation complete!"
+t "👉 MAAT-RPG startet jetzt…" "👉 MAAT-RPG is starting now…"
 sleep 1
 
 bash "$BASE_DIR/start.sh"
