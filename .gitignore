@@ -18,3 +18,11 @@ logs/
 
 # Archives
 *.zip
+
+# Backup files
+*.bak
+
+# Temp 
+*.tmp
+*.swp
+*.orig
