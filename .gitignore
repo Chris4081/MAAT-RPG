@@ -18,3 +18,11 @@ logs/
 
 # Archives
 *.zip
+
+# Backup files
+*.bak
+
+# Temp / Editor junk (optional aber empfehlenswert)
+*.tmp
+*.swp
+*.orig
