@@ -25,7 +25,8 @@ import subprocess
 import threading
 from colorama import Fore, Style
 import shutil
-
+from shared.core.maat_paths import data_file, state_file, get_data_dir
+from shared.core.audio import ManagedAudioPlayer
 # ==========================
 # 🎵 Menü-Musik (optional)
 # ==========================
@@ -33,42 +34,13 @@ class MenuMusic:
     def __init__(self, plugin_dir: str):
         self.plugin_dir = plugin_dir
         self.track = os.path.join(plugin_dir, "menu_theme.mp3")
-        self._running = False
-        self._thread = None
-
-    def _loop(self):
-        while self._running:
-            if os.path.isfile(self.track):
-                try:
-                    subprocess.call(
-                        ["afplay", self.track],
-                        stdout=subprocess.DEVNULL,
-                        stderr=subprocess.DEVNULL,
-                    )
-                except Exception:
-                    time.sleep(1)
-            else:
-                time.sleep(1)
+        self._player = ManagedAudioPlayer(self.track)
 
     def start(self):
-        if self._running:
-            return
-        if not os.path.isfile(self.track):
-            return
-        self._running = True
-        self._thread = threading.Thread(target=self._loop, daemon=True)
-        self._thread.start()
+        self._player.start_loop(self.track)
 
     def stop(self):
-        self._running = False
-        try:
-            subprocess.call(
-                ["killall", "afplay"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
-        except Exception:
-            pass
+        self._player.stop()
 
 
 # ==========================
@@ -87,9 +59,10 @@ PYRAMID = r"""
                 / / /__/____\__\ \ \
                /____________________\
                \   M A A T   R P G  /
-                \__________________/
+                \        0.2       /
+                 \________________/
 """
-
+\
 
 def clear_screen():
     os.system("clear" if os.name != "nt" else "cls")
@@ -99,11 +72,7 @@ def clear_screen():
 # 🔁 Reset-Helfer
 # ==========================
 def reset_story_state(plugin_dir: str):
-    """
-    Setzt maatos/apps/maat_rpg/plugins/story_loader/story_state.json zurück.
-    """
-    plugins_root = os.path.dirname(plugin_dir)  # .../apps/maat_rpg/plugins
-    story_path = os.path.join(plugins_root, "story_loader", "story_state.json")
+    story_path = state_file("story_state.json")
 
     default_story = {
         "messages_total": 0,
@@ -117,14 +86,7 @@ def reset_story_state(plugin_dir: str):
 
 
 def reset_battle_state(plugin_dir: str):
-    """
-    Setzt maatos/apps/maat_rpg/plugins/battle/battle_state/battle_state.json zurück.
-    Struktur ist 1:1 identisch mit BattleState._default().
-    """
-    plugins_root = os.path.dirname(plugin_dir)
-    battle_state_path = os.path.join(
-        plugins_root, "battle", "battle_state", "battle_state.json"
-    )
+    battle_state_path = state_file("battle_state.json")
 
     default_battle = {
         "player": {
@@ -142,11 +104,9 @@ def reset_battle_state(plugin_dir: str):
             "messages_since_last_fight": 0,
             "xp_combo": 0,
             "last_msg_ts": 0,
-
             "fights_total": 0,
             "fights_won": 0,
             "fights_lost": 0,
-
             "boss_fights": 0,
             "boss_wins": 0,
             "final_fights": 0,
@@ -169,28 +129,13 @@ def reset_battle_state(plugin_dir: str):
         json.dump(default_battle, f, indent=2, ensure_ascii=False)
 
 def reset_quests_and_achievements(plugin_dir: str):
-    """
-    Setzt Quest-, Achievement- und Dungeon-States zurück:
-
-    - maatos/apps/maat_rpg/plugins/quests/quest_state.json
-    - maatos/apps/maat_rpg/plugins/emotional_achievements/achievements.json
-    - maatos/apps/maat_rpg/plugins/achievements/achievements_state.json
-    - maatos/apps/maat_rpg/plugins/dungeon_60/data/state.json
-    - maatos/apps/maat_rpg/plugins/dungeon_500/data/state500.json
-    - maatos/apps/maat_rpg/plugins/dungeon_1000/data/state1000.json
-    """
-    plugins_root = os.path.dirname(plugin_dir)  # .../apps/maat_rpg/plugins
-
     paths = [
-        # Quests & Achievements
-        os.path.join(plugins_root, "quests", "quest_state.json"),
-        os.path.join(plugins_root, "emotional_achievements", "achievements.json"),
-        os.path.join(plugins_root, "achievements", "achievements_state.json"),
-
-        # Dungeon-States
-        os.path.join(plugins_root, "dungeon_60", "data", "state.json"),
-        os.path.join(plugins_root, "dungeon_500", "data", "state500.json"),
-        os.path.join(plugins_root, "dungeon_1000", "data", "state1000.json"),
+        state_file("quest_state.json"),
+        state_file("achievements.json"),
+        state_file("achievements_state.json"),
+        state_file("state.json"),
+        state_file("state500.json"),
+        state_file("state1000.json"),
     ]
 
     for p in paths:
@@ -198,23 +143,11 @@ def reset_quests_and_achievements(plugin_dir: str):
             if os.path.isfile(p):
                 os.remove(p)
         except Exception:
-            # Niemals den Start crashen lassen
             pass
 
 
 def reset_self_evo(plugin_dir: str):
-    """
-    Optional: setzt MAAT Self-Evolution v5 zurück:
-    maatos/apps/maat_rpg/plugins/maat_self_evo/evo/state.json
-    (Falls Plugin/Ordner existiert)
-    """
-    plugins_root = os.path.dirname(plugin_dir)
-    evo_state_path = os.path.join(
-        plugins_root, "maat_self_evo", "evo", "state.json"
-    )
-
-    if not os.path.isfile(evo_state_path):
-        return
+    evo_state_path = state_file("self_evo_state.json")
 
     default_evo = {
         "xp": 0,
@@ -232,7 +165,7 @@ def confirm_wipe_all_memory(plugin_dir: str, menu_music: MenuMusic):
     print(Fore.MAGENTA + Style.BRIGHT + "⚠ WARNUNG: Alle Erinnerungen löschen\n" + Style.RESET_ALL)
     print(
         "Dies löscht den Inhalt von:\n"
-        "  • maatos/data\n\n"
+        "~/Library/Application Support/MAAT-RPG/data\n\n"
         "Dort liegen globale Erinnerungen, Logs und andere Zustände\n"
         "deiner MAAT-KI. Spielstände im RPG (Story/Battle/Quests)\n"
         "bleiben davon unberührt.\n"
@@ -246,7 +179,7 @@ def confirm_wipe_all_memory(plugin_dir: str, menu_music: MenuMusic):
     menu_music.stop()
 
     print()
-    print(Fore.MAGENTA + "🧠 Lösche globales Memory (maatos/data) ..." + Style.RESET_ALL)
+    print(Fore.MAGENTA + "🧠 Lösche globales Memory (~/Library/Application Support/MAAT-RPG/data) ..." + Style.RESET_ALL)
     reset_global_memory(plugin_dir)
 
     print(Fore.GREEN + "✅ Alle Erinnerungen im Ordner 'data' wurden gelöscht." + Style.RESET_ALL)
@@ -256,29 +189,8 @@ def confirm_wipe_all_memory(plugin_dir: str, menu_music: MenuMusic):
     time.sleep(2)
     sys.exit(0)
 
-
 def reset_global_memory(plugin_dir: str):
-    """
-    Leert den Ordner 'maatos/data' (bzw. ROOT/data).
-
-    Annahme:
-    - Projektstruktur:   maatos/
-        - maatki.py
-        - data/
-        - apps/maat_rpg/plugins/game_menu/plugin_main.py
-
-    Wir gehen von plugin_dir = .../apps/maat_rpg/plugins/game_menu aus
-    und laufen vier Ebenen nach oben → Projekt-Root.
-    """
-    # 4x dirname: .../game_menu → /plugins → /maat_rpg → /apps → /maatos
-    root = os.path.dirname(
-        os.path.dirname(
-            os.path.dirname(
-                os.path.dirname(plugin_dir)
-            )
-        )
-    )
-    data_dir = os.path.join(root, "data")
+    data_dir = str(get_data_dir())
 
     if not os.path.isdir(data_dir):
         print(f"[MEMORY RESET] Kein 'data' Verzeichnis gefunden unter: {data_dir}")
@@ -294,8 +206,8 @@ def reset_global_memory(plugin_dir: str):
             elif os.path.isdir(path):
                 shutil.rmtree(path)
         except Exception as e:
-            # Niemals den Start/Reset crashen lassen
             print(f"[MEMORY RESET] Fehler beim Löschen von {path}: {e}")
+
 
 
 # ==========================
@@ -538,7 +450,7 @@ def options_menu(plugin_dir: str, menu_music: MenuMusic):
         print(Fore.YELLOW + Style.BRIGHT + "⚙ Optionen\n" + Style.RESET_ALL)
         print("  [1] Zähler zurücksetzen (Story + Battle)")
         print("  [2] Alles zurücksetzen (Story + Battle + Self-Evo)")
-        print("  [3] Alle Erinnerungen löschen (maatos/data)")
+        print("  [3] Alle Erinnerungen löschen (Application Support//MAAT-RPG/data)")
         print("  [4] Zurück\n")
 
         choice = input(Fore.GREEN + "Auswahl: " + Style.RESET_ALL).strip()

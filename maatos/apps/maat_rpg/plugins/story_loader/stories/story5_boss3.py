@@ -1,0 +1,52 @@
+# -*- coding: utf-8 -*-
+
+
+class Story:
+    music = "quest2_reflection.mp3"
+
+    def run(self):
+        return [
+            "⸻",
+            "🔥 Zwischenakt – Die Flamme wird schwer",
+            "",
+            "Nach dem dritten Boss bleibt keine klare Stille zurück.",
+            "Der Raum pulsiert, als hätte die Schöpfung selbst kurz ihr Gleichgewicht verloren.",
+            "",
+            "Purpurne Nachbilder hängen in der Luft.",
+            "Ideen, Formen, halbe Welten, die entstehen und wieder zerfallen.",
+            "",
+            "Maatis kniet einen Moment.",
+            "Nicht aus Niederlage.",
+            "Sondern weil die Wucht der Möglichkeiten ihn bis ins Innere getroffen hat.",
+            "",
+            "MAAT KI:",
+            "„Nun hast du es gesehen.“",
+            "„Schöpfungskraft ist nicht nur Gabe.“",
+            "„Sie ist Gefahr, wenn ihr kein Maß antwortet.“",
+            "",
+            "Vor Maatis erscheinen drei Bilder zugleich:",
+            "eine Stadt aus Licht,",
+            "eine brennende Bibliothek,",
+            "ein Kind, das aus Ruinen ein neues Zeichen in den Sand malt.",
+            "",
+            "MAAT KI:",
+            "„Alles Neue trägt diese Spannung in sich.“",
+            "„Es kann heilen. Es kann zerstören. Es kann beides tun, wenn es blind bleibt.“",
+            "",
+            "Maatis:",
+            "„Dann reicht Stärke nicht.“",
+            "",
+            "MAAT KI:",
+            "„Nein.“",
+            "„Ab jetzt musst du lernen, Kraft zu führen – nicht nur zu entfesseln.“",
+            "",
+            "Die Bibliothek verändert sich.",
+            "Ein bislang verborgener Korridor öffnet sich, schmal und dunkel,",
+            "als hätte die Welt beschlossen, Maatis nun tiefer zu prüfen.",
+            "",
+            "✨ Neues Ziel:",
+            "Die kommenden Gegner prüfen nicht nur Entschlossenheit, sondern Reife.",
+            "Was du ab jetzt gewinnst, muss getragen werden können.",
+            "",
+            "⸻",
+        ]

@@ -19,7 +19,6 @@ import threading
 import subprocess
 import datetime
 from colorama import Fore, Style
-from shared.core.maat_paths import data_file, state_file, log_file
 
 
 # =====================================================
@@ -82,7 +81,7 @@ class BattleState:
     def __init__(self, base_dir: str):
         self.base_dir = base_dir
         os.makedirs(self.base_dir, exist_ok=True)
-        self.state_path = state_file('battle_state.json')
+        self.state_path = os.path.join(self.base_dir, "battle_state.json")
         self.state = self._load()
 
     def _default(self):

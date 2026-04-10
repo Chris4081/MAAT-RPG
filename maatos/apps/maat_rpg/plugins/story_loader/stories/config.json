@@ -35,6 +35,39 @@
         "messages": 30,
         "position": "before"
       }
+    },
+    {
+      "id": 4,
+      "name": "Zwischenakt – Der erste Boss fällt",
+      "module": "story4_boss1",
+      "music": "story1_theme.mp3",
+      "trigger": {
+        "type": "state_value",
+        "path": "battle.stats.boss_wins",
+        "equals": 1
+      }
+    },
+    {
+      "id": 5,
+      "name": "Zwischenakt – Die Flamme wird schwer",
+      "module": "story5_boss3",
+      "music": "quest2_reflection.mp3",
+      "trigger": {
+        "type": "state_value",
+        "path": "battle.stats.boss_wins",
+        "equals": 3
+      }
+    },
+    {
+      "id": 6,
+      "name": "Zwischenakt – Ein Prinzip kehrt zurück",
+      "module": "story6_final1",
+      "music": "story3_theme.mp3",
+      "trigger": {
+        "type": "state_value",
+        "path": "battle.world.principles_restored",
+        "equals": 1
+      }
     }
   ]
 }

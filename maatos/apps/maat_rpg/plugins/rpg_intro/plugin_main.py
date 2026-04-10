@@ -20,6 +20,7 @@ import subprocess
 import termios
 import tty
 import select
+from shared.core.audio import ManagedAudioPlayer
 
 # Ziel-Gesamtdauer in Sekunden (3:47 = 3*60 + 47 = 227)
 TOTAL_INTRO_DURATION = 227.0
@@ -92,6 +93,7 @@ class Plugin:
 
     def __init__(self):
         self._abort = False
+        self._player = ManagedAudioPlayer()
 
     def command(self, cmd: str, context=None):
         return None
@@ -133,24 +135,10 @@ class Plugin:
     # Musik (macOS, optional)
     # -----------------------------------------------
     def _play_music(self, path: str):
-        try:
-            subprocess.Popen(
-                ["afplay", path],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
-        except Exception:
-            pass
+        self._player.play_once(path)
 
     def _stop_music(self):
-        try:
-            subprocess.call(
-                ["killall", "afplay"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
-        except Exception:
-            pass
+        self._player.stop()
 
     # -----------------------------------------------
     # Langsames Streaming

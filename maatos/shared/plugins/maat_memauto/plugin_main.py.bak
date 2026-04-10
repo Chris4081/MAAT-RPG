@@ -23,7 +23,6 @@ import os
 import json
 import re
 from datetime import datetime
-from shared.core.maat_paths import data_file, state_file, log_file
 
 
 class Plugin:
@@ -52,7 +51,7 @@ class Plugin:
         os.makedirs(data_dir, exist_ok=True)
 
         # 🔹 MemAuto-JSON direkt in /data
-        self.mem_path = state_file('memauto.json')
+        self.mem_path = os.path.join(data_dir, "memauto.json")
 
         # Flags
         self.inject_enabled = True

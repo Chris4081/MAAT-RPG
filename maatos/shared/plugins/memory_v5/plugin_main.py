@@ -63,17 +63,19 @@ class Plugin:
     # INIT
     # -------------------------------------------------------------
     def __init__(self):
-        # 🔹 Projekt-Root: drei Ebenen hoch → MAAT-KI/
-        root_dir = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "..", "..", "..")
+        # 🔹 Schreibbarer Benutzerpfad für macOS
+        app_support_dir = os.path.join(
+            os.path.expanduser("~"),
+            "Library",
+            "Application Support",
+            "MAAT-RPG",
+            "data"
         )
-        # 🔹 Alle Dateien nach /data legen
-        data_dir = os.path.join(root_dir, "data")
-        os.makedirs(data_dir, exist_ok=True)
+        os.makedirs(app_support_dir, exist_ok=True)
 
-        self.db_path = os.path.join(data_dir, "memory_v5.db")
-        self.index_path = os.path.join(data_dir, "memory_v5.index")
-        self.identity_path = os.path.join(data_dir, "memory_v5_identity.json")
+        self.db_path = os.path.join(app_support_dir, "memory_v5.db")
+        self.index_path = os.path.join(app_support_dir, "memory_v5.index")
+        self.identity_path = os.path.join(app_support_dir, "memory_v5_identity.json")
 
         self.debug = False
         self.debug_once = False

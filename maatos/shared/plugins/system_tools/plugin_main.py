@@ -22,6 +22,8 @@ import subprocess
 import platform
 from datetime import datetime
 
+from shared.core.maat_paths import get_models_dir, get_data_dir, get_logs_dir
+print("✅ system_tools plugin_main.py importiert")
 # Nur Model-Liste aus llm_loader holen
 try:
     from shared.core.llm_loader import list_available_models
@@ -44,13 +46,20 @@ class Plugin:
     }
 
     def __init__(self):
-        # ROOT = drei Ebenen hoch → MAAT-KI/
+        print("✅ system_tools Plugin initialisiert")
+        # root_dir nur noch für git pull / Projektlesepfade
         self.root_dir = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "..", "..", "..")
         )
-        self.models_dir = os.path.join(self.root_dir, "models")
-        self.data_dir = os.path.join(self.root_dir, "data")
+
+        # zentrale Schreib-/Nutzpfade
+        self.models_dir = str(get_models_dir())
+        self.data_dir = str(get_data_dir())
+        self.logs_dir = str(get_logs_dir())
+
         os.makedirs(self.data_dir, exist_ok=True)
+        os.makedirs(self.logs_dir, exist_ok=True)
+
         self.model_override_path = os.path.join(self.data_dir, "model_override.txt")
 
     # ----------------------------------------------------------
@@ -63,11 +72,9 @@ class Plugin:
 
         base = parts[0].lower()
 
-        # ---------- MODEL ----------
         if base == "/model":
             return self._handle_model(parts)
 
-        # ---------- RESTART ----------
         if base == "/restart":
             self._restart()
             return "🔄 Neustart wird ausgeführt …"
@@ -75,23 +82,18 @@ class Plugin:
         if base == "/safe-restart":
             return self._safe_restart()
 
-        # ---------- PROFILE ----------
         if base == "/profile":
             return self._handle_profiles(parts, context)
 
-        # ---------- PLUGINS ----------
         if base == "/plugins":
             return self._handle_plugins(parts, context)
 
-        # ---------- SYSTEM ----------
         if base == "/sysinfo":
             return self._sysinfo()
 
-        # ---------- MEMORY ----------
         if base == "/meminfo":
             return self._meminfo()
 
-        # ---------- UPDATE ----------
         if base == "/update":
             return self._update()
 
@@ -101,7 +103,6 @@ class Plugin:
     # MODEL COMMANDS
     # ----------------------------------------------------------
     def _handle_model(self, parts):
-        # /model → INTERAKTIVER manueller Modell-Selector
         if len(parts) == 1:
             if list_available_models is None:
                 return "❌ list_available_models konnte nicht importiert werden."
@@ -118,7 +119,6 @@ class Plugin:
             for i, m in enumerate(models, 1):
                 print(f"[{i}] {m}")
 
-            # Interaktive Auswahl
             while True:
                 choice = input("\n🔢 Modell wählen: ").strip()
                 try:
@@ -129,7 +129,6 @@ class Plugin:
 
                         print(f"\n📦 Gewähltes Modell: {chosen}\n")
 
-                        # Wunschmodell speichern
                         try:
                             with open(self.model_override_path, "w", encoding="utf-8") as f:
                                 f.write(chosen)
@@ -147,7 +146,6 @@ class Plugin:
 
                 print("⚠ Bitte eine gültige Zahl eingeben.")
 
-        # /model list → nur Dateien anzeigen
         if len(parts) >= 2 and parts[1].lower() == "list":
             if not os.path.isdir(self.models_dir):
                 return f"❌ models/ Ordner nicht gefunden: {self.models_dir}"
@@ -156,12 +154,11 @@ class Plugin:
             if not models:
                 return "📂 Keine Modelle im models/ Ordner gefunden."
 
-            out = ["📚 Verfügbare Modelle (Dateinamen in models/):"]
+            out = ["📚 Verfügbare Modelle:"]
             for e in models:
                 out.append(f"  • {e}")
             return "\n".join(out)
 
-        # /model set <name> → Wunschmodell direkt setzen (ohne Menü)
         if len(parts) >= 2 and parts[1].lower() == "set":
             if len(parts) < 3:
                 return "Nutze: /model set <dateiname_aus_models_ordner>"
@@ -185,11 +182,10 @@ class Plugin:
             except Exception as e:
                 return f"❌ Konnte model_override.txt nicht schreiben: {e}"
 
-        # Hilfe-Text fallback
         return (
             "📘 Modellverwaltung:\n"
             "  • /model                 – Interaktiver Modell-Selector\n"
-            "  • /model list            – Zeigt Dateien im models/ Ordner\n"
+            "  • /model list            – Zeigt verfügbare Modelle\n"
             "  • /model set <name>      – Wunschmodell direkt setzen\n"
         )
 
@@ -204,9 +200,7 @@ class Plugin:
     def _safe_restart(self):
         try:
             ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-            log_dir = os.path.join(self.root_dir, "logs")
-            os.makedirs(log_dir, exist_ok=True)
-            logpath = os.path.join(log_dir, f"safe_restart_{ts}.log")
+            logpath = os.path.join(self.logs_dir, f"safe_restart_{ts}.log")
             with open(logpath, "w", encoding="utf-8") as f:
                 f.write("Safe-Restart at " + str(datetime.now()))
         except Exception:

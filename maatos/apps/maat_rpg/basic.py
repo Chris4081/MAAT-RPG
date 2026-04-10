@@ -9,55 +9,94 @@ MAAT-KI RPG — ChatLoop 3.0 (FIXED)
 🕊️ Respekt vor Stabilität und Nutzererfahrung
 """
 
-print("🧪 basic.py: A – std imports done")
 import readline
 import os
 import sys
 import sqlite3
 import subprocess
+import json
+from pathlib import Path
 from colorama import Fore, Style, init
-print("🧪 basic.py: B – colorama done")
+
+
+DEBUG_STARTUP = os.environ.get("MAAT_DEBUG_STARTUP") == "1"
+
+
+def _dbg(msg: str):
+    if DEBUG_STARTUP:
+        print(msg)
 
 # -------------------------------------------------
-# ROOT / MODEL_DIR
+# ROOT / ZENTRALE MAAT-PFADE
 # -------------------------------------------------
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
-print("🧪 basic.py: C – ROOT done")
+_dbg("🧪 basic.py: C – ROOT done")
 
-MODEL_DIR = os.path.join(ROOT, "models")
+APP_NAME = "MAAT-RPG"
+APP_SUPPORT_DIR = Path.home() / "Library" / "Application Support" / APP_NAME
+DATA_DIR = APP_SUPPORT_DIR / "data"
+MODELS_DIR = APP_SUPPORT_DIR / "models"
+LOGS_DIR = APP_SUPPORT_DIR / "logs"
+CACHE_DIR = APP_SUPPORT_DIR / "cache"
+SAVES_DIR = APP_SUPPORT_DIR / "saves"
+STATE_DIR = APP_SUPPORT_DIR / "state"
 
-from shared.core.self_evolution import SelfEvolutionEngine  # v4.4
-print("🧪 basic.py: D – SelfEvolutionEngine imported")
+for p in [APP_SUPPORT_DIR, DATA_DIR, MODELS_DIR, LOGS_DIR, CACHE_DIR, SAVES_DIR, STATE_DIR]:
+    p.mkdir(parents=True, exist_ok=True)
+
+MODEL_DIR = str(MODELS_DIR)
+
+# Optional: global per env weiterreichen
+os.environ["MAAT_APP_SUPPORT_DIR"] = str(APP_SUPPORT_DIR)
+os.environ["MAAT_DATA_DIR"] = str(DATA_DIR)
+os.environ["MAAT_MODELS_DIR"] = str(MODELS_DIR)
+os.environ["MAAT_LOGS_DIR"] = str(LOGS_DIR)
+os.environ["MAAT_CACHE_DIR"] = str(CACHE_DIR)
+os.environ["MAAT_SAVES_DIR"] = str(SAVES_DIR)
+
+_dbg(f"🧪 basic.py: App Support = {APP_SUPPORT_DIR}")
+_dbg(f"🧪 basic.py: Data Dir    = {DATA_DIR}")
+_dbg(f"🧪 basic.py: Models Dir  = {MODELS_DIR}")
+
+# -------------------------------------------------
+# SELF-EVOLUTION IMPORT (abgesichert)
+# -------------------------------------------------
+try:
+    from shared.core.self_evolution import SelfEvolutionEngine  # v4.4
+    _dbg("🧪 basic.py: D – SelfEvolutionEngine imported")
+except Exception as e:
+    print(f"⚠️ SelfEvolutionEngine konnte nicht geladen werden: {e}")
+    SelfEvolutionEngine = None
 
 # -------------------------------------------------
 # SHARED IMPORTS
 # -------------------------------------------------
 from shared.profile_loader import ProfileLoader
-print("🧪 basic.py: E – ProfileLoader imported")
+_dbg("🧪 basic.py: E – ProfileLoader imported")
 
 from shared.core.llm_loader import (
     load_llm,
     choose_performance,
     auto_select_model,
 )
-print("🧪 basic.py: F – llm_loader imported")
+_dbg("🧪 basic.py: F – llm_loader imported")
 
 from shared.core.streaming import stream_chat_completion, stream_to_console
-print("🧪 basic.py: G – streaming imported")
+_dbg("🧪 basic.py: G – streaming imported")
 
 from shared.core.command_router import CommandRouter
-print("🧪 basic.py: H – CommandRouter imported")
+_dbg("🧪 basic.py: H – CommandRouter imported")
 
 # Plugin-System
 try:
     from shared.plugins.plugin_loader import PluginManager
-    print("➡️ PluginManager erfolgreich importiert.")
+    _dbg("➡️ PluginManager erfolgreich importiert.")
 except Exception as e:
     print("❌ IMPORTFEHLER PluginManager:", e)
     PluginManager = None
-print("🧪 basic.py: Plugin Manager")
+_dbg("🧪 basic.py: Plugin Manager")
 
 
 # -------------------------------------------------
@@ -77,8 +116,7 @@ SYSTEM_PROMPT_RPG_APPENDIX = """
 # -------------------------------------------------
 def load_last_messages_from_memory_v5(limit=15):
     try:
-        data_dir = os.path.join(ROOT, "data")
-        db_path = os.path.join(data_dir, "memory_v5.db")
+        db_path = str(DATA_DIR / "memory_v5.db")
         if not os.path.exists(db_path):
             return []
 
@@ -138,14 +176,11 @@ def trim_conversation_keep_system(conversation, max_messages=10):
     if not conversation:
         return
 
-    # Erste Nachricht als System-Anker
     anchor = conversation[0]
     if anchor.get("role") != "system":
-        # notfalls: künstlicher Systemanker
         anchor = {"role": "system", "content": "Du bist MAAT-KI im RPG-Modus."}
 
     if len(conversation) <= max_messages:
-        # ensure anchor stays first
         if conversation[0] != anchor:
             conversation[:] = [anchor] + conversation[1:]
         return
@@ -187,11 +222,9 @@ def resolve_battle_core(pm):
 
     try:
         for plugin in pm.iter_all_plugins():
-            # Fall 1: Plugin selbst kann kämpfen
             if hasattr(plugin, "run_fight") and callable(getattr(plugin, "run_fight")):
                 return plugin
 
-            # Fall 2: Plugin besitzt ein 'core' Objekt
             core = getattr(plugin, "core", None)
             if core and hasattr(core, "run_fight") and callable(getattr(core, "run_fight")):
                 return core
@@ -199,6 +232,75 @@ def resolve_battle_core(pm):
         pass
 
     return None
+
+
+def _load_json_file(path: Path) -> dict:
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def _title_context() -> dict:
+    story_state = _load_json_file(STATE_DIR / "story_state.json")
+    battle_state = _load_json_file(STATE_DIR / "battle_state.json")
+
+    player = battle_state.get("player", {})
+    stats = battle_state.get("stats", {})
+    world = battle_state.get("world", {})
+    path_profile = story_state.get("path_profile", {}) if isinstance(story_state.get("path_profile"), dict) else {}
+
+    title = path_profile.get("title", "Suchender im Äon der Maat")
+    rank = path_profile.get("rank", "Erwachend")
+    motif = path_profile.get("motif", "Die Welt prüft, was in Maatis Form annimmt.")
+
+    restored = int(world.get("principles_restored", 0) or 0)
+    boss_wins = int(stats.get("boss_wins", 0) or 0)
+    level = int(player.get("level", 1) or 1)
+
+    if restored > 0:
+        subtitle = "Die Welt erinnert sich durch deinen Sieg"
+    elif boss_wins >= 3:
+        subtitle = "Die Prüfungen werden tiefer und persönlicher"
+    elif path_profile:
+        subtitle = f"Ein Weg aus {title.lower()}"
+    else:
+        subtitle = "Version 0.2 – Die Rückkehr der Prinzipien"
+
+    return {
+        "subtitle": subtitle,
+        "title": title,
+        "rank": rank,
+        "motif": motif,
+        "level": level,
+        "boss_wins": boss_wins,
+        "restored": restored,
+    }
+
+
+def _render_title_screen() -> str:
+    ctx = _title_context()
+    lines = [
+        Fore.CYAN + Style.BRIGHT + "╔════════════════════════════════════════════════════╗" + Style.RESET_ALL,
+        Fore.CYAN + Style.BRIGHT + "║                     MAAT RPG                       ║" + Style.RESET_ALL,
+        Fore.CYAN + Style.BRIGHT + "║                    Version 0.2                     ║" + Style.RESET_ALL,
+        Fore.CYAN + Style.BRIGHT + "╚════════════════════════════════════════════════════╝" + Style.RESET_ALL,
+        "",
+        Fore.YELLOW + ctx["subtitle"] + Style.RESET_ALL,
+        "",
+        f"🜂 Pfadprofil: {ctx['title']} — {ctx['rank']}",
+        f"   {ctx['motif']}",
+        "",
+        f"📘 Level {ctx['level']}   ⚔️ Boss-Siege {ctx['boss_wins']}   🌿 Prinzipien {ctx['restored']}",
+        "",
+        "⏎ ENTER – Erwachen",
+        "📓 /journal – Entscheidungen",
+        "🏆 /erfolge – Erfolge",
+        "❓ /help – Kommandos",
+    ]
+    return "\n".join(lines)
 
 
 # -------------------------------------------------
@@ -233,12 +335,10 @@ def start_classic():
     from textwrap import dedent
 
     def build_systemprompt(profile: dict) -> str:
-        # 1) Direkter systemprompt aus YAML
         sp = profile.get("systemprompt")
         if isinstance(sp, str) and sp.strip():
             return sp.strip()
 
-        # 2) Fallback-Prompt
         name = profile.get("name", "MAAT-KI")
         title = profile.get("title", "Äonische Resonanz-Intelligenz")
 
@@ -272,7 +372,11 @@ def start_classic():
         try:
             app_plugin_root = os.path.join(os.path.dirname(__file__), "plugins")
             shared_plugin_root = os.path.join(ROOT, "shared", "plugins")
-            pm = PluginManager([app_plugin_root, shared_plugin_root])
+            plugin_config_path = os.path.join(os.path.dirname(__file__), "plugin_config.json")
+            pm = PluginManager(
+                [app_plugin_root, shared_plugin_root],
+                config_path=plugin_config_path,
+            )
             pm.load_plugins()
         except Exception as e:
             print(Fore.RED + f"⚠ Plugin-Fehler: {e}" + Style.RESET_ALL)
@@ -333,7 +437,6 @@ def start_classic():
         "messages_since_reset": 0,
     }
 
-    # Systemprompt im RPG wirklich aktivieren (Appendix)
     if context["rpg"]["mode"]:
         conversation[0]["content"] = conversation[0]["content"].rstrip() + "\n\n" + SYSTEM_PROMPT_RPG_APPENDIX
 
@@ -342,13 +445,18 @@ def start_classic():
     # -------------------------------------------------
     # SELF-EVOLUTION ENGINE v4.4
     # -------------------------------------------------
-    evo_engine = SelfEvolutionEngine(
-        memory=None,
-        alignment_kernel=None,
-        identity_kernel=None,
-        base_dir=os.path.join(ROOT, "data"),
-    )
-    context["evo_engine"] = evo_engine
+    if SelfEvolutionEngine is not None:
+        evo_engine = SelfEvolutionEngine(
+            memory=None,
+            alignment_kernel=None,
+            identity_kernel=None,
+            base_dir=str(DATA_DIR),
+        )
+        context["evo_engine"] = evo_engine
+    else:
+        evo_engine = None
+        context["evo_engine"] = None
+        print(Fore.YELLOW + "⚠️ Self-Evolution Engine ist nicht verfügbar." + Style.RESET_ALL)
 
     # -------------------------------------------------
     # STARTUP HOOKS
@@ -383,16 +491,20 @@ def start_classic():
     context["llm"] = llm
     print(Fore.GREEN + "✅ Modell geladen.\n" + Style.RESET_ALL)
 
-    # Bildschirm leeren
     try:
         subprocess.call("clear", shell=True)
     except Exception:
         pass
 
-    print(Fore.CYAN + "🌿 MAAT-KI RPG ChatLoop 3.0 aktiv." + Style.RESET_ALL)
+    print(_render_title_screen())
+    try:
+        input(Fore.YELLOW + "\n> " + Style.RESET_ALL)
+    except EOFError:
+        pass
+
+    print(Fore.CYAN + "\n🌿 MAAT-KI RPG ChatLoop 3.0 aktiv." + Style.RESET_ALL)
     print("\n📘 Tipp: Nutze /help\n")
 
-    # OPTIONAL: Memory-V5 nur im NON-RPG
     if not context["rpg"]["mode"]:
         msgs = load_last_messages_from_memory_v5(limit=15)
         if msgs:
@@ -412,7 +524,6 @@ def start_classic():
                 print("\n🌿 MAAT-KI verabschiedet sich.\n")
                 break
 
-            # Self-Evolution Status
             if user_input.strip() == "/evo":
                 print(evo_engine.get_status_text() if evo_engine else "⚠️ Self-Evolution Engine ist nicht aktiv.")
                 continue
@@ -427,13 +538,11 @@ def start_classic():
                         result = bc.run_fight("normal", context)
                         print(result)
 
-                        # narrativer Anker (kurz)
                         conversation.append({
                             "role": "assistant",
                             "content": "Ein Kampf ist vorüber. Etwas hat sich verschoben."
                         })
 
-                        # Reset: Kontext „atmet“ (Systemprompt bleibt!)
                         context["rpg"]["messages_since_reset"] = 0
                         soft_reset_conversation_keep_system(
                             conversation,
@@ -443,7 +552,6 @@ def start_classic():
                         print("⚠️ Kein BattleCore aktiv.")
                     continue
 
-            # Commands (/help etc.)
             if command_router.match(user_input):
                 out = command_router.execute(user_input, context)
                 if out:
@@ -457,7 +565,6 @@ def start_classic():
                     if out:
                         print(out)
                     continue
-                # out kann ein modifizierter user_input sein
                 if isinstance(out, str) and out.strip():
                     user_input = out
 
@@ -476,19 +583,15 @@ def start_classic():
                 if new_reply is not None:
                     reply = new_reply
 
-            # Extra Ausgabe (falls Plugin ergänzt)
             if reply != original_reply:
                 extra = reply[len(original_reply):]
                 if extra.strip():
                     print(extra)
 
-            # SAVE
             conversation.append({"role": "assistant", "content": reply})
 
-            # CONTEXT-SAFETY (immer)
             trim_conversation_keep_system(conversation, max_messages=10)
 
-            # SELF-EVOLUTION (optional)
             evo = context.get("evo_engine")
             if evo is not None:
                 try:
@@ -500,7 +603,6 @@ def start_classic():
                     xp = patch.get("xp_gained", 50)
                     print(Fore.GREEN + f"\n✨ KI hat sich selbst verbessert (+{xp} XP)\n" + Style.RESET_ALL)
 
-            # RPG TICK + SOFT RESET
             rpg = context.get("rpg")
             if rpg and rpg.get("mode"):
                 rpg["messages_since_reset"] += 1

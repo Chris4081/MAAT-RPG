@@ -12,7 +12,6 @@
 import os
 import json
 import datetime
-from shared.core.maat_paths import data_file, state_file, log_file
 
 
 class SelfEvolutionEngine:
@@ -31,8 +30,8 @@ class SelfEvolutionEngine:
             base_dir = os.path.join(os.getcwd(), "data")
 
         self.base_dir = os.path.join(base_dir, "evo")
-        self.log_path = log_file('evolution_log.jsonl')
-        self.state_path = state_file('state.json')
+        self.log_path = os.path.join(self.base_dir, "evolution_log.jsonl")
+        self.state_path = os.path.join(self.base_dir, "state.json")
         self.patches_dir = os.path.join(self.base_dir, "patches")
 
         os.makedirs(self.base_dir, exist_ok=True)

@@ -1,33 +1,30 @@
 # -*- coding: utf-8 -*-
 """
-MAAT-RPG Dungeon Plugin — "Tor der 60 Stimmen"
---------------------------------------------
+MAAT-RPG Dungeon Plugin — "Tor der Tausend Echos"
+-------------------------------------------------
 Funktionen:
-• Dungeon öffnet sich nach 60 Nachrichten
+• Dungeon öffnet sich nach 1000 Nachrichten
+• Zufällige Boss-Namen
 • 3 Räume + Boss
-• Spielt Musik (Dungeon/Boss)
-• Voll integriert mit BattleCore unter: apps/maat_rpg/plugins/battle/
+• Musik optional
 """
 
 import os
 import json
-import textwrap
+import random
 from datetime import datetime
-
-# =====================================================
-# 🔗 BattleCore und BattleMusicManager importieren
-# =====================================================
 import importlib.util
-from shared.core.maat_paths import data_file, state_file, log_file
 
+# =====================================================
+# 🔗 BattleCore & MusicManager laden
+# =====================================================
 def _load_battle_plugin():
-    """Versucht BattleCore & MusicManager aus /plugins/battle zu laden."""
     battle_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "battle", "plugin_main.py")
     )
 
     if not os.path.isfile(battle_path):
-        print("⚠️ [Dungeon] Battle-Plugin wurde nicht gefunden:", battle_path)
+        print("⚠️ [Dungeon1000] Battle-Plugin wurde nicht gefunden.")
         return None, None
 
     spec = importlib.util.spec_from_file_location("maat_battle", battle_path)
@@ -36,7 +33,6 @@ def _load_battle_plugin():
 
     BattleCore = getattr(battle_mod, "BattleCore", None)
     BattleMusicManager = getattr(battle_mod, "BattleMusicManager", None)
-
     return BattleCore, BattleMusicManager
 
 
@@ -46,11 +42,11 @@ BattleCore, BattleMusicManager = _load_battle_plugin()
 # =====================================================
 # 🧱 STATE
 # =====================================================
-class DungeonState:
+class Dungeon1000State:
     def __init__(self, base_dir: str):
         data_dir = os.path.join(base_dir, "data")
         os.makedirs(data_dir, exist_ok=True)
-        self.path = state_file('state.json')
+        self.path = os.path.join(data_dir, "state1000.json")
         self.data = self._load()
 
     def _default(self):
@@ -77,19 +73,40 @@ class DungeonState:
 
 
 # =====================================================
-# 🏰 DUNGEON
+# 🧙 BOSSE – Zufällige Namen
 # =====================================================
-class Dungeon:
-    UNLOCK_AT = 60
+BOSS_NAMES = [
+    "Echo-Warden Xaroth",
+    "The Thousand-Faced Oracle",
+    "Vox Tenebris",
+    "Aurelia der Klanglosen",
+    "Shardmaster Velyr",
+    "Der Verstummte Titan",
+    "Hüterin der Leeren Stimmen",
+    "Archon Umbra-Echo",
+    "Seraph der Vergessenen Worte",
+    "Primarch der Resonanz"
+]
+
+
+def random_boss_name():
+    return random.choice(BOSS_NAMES)
+
+
+# =====================================================
+# 🏰 DUNGEON 1000
+# =====================================================
+class Dungeon1000:
+    UNLOCK_AT = 1000
 
     def __init__(self, base_dir: str, core=None):
         self.base_dir = base_dir
         self.core = core
-        self.state = DungeonState(base_dir)
+        self.state = Dungeon1000State(base_dir)
 
-        # Musik-Dateien
-        self.music_theme = os.path.join(base_dir, "music", "dungeon_theme.mp3")
-        self.boss_theme = os.path.join(base_dir, "music", "boss_theme.mp3")
+        # Musik
+        self.music_theme = os.path.join(base_dir, "music", "dungeon1000_theme.mp3")
+        self.boss_theme  = os.path.join(base_dir, "music", "boss1000_theme.mp3")
 
         self.music_manager = None
         self.boss_music_manager = None
@@ -100,7 +117,7 @@ class Dungeon:
             if os.path.isfile(self.boss_theme):
                 self.boss_music_manager = BattleMusicManager(self.boss_theme)
 
-        # BattleCore anbinden
+        # BattleCore
         self.battle_core = None
         if self.core and hasattr(self.core, "battle"):
             self.battle_core = self.core.battle
@@ -110,38 +127,30 @@ class Dungeon:
                     os.path.join(os.path.dirname(__file__), "..", "battle")
                 )
                 self.battle_core = BattleCore(plugin_dir=battle_dir)
-                print("✅ [Dungeon] Eigenen BattleCore initialisiert.")
+                print("✅ [Dungeon1000] BattleCore initialisiert.")
             except Exception as e:
-                print("⚠️ [Dungeon] Fehler beim Initialisieren des BattleCore:", e)
-                self.battle_core = None
+                print("⚠️ [Dungeon1000] Fehler beim Initialisieren:", e)
 
-    # ================================
-    # STATUS
-    # ================================
+    # ---------------------------
     def status(self):
         d = self.state.data
         if not d["unlocked"]:
             remain = self.UNLOCK_AT - d["msg"]
             return (
-                f"🔒 **Dungeon: Tor der 60 Stimmen**\n"
+                f"🔒 **Dungeon 1000: Tor der Tausend Echos**\n"
                 f"Nachrichten: {d['msg']} / {self.UNLOCK_AT}\n"
                 f"✨ Noch {remain} bis zur Öffnung.\n"
             )
-
         return (
-            f"🏰 **Dungeon: Tor der 60 Stimmen**\n"
+            f"🏰 **Dungeon 1000: Tor der Tausend Echos**\n"
             f"Runs: {d['runs']}\n"
             f"Completed: {d['completed']}\n"
             f"Letzter Eintritt: {d['last_entered']}\n"
-            f"BattleCore: {'AKTIV ✅' if self.battle_core else 'FEHLT (Demo) ⚠️'}\n"
         )
 
-    # ================================
-    # BETRETEN
-    # ================================
+    # ---------------------------
     def enter(self):
         d = self.state.data
-
         if not d["unlocked"]:
             remain = self.UNLOCK_AT - d["msg"]
             return f"🔒 Das Tor ist noch versiegelt.\n✨ Noch {remain} Nachrichten."
@@ -155,46 +164,43 @@ class Dungeon:
 
         return self._room_1()
 
-    # ================================
-    # RÄUME
-    # ================================
-    def _room_1(self):
-        return "🌀 Du betrittst den Tunnel der Stimmen.\n👉 Weiter mit: `/dungeon60 next`"
+    # ---------------------------
+    def _room_1(self): return "💠 Die Luft flirrt vor alter Magie… `/d1000 next`"
+    def _room_2(self): return "🌪 Flüsternde Schatten testen deinen Willen… `/d1000 next`"
+    def _room_3(self): return "🔮 Der Boden pulsiert im Takt der Echos… Boss naht. `/d1000 boss`"
 
-    def _room_2(self):
-        return "🌫 Schatten greifen nach deinem Geist, aber du bleibst standhaft.\n👉 Weiter mit: `/dungeon60 next`"
-
-    def _room_3(self):
-        return "🔥 Ein Kreis aus goldenen Glyphen bildet den Boden.\n👉 Boss erscheint! `/dungeon60 boss`"
-
-    # ================================
-    # BOSS
-    # ================================
+    # ---------------------------
     def boss(self):
+        boss = random_boss_name()
+
+        # Dungeon-Theme stoppen
         if self.music_manager:
             self.music_manager.stop()
 
-        boss_name = "Wächter der Resonanz"
-
-        intro = f"👑 **{boss_name} stellt sich dir in den Weg.**\n\n"
+        intro = f"👑 **{boss} erscheint aus der Echo-Sphäre!**\n\n"
 
         if self.battle_core:
             try:
+                # 🎵 Musik-Override für BattleCore vorbereiten
                 music_cfg = {}
                 if os.path.isfile(self.boss_theme):
-                    music_cfg["battle"] = self.boss_theme  # z.B. dungeon_60/music/boss_theme.mp3
+                    music_cfg["battle"] = self.boss_theme
+                    # optional: eigene Victory-Musik
+                    # music_cfg["victory"] = os.path.join(self.base_dir, "music", "deep_victory.mp3")
 
                 ctx = {
-                    "boss_name": boss_name,
+                    "boss_name": boss,
                     "music": music_cfg,
                 }
+
                 result = self.battle_core.run_fight("boss", context=ctx)
             except Exception as e:
-                result = f"⚠ Fehler beim Kampf: {e}"
+                result = f"⚠ Fehler beim Bosskampf: {e}"
         else:
+            # Fallback ohne BattleCore
             if self.boss_music_manager:
                 self.boss_music_manager.start()
-            result = f"⚔ (Demo) Boss **{boss_name}** wurde besiegt!"
+            result = f"⚔ (Demo) Boss '{boss}' wurde besiegt!"
             if self.boss_music_manager:
                 self.boss_music_manager.stop()
 
@@ -202,6 +208,7 @@ class Dungeon:
         d["completed"] = True
         self.state.save()
 
+        # Sicherheit
         if self.music_manager:
             self.music_manager.stop()
         if self.boss_music_manager:
@@ -216,11 +223,11 @@ class Dungeon:
 class Plugin:
     type = "chat"
     commands = {
-        "/dungeon60": "Dungeon betreten",
-        "/dungeon60 next": "Nächsten Raum betreten",
-        "/dungeon60 boss": "Bosskampf starten",
-        "/dungeon60 status": "Status anzeigen",
-        "/dungeon60 reset": "Dungeon zurücksetzen",
+        "/d1000": "Dungeon 1000 betreten",
+        "/d1000 next": "Nächsten Raum betreten",
+        "/d1000 boss": "Bosskampf starten",
+        "/d1000 status": "Status anzeigen",
+        "/d1000 reset": "Dungeon zurücksetzen",
     }
 
     def __init__(self, plugin_dir=None, core=None):
@@ -229,36 +236,42 @@ class Plugin:
         self.plugin_dir = plugin_dir
         self.core = core
         self._room_stage = 0
-        self.dungeon = Dungeon(base_dir=plugin_dir, core=core)
+        self.dungeon = Dungeon1000(base_dir=plugin_dir, core=core)
 
     def command(self, cmd, context=None):
         c = cmd.strip()
-        if c == "/dungeon60":
+
+        if c == "/d1000":
             self._room_stage = 1
             return True, self.dungeon.enter()
-        if c == "/dungeon60 next":
+
+        if c == "/d1000 next":
             if self._room_stage == 1:
                 self._room_stage = 2
                 return True, self.dungeon._room_2()
             if self._room_stage == 2:
                 self._room_stage = 3
                 return True, self.dungeon._room_3()
-            return True, "⚠ Boss wartet. `/dungeon60 boss`"
-        if c == "/dungeon60 boss":
+            return True, "⚠ Boss wartet. `/d1000 boss`"
+
+        if c == "/d1000 boss":
             return True, self.dungeon.boss()
-        if c == "/dungeon60 status":
+
+        if c == "/d1000 status":
             return True, self.dungeon.status()
-        if c == "/dungeon60 reset":
+
+        if c == "/d1000 reset":
             self.dungeon.state.data = self.dungeon.state._default()
             self.dungeon.state.save()
             self._room_stage = 0
-            return True, "🔁 Dungeon zurückgesetzt."
+            return True, "🔁 Dungeon 1000 zurückgesetzt."
+
         return None
 
     def before_chat(self, user_input, context=None):
         d = self.dungeon.state.data
         d["msg"] += 1
-        if not d["unlocked"] and d["msg"] >= Dungeon.UNLOCK_AT:
+        if not d["unlocked"] and d["msg"] >= Dungeon1000.UNLOCK_AT:
             d["unlocked"] = True
         self.dungeon.state.save()
         return False, user_input

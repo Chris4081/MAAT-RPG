@@ -4,6 +4,7 @@ print("🧪 llm_loader.py: IMPORT START")
 
 import os
 import json
+from pathlib import Path
 from colorama import Fore, Style
 from .backend_router import load_backend
 
@@ -12,25 +13,48 @@ from .backend_router import load_backend
 # -------------------------------------------------------------
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-MODEL_DIR_DEFAULT = os.path.join(ROOT, "models")
+
+def _app_support_dir() -> str:
+    env = os.environ.get("MAAT_APP_SUPPORT_DIR")
+    if env:
+        path = Path(env)
+    else:
+        path = Path.home() / "Library" / "Application Support" / "MAAT-RPG"
+    path.mkdir(parents=True, exist_ok=True)
+    return str(path)
+
+def _data_dir() -> str:
+    env = os.environ.get("MAAT_DATA_DIR")
+    if env:
+        path = Path(env)
+    else:
+        path = Path(_app_support_dir()) / "data"
+    path.mkdir(parents=True, exist_ok=True)
+    return str(path)
+
+def _models_dir() -> str:
+    env = os.environ.get("MAAT_MODELS_DIR")
+    if env:
+        path = Path(env)
+    else:
+        path = Path(_app_support_dir()) / "models"
+    path.mkdir(parents=True, exist_ok=True)
+    return str(path)
+
+MODEL_DIR_DEFAULT = os.environ.get(
+    "MAAT_MODELS_DIR",
+    os.path.join(ROOT, "models")
+)
 
 # -------------------------------------------------------------
 # OVERRIDE PATHS (MODEL / PERF)
 # -------------------------------------------------------------
 
-def _data_dir() -> str:
-    path = os.path.join(ROOT, "data")
-    os.makedirs(path, exist_ok=True)
-    return path
-
-
 def _model_override_path() -> str:
     return os.path.join(_data_dir(), "model_override.txt")
 
-
 def _perf_override_path() -> str:
     return os.path.join(_data_dir(), "perf_override.json")
-
 
 # 🔁 Backward compatibility (alte Aufrufe)
 def _override_path() -> str:
@@ -51,14 +75,14 @@ def load_saved_perf() -> dict | None:
     except Exception:
         return None
 
-
 def save_perf(perf: dict):
     try:
-        with open(_perf_override_path(), "w", encoding="utf-8") as f:
+        path = _perf_override_path()
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(perf, f, indent=2)
         print(
             Fore.CYAN
-            + "💾 Performance gespeichert (data/perf_override.json)"
+            + f"💾 Performance gespeichert: {path}"
             + Style.RESET_ALL
         )
     except Exception as e:
@@ -79,14 +103,14 @@ def load_saved_model_name() -> str | None:
     except Exception:
         return None
 
-
 def save_last_model_choice(model_name: str):
     try:
-        with open(_model_override_path(), "w", encoding="utf-8") as f:
+        path = _model_override_path()
+        with open(path, "w", encoding="utf-8") as f:
             f.write(model_name.strip())
         print(
             Fore.CYAN
-            + f"💾 Modell gespeichert: {model_name}"
+            + f"💾 Modell gespeichert: {model_name} → {path}"
             + Style.RESET_ALL
         )
     except Exception as e:
@@ -188,7 +212,6 @@ def choose_performance() -> dict:
     choice = input("\n🔢 Auswahl: ").strip()
     perf = profiles.get(choice, profiles["1"])
 
-    # 🔒 Stabilität: llama-first (kein MLX-Freeze)
     perf["backend"] = "llama"
 
     save_perf(perf)

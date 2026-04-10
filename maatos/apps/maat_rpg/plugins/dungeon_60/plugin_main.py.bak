@@ -18,7 +18,6 @@ from datetime import datetime
 # 🔗 BattleCore und BattleMusicManager importieren
 # =====================================================
 import importlib.util
-from shared.core.maat_paths import data_file, state_file, log_file
 
 def _load_battle_plugin():
     """Versucht BattleCore & MusicManager aus /plugins/battle zu laden."""
@@ -50,7 +49,7 @@ class DungeonState:
     def __init__(self, base_dir: str):
         data_dir = os.path.join(base_dir, "data")
         os.makedirs(data_dir, exist_ok=True)
-        self.path = state_file('state.json')
+        self.path = os.path.join(data_dir, "state.json")
         self.data = self._load()
 
     def _default(self):

@@ -2,19 +2,47 @@
 # -*- coding: utf-8 -*-
 
 import os
+import json
 import importlib.util
 import inspect
 
 
 class PluginManager:
-    def __init__(self, plugin_roots):
+    def __init__(self, plugin_roots, config_path=None):
         if isinstance(plugin_roots, str):
             self.plugin_roots = [plugin_roots]
         else:
             self.plugin_roots = list(plugin_roots)
 
+        self.config_path = config_path
+        self.plugin_settings = self._load_plugin_settings(config_path)
         self.plugins_chat = []
         self.plugins_stream = []
+        self.skipped_plugins = []
+
+    def _load_plugin_settings(self, config_path):
+        if not config_path or not os.path.isfile(config_path):
+            return {}
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            plugins = data.get("plugins", {})
+            return plugins if isinstance(plugins, dict) else {}
+        except Exception as e:
+            print(f"⚠ Plugin-Konfiguration konnte nicht geladen werden: {e}")
+            return {}
+
+    def _plugin_id_for_path(self, file_path):
+        base = os.path.basename(file_path)
+        if base == "plugin_main.py":
+            return os.path.basename(os.path.dirname(file_path))
+        return os.path.splitext(base)[0]
+
+    def _is_enabled(self, plugin_id):
+        raw = self.plugin_settings.get(plugin_id, True)
+        if isinstance(raw, dict):
+            return raw.get("enabled", True)
+        return bool(raw)
 
     # ---------------------------------------------------------
     # LOAD
@@ -47,6 +75,12 @@ class PluginManager:
 
     def _load_single(self, file_path):
         try:
+            plugin_id = self._plugin_id_for_path(file_path)
+            if not self._is_enabled(plugin_id):
+                self.skipped_plugins.append(plugin_id)
+                print(f"⏭ Plugin deaktiviert: {plugin_id}")
+                return
+
             mod_name = "maat_plugin_" + os.path.basename(file_path).replace(".py", "")
             spec = importlib.util.spec_from_file_location(mod_name, file_path)
             if not spec or not spec.loader:
@@ -62,6 +96,7 @@ class PluginManager:
                 return
 
             inst = PluginClass()
+            setattr(inst, "plugin_id", plugin_id)
             ptype = getattr(inst, "type", "chat")
 
             if ptype == "stream":
@@ -79,6 +114,8 @@ class PluginManager:
         print("\n📦 Plugin-Übersicht:")
         print(f"   • Chat-Plugins:     {len(self.plugins_chat)}")
         print(f"   • Streaming-Plugins:{len(self.plugins_stream)}\n")
+        if self.skipped_plugins:
+            print(f"   • Deaktiviert:      {', '.join(sorted(self.skipped_plugins))}\n")
 
     def print_plugin_summary(self):
         self._print_plugin_summary()

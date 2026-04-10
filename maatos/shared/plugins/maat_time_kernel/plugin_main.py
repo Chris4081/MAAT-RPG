@@ -17,7 +17,7 @@ import time
 import sqlite3
 import os
 import re
-
+from pathlib import Path
 
 class Plugin:
     type = "chat"
@@ -43,15 +43,14 @@ class Plugin:
         self.last_timestamp = time.time()
 
         # --------------------------------------
-        # Time-Memory Datenbank
+        # Schreibbarer Benutzerpfad für macOS
         # --------------------------------------
-        root_dir = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "..", "..", "..")
+        app_support_dir = (
+            Path.home() / "Library" / "Application Support" / "MAAT-RPG" / "data"
         )
-        data_dir = os.path.join(root_dir, "data")
-        os.makedirs(data_dir, exist_ok=True)
+        app_support_dir.mkdir(parents=True, exist_ok=True)
 
-        self.db_path = os.path.join(data_dir, "time_memory.db")
+        self.db_path = str(app_support_dir / "time_memory.db")
         self._init_db()
 
     # -----------------------------------------------------

@@ -7,67 +7,67 @@ und bietet ein Auswahlmenü zum Starten.
 
 Neu:
 - [S] Setup: setzt die Modell-Auswahl zurück
-  (löscht maatos/data/model_override.txt)
+  (löscht model_override.txt im zentralen data-Ordner)
 """
 
 import os
 import importlib.util
 from colorama import Fore, Style
+from shared.core.maat_paths import get_data_dir
 
 # ROOT = maatos/
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 APPS_DIR = os.path.join(ROOT, "apps")
 
 # Pfad zum Modell-Override (wird von llm_loader benutzt)
-DATA_DIR = os.path.join(ROOT, "data")
+DATA_DIR = str(get_data_dir())
 MODEL_OVERRIDE_PATH = os.path.join(DATA_DIR, "model_override.txt")
+PERF_OVERRIDE_PATH = os.path.join(DATA_DIR, "perf_override.json")
 
-
-def reset_model_override():
+def reset_startup_selection():
     """
-    Löscht die gespeicherte Modell-Auswahl (model_override.txt),
-    damit beim nächsten Start eines LLM wieder das Modell-Menü erscheint.
+    Löscht:
+    - model_override.txt
+    - perf_override.json
+
+    Dadurch wird beim nächsten Start wieder
+    Modell + Performance neu abgefragt.
     """
     os.makedirs(DATA_DIR, exist_ok=True)
 
-    if os.path.isfile(MODEL_OVERRIDE_PATH):
-        try:
-            os.remove(MODEL_OVERRIDE_PATH)
-            print(
-                Fore.GREEN
-                + f"\n✅ Modell-Auswahl zurückgesetzt."
-                + Style.RESET_ALL
-            )
-            print(
-                "Beim nächsten Laden eines Modells wirst du wieder nach einem Modell gefragt.\n"
-            )
-        except Exception as e:
-            print(
-                Fore.RED
-                + f"⚠ Konnte model_override.txt nicht löschen: {e}"
-                + Style.RESET_ALL
-            )
+    removed = []
+
+    for path in [MODEL_OVERRIDE_PATH, PERF_OVERRIDE_PATH]:
+        if os.path.isfile(path):
+            try:
+                os.remove(path)
+                removed.append(path)
+            except Exception as e:
+                print(
+                    Fore.RED
+                    + f"⚠ Konnte Datei nicht löschen: {path}\n{e}"
+                    + Style.RESET_ALL
+                )
+
+    if removed:
+        print(Fore.GREEN + "\n✅ Start-Auswahl zurückgesetzt." + Style.RESET_ALL)
+        print("Beim nächsten Laden wirst du wieder gefragt nach:")
+        print("  • Modell")
+        print("  • Performance / Kontext\n")
+        for p in removed:
+            print(f"   gelöscht: {p}")
+        print()
     else:
         print(
             Fore.YELLOW
-            + "\nℹ Es war kein gespeichertes Modell vorhanden (model_override.txt fehlt).\n"
+            + "\nℹ Es waren keine gespeicherten Start-Einstellungen vorhanden.\n"
             + Style.RESET_ALL
         )
-
 
 def discover_apps(apps_dir: str | None = None) -> list[dict]:
     """
     Durchsucht apps/** nach basic.py
-    und liefert eine Liste von App-Infos:
-    [
-      {
-        "name": "maat_classic",
-        "label": "maat_classic",
-        "path": "/.../apps/maat_classic/basic.py",
-        "module_name": "apps.maat_classic.basic"
-      },
-      ...
-    ]
+    und liefert eine Liste von App-Infos.
     """
     if apps_dir is None:
         apps_dir = APPS_DIR
@@ -76,9 +76,8 @@ def discover_apps(apps_dir: str | None = None) -> list[dict]:
 
     for root, dirs, files in os.walk(apps_dir):
         if "basic.py" in files:
-            # z.B. root = /.../apps/maat_classic
-            rel_root = os.path.relpath(root, ROOT)           # "apps/maat_classic"
-            app_name = os.path.basename(root)                # "maat_classic"
+            rel_root = os.path.relpath(root, ROOT)
+            app_name = os.path.basename(root)
             module_name = rel_root.replace(os.sep, ".") + ".basic"
             path = os.path.join(root, "basic.py")
 
@@ -89,7 +88,6 @@ def discover_apps(apps_dir: str | None = None) -> list[dict]:
                 "module_name": module_name,
             })
 
-    # Sortiert nach Name, damit Menü stabil bleibt
     return sorted(apps, key=lambda a: a["name"].lower())
 
 
@@ -122,13 +120,10 @@ def choose_app(apps: list[dict]) -> dict | None:
         choice_raw = input(f"Bitte wählen [{default_idx}]: ").strip()
         choice = choice_raw.lower()
 
-        # --- Setup / Reset-Modell ---
         if choice in ("s", "setup"):
-            reset_model_override()
-            # Danach einfach erneut das Menü anzeigen
+            reset_startup_selection()
             continue
 
-        # --- Leere Eingabe → Default-App ---
         if not choice:
             idx = default_idx - 1
         else:
@@ -153,10 +148,7 @@ def choose_app(apps: list[dict]) -> dict | None:
 def run_app(app_info: dict):
     """
     Lädt das basic.py Modul der gewählten App dynamisch
-    und sucht eine passende Startfunktion:
-
-    - bevorzugt: start_app()
-    - sonst: erste Funktion, die mit start_ beginnt (z.B. start_classic)
+    und sucht eine passende Startfunktion.
     """
     module_path = app_info["path"]
     module_name = app_info["module_name"]
@@ -168,13 +160,11 @@ def run_app(app_info: dict):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
 
-    # 1) Bevorzugt: start_app()
     start_fn = getattr(module, "start_app", None)
     if callable(start_fn):
         start_fn()
         return
 
-    # 2) Fallback: erste Funktion, die mit "start_" beginnt
     for name in dir(module):
         if name.startswith("start_"):
             cand = getattr(module, name)

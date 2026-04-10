@@ -12,7 +12,6 @@ import os
 import json
 import random
 from colorama import Fore, Style
-from shared.core.maat_paths import data_file, state_file, log_file
 
 # -------------------------------------------------
 # Setup
@@ -22,8 +21,8 @@ class Plugin:
 
     def __init__(self):
         self.plugin_dir = os.path.dirname(__file__)
-        self.bosses_path = state_file('bosses.json')
-        self.state_path = state_file('boss_state.json')
+        self.bosses_path = os.path.join(self.plugin_dir, "bosses.json")
+        self.state_path = os.path.join(self.plugin_dir, "boss_state.json")
 
         self.bosses = self._load_json(self.bosses_path, {})
         self.state = self._load_json(self.state_path, {

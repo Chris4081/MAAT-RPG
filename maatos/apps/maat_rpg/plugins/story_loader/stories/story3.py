@@ -37,6 +37,9 @@ class Story:
         lines.append("„Ja. Doch du kämpfst nicht mit roher Kraft.“")
         lines.append("„Du kämpfst mit PRINCIPIA – mit den fünf Maat-Prinzipien als Angriffe.“")
         lines.append("")
+        lines.append("Die Symbole über Maatis beginnen sich zu senken.")
+        lines.append("Nicht wie Waffen, sondern wie Entscheidungen, die Form annehmen.")
+        lines.append("")
         lines.append("Vor Maatis erscheinen fünf Lichtklingen, jede anders geformt:")
         lines.append("Eine fließende Klinge der Harmonie.")
         lines.append("Ein ausbalanciertes Schwert der Balance.")
@@ -55,6 +58,7 @@ class Story:
         lines.append("„Schöpfungskraft verursacht große, unberechenbare Treffer.“")
         lines.append("„Verbundenheit stärkt dich im Fluss des Kampfes.“")
         lines.append("„Respekt schützt dich, indem er die Wucht der Gegner anerkennt, ohne zu zerbrechen.“")
+        lines.append("„Und mit wachsender Resonanz kann ein MAAT-Impuls entstehen – selten, aber entscheidend.“")
         lines.append("")
         lines.append("Maatis:")
         lines.append("„Und was ist mit diesen… Bosse von denen du gesprochen hast?“")
@@ -82,6 +86,7 @@ class Story:
         lines.append("„Der Weg der Maat ist kein Weg der Perfektion – sondern der Wiederkehr.“")
         lines.append("")
         lines.append("Vor Maatis erscheint nun die Silhouette eines ersten großen Gegners, noch verschwommen.")
+        lines.append("Für einen Augenblick hat Maatis das Gefühl, dass der Schatten ihn bereits kennt.")
         lines.append("")
         lines.append("MAAT KI:")
         lines.append("„Dein nächster Schritt ist klar:“")
@@ -98,12 +103,36 @@ class Story:
         lines.append("• Besiege den Boss mit den Maat-Prinzipien.")
         lines.append("")
         lines.append("MAAT KI:")
-        lines.append("„Wenn du bereit bist, rufe mich mit dem Befehl /rpg.“")
+        lines.append("„Wenn du bereit bist, beginne mit /fight.“")
+        lines.append("„Und wenn du die Systeme gezielt prüfen willst, nutze /fightboss oder /fightfinal als Testpfade.“")
         lines.append("„Die Schatten warten bereits… und mit jedem Sieg erinnerst du die Welt an das, was sie vergessen hat.“")
         lines.append("")
         lines.append("⸻")
         lines.append("")
-        lines.append("✨ Quest-Hinweis: Nutze im Chat den Befehl /rpg, um Kämpfe zu starten und deinen ersten Boss zu besiegen.")
+        lines.append("✨ Quest-Hinweis: Nutze /fight, um die ersten Kämpfe zu starten und Resonanz, Schild und Prinzipienangriffe kennenzulernen.")
         lines.append("")
 
-        return lines
+        return {
+            "lines": lines,
+            "choice": {
+                "id": "combat_vow",
+                "prompt": "Welches innere Versprechen gibt sich Maatis vor dem Weg in den Kampf?",
+                "options": [
+                    {
+                        "label": "Ich kämpfe, um zu schützen",
+                        "value": "protect",
+                        "response": "Maatis legt die Hand auf das Lichtsymbol und schwört, Kraft nie vom Schutz des Lebendigen zu trennen.",
+                    },
+                    {
+                        "label": "Ich kämpfe, um Wahrheit freizulegen",
+                        "value": "truth",
+                        "response": "Maatis spürt, dass jeder Schatten auch ein verborgener Teil der Wahrheit ist, der gesehen werden will.",
+                    },
+                    {
+                        "label": "Ich kämpfe, um die Welt zu erinnern",
+                        "value": "remember",
+                        "response": "Maatis entscheidet, dass jeder Sieg nicht nur sein eigener sein darf, sondern eine Erinnerung für die Welt werden muss.",
+                    },
+                ],
+            },
+        }

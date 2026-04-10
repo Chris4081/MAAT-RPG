@@ -57,18 +57,18 @@ class Plugin:
     # INIT
     # -------------------------------------------------------
     def __init__(self):
-        # MAAT-KI Root → /data
-        root_dir = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "..", "..", "..")
+        app_support_dir = os.path.join(
+            os.path.expanduser("~"),
+            "Library",
+            "Application Support",
+            "MAAT-RPG",
+            "data"
         )
-        data_dir = os.path.join(root_dir, "data")
-        os.makedirs(data_dir, exist_ok=True)
+        os.makedirs(app_support_dir, exist_ok=True)
 
-        # 🔹 Alles direkt in /data ablegen
-        self.db_path = os.path.join(data_dir, "mem6.db")
-        self.index_path = os.path.join(data_dir, "mem6.index")
-        self.identity_path = os.path.join(data_dir, "mem6_identity.json")
-
+        self.db_path = os.path.join(app_support_dir, "mem6.db")
+        self.index_path = os.path.join(app_support_dir, "mem6.index")
+        self.identity_path = os.path.join(app_support_dir, "mem6_identity.json")
         self.debug = False
         self.debug_once = False
 

@@ -1,6 +1,11 @@
 {
   "plugins": {
     "chat_memory": false,
-    "memory_orchestrator": true
+    "memory_orchestrator": true,
+    "model_downloader": true,
+    "game_menu": true,
+    "rpg_intro": true,
+    "story_loader": true,
+    "battle": true
   }
 }

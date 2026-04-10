@@ -98,4 +98,27 @@ class Story:
         lines.append("und wie aus bloßem Wissen echte Weisheit werden kann.")
         lines.append("⸻")
 
-        return lines
+        return {
+            "lines": lines,
+            "choice": {
+                "id": "reflection_path",
+                "prompt": "Wie nähert sich Maatis dem ersten echten Maat-Urteil?",
+                "options": [
+                    {
+                        "label": "Mit Harmonie und Vermittlung",
+                        "value": "harmonie",
+                        "response": "Maatis entscheidet sich, zuerst nach Verbindung und Ausgleich zu suchen.",
+                    },
+                    {
+                        "label": "Mit klaren Grenzen und Respekt",
+                        "value": "respekt",
+                        "response": "Maatis spürt, dass jede gerechte Entscheidung zuerst die Grenzen aller Beteiligten achten muss.",
+                    },
+                    {
+                        "label": "Mit Schöpfungskraft und neuer Idee",
+                        "value": "schoepfung",
+                        "response": "Maatis sucht nicht nur nach Bewertung, sondern nach einer neuen Möglichkeit, die es vorher nicht gab.",
+                    },
+                ],
+            },
+        }

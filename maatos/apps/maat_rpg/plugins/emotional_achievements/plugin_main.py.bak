@@ -20,7 +20,6 @@ import json
 import random
 import time
 from colorama import Fore, Style
-from shared.core.maat_paths import data_file, state_file, log_file
 
 
 # ==========================================================
@@ -130,7 +129,7 @@ def grant_rpg_xp(plugin_dir: str, amount: int):
         rpg_root = os.path.dirname(plugins_dir)        # .../apps/maat_rpg
 
         battle_state_dir = os.path.join(rpg_root, "battle", "battle_state")
-        state_path = state_file('battle_state.json')
+        state_path = os.path.join(battle_state_dir, "battle_state.json")
 
         if not os.path.isfile(state_path):
             # Noch kein Kampf-Plugin-State vorhanden → still ignorieren
@@ -185,7 +184,7 @@ def print_rpg_xp_bar(plugin_dir: str):
         plugins_dir = os.path.dirname(plugin_dir)
         rpg_root = os.path.dirname(plugins_dir)
         battle_state_dir = os.path.join(rpg_root, "battle", "battle_state")
-        state_path = state_file('battle_state.json')
+        state_path = os.path.join(battle_state_dir, "battle_state.json")
 
         if not os.path.isfile(state_path):
             return
@@ -227,7 +226,7 @@ class Plugin:
 
     def __init__(self):
         self.plugin_dir = os.path.dirname(__file__)
-        self.state_path = state_file('achievements.json')
+        self.state_path = os.path.join(self.plugin_dir, "achievements.json")
 
         # Lade oder erstelle State
         self.state = load_json(self.state_path, {

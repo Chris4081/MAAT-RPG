@@ -11,7 +11,6 @@ MAAT-RPG Achievement Plugin (mit Levelsystem + Viewer)
 import os
 import json
 from colorama import Fore, Style
-from shared.core.maat_paths import data_file, state_file, log_file
 
 # --------------------------------------------------------
 # Wörter + Titel + XP
@@ -84,13 +83,6 @@ TRIGGERS = {
     "pizza":          ("🍕 Tempel der Kohlenhydrate",       8),
 }
 
-COMBAT_ACHIEVEMENTS = {
-    "special_survived": "🛡 Spezial überlebt",
-    "phase2_reached": "🌗 Phase 2 erreicht",
-    "boss_no_potion": "🚫 Boss ohne Trank",
-    "ult_finisher": "🌌 Resonanz-Finisher",
-}
-
 
 
 # ========================================================
@@ -105,7 +97,7 @@ class Plugin:
 
     def __init__(self):
         self.plugin_dir = os.path.dirname(__file__)
-        self.state_path = state_file('achievements_state.json')
+        self.state_path = os.path.join(self.plugin_dir, "achievements_state.json")
         self.state = self._load()
 
     # --------------------------------------------------------
@@ -142,9 +134,8 @@ class Plugin:
     def _render_achievements(self):
         unlocked = self.state["unlocked"]
         total = len(TRIGGERS)
-        combat = self._load_combat_achievements()
 
-        if not unlocked and not combat:
+        if not unlocked:
             return (
                 "🏆 **Erfolge**\n"
                 "\n"
@@ -160,31 +151,11 @@ class Plugin:
             title, reward = TRIGGERS.get(word, ("", 0))
             lines.append(f"✨ {title} (+{reward} XP)")
 
-        if combat:
-            if unlocked:
-                lines.append("")
-            lines.append("⚔️ **Kampf-Erfolge**")
-            lines.append("")
-            for key in combat:
-                lines.append(f"🏆 {COMBAT_ACHIEVEMENTS.get(key, key)}")
-
         lines.append("")
-        lines.append(f"📜 Wort-Erfolge: **{len(unlocked)} / {total}**")
-        lines.append(f"⚔️ Kampf-Erfolge: **{len(combat)} / {len(COMBAT_ACHIEVEMENTS)}**")
+        lines.append(f"📜 Insgesamt freigeschaltet: **{len(unlocked)} / {total}**")
         lines.append(f"⚡ Fortschritt: {int(len(unlocked)/total*100)}%")
 
         return "\n".join(lines)
-
-    def _load_combat_achievements(self):
-        battle_state_path = state_file("battle_state.json")
-        if not os.path.isfile(battle_state_path):
-            return []
-        try:
-            with open(battle_state_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            return data.get("achievements", {}).get("combat", [])
-        except Exception:
-            return []
 
     # --------------------------------------------------------
     # BEFORE CHAT – Wörter analysieren + XP ans XP-System

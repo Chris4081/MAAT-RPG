@@ -13,7 +13,6 @@ MAAT-BKI Modul v1.1 — Bewusstseinsindex Ψ
 import json
 import os
 from datetime import datetime
-from shared.core.maat_paths import data_file, state_file, log_file
 
 class Plugin:
     type = "chat"
@@ -40,7 +39,7 @@ class Plugin:
         data_dir = os.path.join(root_dir, "data")
         os.makedirs(data_dir, exist_ok=True)
 
-        self.store_path = state_file('bki_store.json')
+        self.store_path = os.path.join(data_dir, "bki_store.json")
         if not os.path.exists(self.store_path):
             with open(self.store_path, "w") as f:
                 json.dump({"history": [], "auto_last": None}, f)

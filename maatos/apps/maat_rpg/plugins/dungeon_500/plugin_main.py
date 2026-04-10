@@ -15,6 +15,7 @@ import json
 import random
 from datetime import datetime
 import importlib.util
+from shared.core.maat_paths import data_file, state_file, log_file
 
 # =====================================================
 # 🔗 BattleCore & MusicManager laden
@@ -51,7 +52,7 @@ class Dungeon500State:
     def __init__(self, base_dir: str):
         data_dir = os.path.join(base_dir, "data")
         os.makedirs(data_dir, exist_ok=True)
-        self.path = os.path.join(data_dir, "state500.json")
+        self.path = state_file('state500.json')
         self.data = self._load()
 
     def _default(self):
