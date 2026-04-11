@@ -1,6 +1,30 @@
+> 🇩🇪 [Deutsch](#-deutsch) · 🇬🇧 [English](#-english)
+
 # 🌿 MAAT-RPG ALPHA
 
-> 🇩🇪 [Deutsch](#-deutsch) · 🇬🇧 [English](#-english)
+**MAAT RPG** is a bilingual, local AI role-playing game in the terminal, based on story, combat, path identity, journal progression and the five principles of MAAT.
+
+
+### Highlights
+
+- Bilingual German / English interface and story flow
+- Reactive path profile with title, rank, and motive
+- Guided demo battles and real boss encounters
+- Journal, boss codex, quests, and combat progression
+- Local GGUF model loading for MAAT-OS / MAAT RPG
+
+## Gameplay Video
+
+A first look at **MAAT RPG** in action: story flow, bilingual UI, combat, and atmosphere.
+
+[![MAAT RPG Gameplay](https://img.youtube.com/vi/PLjnpm_KtVo/hqdefault.jpg)](https://www.youtube.com/watch?v=PLjnpm_KtVo)
+
+### Links
+
+- GitHub: [MAAT-RPG](https://github.com/Chris4081/MAAT-RPG)
+- Full feature list: [FUNKTIONEN.md](./FUNKTIONEN.md)
+
+
 
 ---
 
