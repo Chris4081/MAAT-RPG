@@ -15,12 +15,10 @@ Features:
 import os
 import sys
 import time
-import threading
 import subprocess
 import termios
 import tty
 import select
-from shared.core.audio import ManagedAudioPlayer
 from shared.core.rpg_i18n import get_language
 
 # Ziel-Gesamtdauer in Sekunden (3:47 = 3*60 + 47 = 227)
@@ -129,7 +127,7 @@ class Plugin:
 
     def __init__(self):
         self._abort = False
-        self._player = ManagedAudioPlayer()
+        self._music_proc: subprocess.Popen | None = None
 
     def _lang(self) -> str:
         return get_language(("de", "en"))
@@ -142,6 +140,12 @@ class Plugin:
 
     def _t(self, de: str, en: str) -> str:
         return en if self._lang() == "en" else de
+
+    def _interactive_terminal(self) -> bool:
+        return bool(
+            getattr(sys.stdin, "isatty", lambda: False)()
+            and getattr(sys.stdout, "isatty", lambda: False)()
+        )
 
     def command(self, cmd: str, context=None):
         return None
@@ -182,11 +186,36 @@ class Plugin:
     # -----------------------------------------------
     # Musik (macOS, optional)
     # -----------------------------------------------
-    def _play_music(self, path: str):
-        self._player.play_once(path)
+    def _play_music(self, path: str) -> bool:
+        if not path or not os.path.isfile(path):
+            return False
+
+        self._stop_music()
+
+        try:
+            self._music_proc = subprocess.Popen(
+                ["afplay", path],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            return True
+        except Exception:
+            self._music_proc = None
+            return False
 
     def _stop_music(self):
-        self._player.stop()
+        proc = self._music_proc
+        self._music_proc = None
+        if proc is None or proc.poll() is not None:
+            return
+        try:
+            proc.terminate()
+            proc.wait(timeout=1)
+        except Exception:
+            try:
+                proc.kill()
+            except Exception:
+                pass
 
     # -----------------------------------------------
     # Langsames Streaming
@@ -247,6 +276,16 @@ class Plugin:
             )
         )
 
+        if not self._interactive_terminal():
+            print(
+                self._t(
+                    "[MAAT-RPG Intro] Kein interaktives Terminal erkannt - Intro wird übersprungen.\n",
+                    "[MAAT-RPG Intro] No interactive terminal detected - skipping intro.\n",
+                )
+            )
+            self._stop_music()
+            return
+
         self._abort = False
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
@@ -259,11 +298,9 @@ class Plugin:
             # 1) Musik starten
             intro_mp3 = os.path.join(base_dir, "intro.mp3")
             if os.path.isfile(intro_mp3):
-                threading.Thread(
-                    target=self._play_music,
-                    args=(intro_mp3,),
-                    daemon=True
-                ).start()
+                started = self._play_music(intro_mp3)
+                if not started:
+                    print(self._t("[MAAT-RPG Intro] Intro-Musik konnte nicht gestartet werden.", "[MAAT-RPG Intro] Failed to start intro music."))
 
             # 2) Pyramide
             if not self._show_ascii_pyramid():

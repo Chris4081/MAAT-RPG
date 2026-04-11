@@ -15,10 +15,12 @@ import tty
 import termios
 import select
 import re
+import json
 from colorama import Fore, Style
 
 from .backend_router import stream_chat as backend_stream_chat
 from .rpg_i18n import get_language
+from .maat_paths import state_file
 
 
 # =====================================================================
@@ -57,6 +59,16 @@ RESET = "\033[0m"
 
 def _stream_lang() -> str:
     return get_language(("de", "en"))
+
+
+def _show_thinking_enabled() -> bool:
+    try:
+        settings_path = state_file("settings_state.json")
+        with open(settings_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return bool(data.get("show_thinking", False))
+    except Exception:
+        return False
 
 def rainbow_progress(stop_event: threading.Event):
     """Animierter Ladebalken."""
@@ -235,6 +247,8 @@ def stream_to_console(generator):
     full = ""
     pending = ""
     inside_think = False
+    show_thinking = _show_thinking_enabled()
+    announced_thinking = False
     print(Fore.GREEN, end="")
 
     def flush_visible(text: str):
@@ -245,19 +259,25 @@ def stream_to_console(generator):
         sys.stdout.flush()
         full += text
 
+    def announce_thinking():
+        nonlocal announced_thinking
+        if announced_thinking:
+            return
+        message = "\nMAAT-KI is thinking:\n" if _stream_lang() == "en" else "\nMAAT-KI denkt nach:\n"
+        flush_visible(message)
+        announced_thinking = True
+
     try:
-        # Terminal in cbreak-Modus → Tasten sofort lesbar
         tty.setcbreak(fd)
 
         for tok in generator:
             if tok is None:
                 continue
 
-            # 🔴 ESC-Check (non-blocking)
             r, _, _ = select.select([sys.stdin], [], [], 0)
             if r:
                 ch = sys.stdin.read(1)
-                if ch == "\x1b":  # ESC
+                if ch == "\x1b":
                     print(Style.RESET_ALL + "\n⏹️ Stream mit ESC abgebrochen.\n")
                     return full
 
@@ -269,8 +289,18 @@ def stream_to_console(generator):
                 if inside_think:
                     end_idx = lower.find("</think>")
                     if end_idx == -1:
+                        if show_thinking:
+                            safe = pending[:-7] if len(pending) > 7 else ""
+                            if safe:
+                                flush_visible(safe)
+                                pending = pending[len(safe):]
+                            break
                         pending = pending[-7:] if len(pending) > 7 else pending
                         break
+
+                    think_text = pending[:end_idx]
+                    if show_thinking and think_text:
+                        flush_visible(think_text)
                     pending = pending[end_idx + len("</think>"):]
                     inside_think = False
                     continue
@@ -286,13 +316,14 @@ def stream_to_console(generator):
                 visible = pending[:start_idx]
                 flush_visible(visible)
                 pending = pending[start_idx + len("<think>"):]
+                if not show_thinking:
+                    announce_thinking()
                 inside_think = True
 
     except Exception as e:
         print(Style.RESET_ALL + Fore.RED + f"[STREAM PRINT ERROR] {e}" + Style.RESET_ALL)
 
     finally:
-        # Terminal-Einstellungen zurücksetzen
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
     if pending and not inside_think:

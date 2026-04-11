@@ -18,8 +18,8 @@ import hashlib
 from datetime import datetime
 
 import numpy as np
-import faiss
 from shared.core.rpg_i18n import get_language
+from shared.core.vector_index import faiss_available, load_vector_index, save_vector_index
 
 # -------------------------------------------------------------
 # EMBEDDING-EINSTELLUNGEN
@@ -83,6 +83,7 @@ class Plugin:
 
         self._init_db()
         self._init_identity()
+        self.vector_backend = "faiss" if faiss_available() else "numpy"
         self._init_vector_index()
 
     def _lang(self):
@@ -142,11 +143,7 @@ class Plugin:
     # VECTOR INDEX INIT
     # -------------------------------------------------------------
     def _init_vector_index(self):
-        if os.path.exists(self.index_path):
-            self.index = faiss.read_index(self.index_path)
-        else:
-            self.index = faiss.IndexFlatL2(EMBED_DIM)
-            faiss.write_index(self.index, self.index_path)
+        self.index = load_vector_index(self.index_path, EMBED_DIM)
 
     # -------------------------------------------------------------
     # RESONANZ-BERECHNUNG (Maat-Felder)
@@ -187,7 +184,7 @@ class Plugin:
         vec = embed_text(text)
         vec = np.array([vec]).astype("float32")
         self.index.add(vec)
-        faiss.write_index(self.index, self.index_path)
+        save_vector_index(self.index, self.index_path)
 
     # -------------------------------------------------------------
     # SEMANTISCHE SUCHE
@@ -256,6 +253,7 @@ class Plugin:
                 + f"• {self._t('Zweck', 'Purpose')}: {ident.get('purpose')}\n"
                 + f"• {self._t('DB-Pfad', 'DB path')}: {self.db_path}\n"
                 + f"• {self._t('Index', 'Index')}: {self.index_path}\n"
+                + f"• {self._t('Backend', 'Backend')}: {self.vector_backend}\n"
                 + f"• {self._t('Vektoren im Index', 'Vectors in index')}: {self.index.ntotal}\n"
             )
 
@@ -305,7 +303,7 @@ class Plugin:
             return (
                 self._t("ℹ MAAT-Memory v5:\n", "ℹ MAAT Memory v5:\n")
                 + self._t("- Episodisches Memory: SQLite (table: episodic)\n", "- Episodic memory: SQLite (table: episodic)\n")
-                + self._t(f"- Semantisches Memory: FAISS Index (Dim={EMBED_DIM}, Vektoren={self.index.ntotal})\n", f"- Semantic memory: FAISS index (dim={EMBED_DIM}, vectors={self.index.ntotal})\n")
+                + self._t(f"- Semantisches Memory: {self.vector_backend.upper()}-Index (Dim={EMBED_DIM}, Vektoren={self.index.ntotal})\n", f"- Semantic memory: {self.vector_backend.upper()} index (dim={EMBED_DIM}, vectors={self.index.ntotal})\n")
                 + self._t("- Resonanz: Maat-Felder H,B,S,V,R -> Spalte 'resonance'\n", "- Resonance: MAAT fields H,B,S,V,R -> column 'resonance'\n")
                 + self._t("- Hooks: before_chat() und after_response() speichern automatisch.", "- Hooks: before_chat() and after_response() save automatically.")
             )

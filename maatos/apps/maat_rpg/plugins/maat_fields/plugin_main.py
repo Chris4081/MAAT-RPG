@@ -9,6 +9,7 @@ MAAT-Felder Plugin
 import os
 import json
 from colorama import Fore, Style
+from shared.core.maat_paths import state_file
 
 # Standardwerte für die Felder
 DEFAULT_STATE = {
@@ -34,10 +35,7 @@ class Plugin:
 
     def __init__(self):
         self.plugin_dir = os.path.dirname(__file__)
-        self.data_dir = os.path.join(self.plugin_dir, "data")
-        os.makedirs(self.data_dir, exist_ok=True)
-
-        self.state_path = os.path.join(self.data_dir, "state.json")
+        self.state_path = state_file("maat_fields_state.json")
         self.state = self._load_state()
 
     # ------------------------

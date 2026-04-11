@@ -20,7 +20,12 @@ MAAT-RPG Startmenü-Plugin
 import os
 import sys
 import json
+import subprocess
+import select
+import termios
+import tty
 import time
+import threading
 from colorama import Fore, Style
 import shutil
 from shared.core.maat_paths import state_file, get_data_dir
@@ -40,6 +45,7 @@ TEXT = {
         "brand": "MAAT-OS / MAAT-RPG",
         "version": "Version 0.2 - Rueckkehr der Prinzipien",
         "title_continue": "Druecke Enter zum Fortfahren",
+        "title_idle_hint": "Oder warte 20 Sekunden fuer eine Demo-Vorschau.",
         "fallback_title": "Suchender im Aeon der Maat",
         "fallback_rank": "Erwachend",
         "fallback_motif": "Die Welt tastet nach der Form, die Maatis annimmt.",
@@ -70,11 +76,18 @@ TEXT = {
         "restart_hint": "Starte MAAT-RPG neu, um das Hauptmenue vollstaendig zu nutzen.",
         "active_shortcuts": "Im aktuellen Lauf helfen dir besonders: /journal, /erfolge, /xp, /maatbond",
         "options_title": "⚙ Optionen",
-        "opt_reset": "[1] Zaehler zuruecksetzen (Story + Battle)",
-        "opt_full_reset": "[2] Alles zuruecksetzen (Story + Battle + Self-Evo)",
-        "opt_memory": "[3] Alle Erinnerungen loeschen (Application Support/MAAT-RPG/data)",
-        "opt_language": "[4] Sprache wechseln",
-        "opt_back": "[5] Zurueck",
+        "opt_text_speed": "[1] Story-Texttempo: {value}",
+        "opt_music": "[2] Musik: {value}",
+        "opt_thinking": "[3] Thinking anzeigen: {value}",
+        "opt_reset": "[4] Zaehler zuruecksetzen (Story + Battle)",
+        "opt_full_reset": "[5] Alles zuruecksetzen (Story + Battle + Self-Evo)",
+        "opt_memory": "[6] Alle Erinnerungen loeschen (Application Support/MAAT-RPG/data)",
+        "opt_language": "[7] Sprache wechseln",
+        "opt_back": "[8] Zurueck",
+        "speed_slow": "Langsam",
+        "speed_fast": "Schnell",
+        "music_on": "An",
+        "music_off": "Aus",
         "info_title": "ℹ MAAT-OS – Info",
         "info_overview": "[1] Was ist MAAT-OS?",
         "info_plugins": "[2] Wie funktioniert das Plugin-System?",
@@ -105,6 +118,7 @@ TEXT = {
         "brand": "MAAT-OS / MAAT-RPG",
         "version": "Version 0.2 - Return of the Principles",
         "title_continue": "Press enter to continue",
+        "title_idle_hint": "Or wait 20 seconds for a demo preview.",
         "fallback_title": "Seeker in the Aeon of Maat",
         "fallback_rank": "Awakening",
         "fallback_motif": "The world is feeling for the shape Maatis is becoming.",
@@ -135,11 +149,18 @@ TEXT = {
         "restart_hint": "Restart MAAT-RPG to use the full main menu.",
         "active_shortcuts": "Helpful right now: /journal, /erfolge, /xp, /maatbond",
         "options_title": "⚙ Options",
-        "opt_reset": "[1] Reset counters (Story + Battle)",
-        "opt_full_reset": "[2] Reset everything (Story + Battle + Self-Evo)",
-        "opt_memory": "[3] Delete all memories (Application Support/MAAT-RPG/data)",
-        "opt_language": "[4] Change language",
-        "opt_back": "[5] Back",
+        "opt_text_speed": "[1] Story text speed: {value}",
+        "opt_music": "[2] Music: {value}",
+        "opt_thinking": "[3] Show thinking: {value}",
+        "opt_reset": "[4] Reset counters (Story + Battle)",
+        "opt_full_reset": "[5] Reset everything (Story + Battle + Self-Evo)",
+        "opt_memory": "[6] Delete all memories (Application Support/MAAT-RPG/data)",
+        "opt_language": "[7] Change language",
+        "opt_back": "[8] Back",
+        "speed_slow": "Slow",
+        "speed_fast": "Fast",
+        "music_on": "On",
+        "music_off": "Off",
         "info_title": "ℹ MAAT-OS – Info",
         "info_overview": "[1] What is MAAT-OS?",
         "info_plugins": "[2] How does the plugin system work?",
@@ -177,6 +198,34 @@ def _save_settings(data: dict):
     os.makedirs(os.path.dirname(SETTINGS_FILE), exist_ok=True)
     with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+def _stop_all_afplay():
+    try:
+        subprocess.call(["killall", "afplay"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception:
+        pass
+
+
+def _setting_text_speed(settings: dict) -> str:
+    value = str(settings.get("story_text_speed", "fast")).lower()
+    return value if value in {"slow", "fast"} else "fast"
+
+
+def _setting_music_enabled(settings: dict) -> bool:
+    return bool(settings.get("music_enabled", True))
+
+
+def _setting_show_thinking(settings: dict) -> bool:
+    return bool(settings.get("show_thinking", False))
+
+
+def _settings_labels(language: str, settings: dict) -> tuple[str, str, str]:
+    t = TEXT.get(language, TEXT["de"])
+    speed = t["speed_slow"] if _setting_text_speed(settings) == "slow" else t["speed_fast"]
+    music = t["music_on"] if _setting_music_enabled(settings) else t["music_off"]
+    thinking = t["music_on"] if _setting_show_thinking(settings) else t["music_off"]
+    return speed, music, thinking
 # ==========================
 # 🎵 Menü-Musik (optional)
 # ==========================
@@ -187,6 +236,9 @@ class MenuMusic:
         self._player = ManagedAudioPlayer(self.track)
 
     def start(self):
+        settings = _load_settings()
+        if not _setting_music_enabled(settings):
+            return
         self._player.start_loop(self.track)
 
     def stop(self):
@@ -322,6 +374,7 @@ def _render_title_screen(language: str) -> str:
         Fore.CYAN + Style.BRIGHT + t["version"] + Style.RESET_ALL,
         "",
         Fore.GREEN + Style.BRIGHT + t["title_continue"] + Style.RESET_ALL,
+        Fore.CYAN + t["title_idle_hint"] + Style.RESET_ALL,
     ]
     return "\n".join(lines)
 
@@ -843,8 +896,12 @@ def options_menu(plugin_dir: str, menu_music: MenuMusic):
         settings = _load_settings()
         language = settings.get("language", "de")
         t = TEXT.get(language, TEXT["de"])
+        speed_label, music_label, thinking_label = _settings_labels(language, settings)
         clear_screen()
         print(Fore.YELLOW + Style.BRIGHT + t["options_title"] + "\n" + Style.RESET_ALL)
+        print("  " + t["opt_text_speed"].format(value=speed_label))
+        print("  " + t["opt_music"].format(value=music_label))
+        print("  " + t["opt_thinking"].format(value=thinking_label))
         print(f"  {t['opt_reset']}")
         print(f"  {t['opt_full_reset']}")
         print(f"  {t['opt_memory']}")
@@ -854,18 +911,35 @@ def options_menu(plugin_dir: str, menu_music: MenuMusic):
         choice = input(Fore.GREEN + t["choice"] + Style.RESET_ALL).strip()
 
         if choice == "1":
-            confirm_reset(plugin_dir, full_reset=False, menu_music=menu_music)
+            current = _setting_text_speed(settings)
+            settings["story_text_speed"] = "slow" if current == "fast" else "fast"
+            _save_settings(settings)
         elif choice == "2":
-            confirm_reset(plugin_dir, full_reset=True, menu_music=menu_music)
+            enabled = _setting_music_enabled(settings)
+            settings["music_enabled"] = not enabled
+            _save_settings(settings)
+            if settings["music_enabled"]:
+                menu_music.start()
+            else:
+                menu_music.stop()
         elif choice == "3":
-            confirm_wipe_all_memory(plugin_dir, menu_music)
+            enabled = _setting_show_thinking(settings)
+            settings["show_thinking"] = not enabled
+            _save_settings(settings)
         elif choice == "4":
+            confirm_reset(plugin_dir, full_reset=False, menu_music=menu_music)
+        elif choice == "5":
+            confirm_reset(plugin_dir, full_reset=True, menu_music=menu_music)
+        elif choice == "6":
+            confirm_wipe_all_memory(plugin_dir, menu_music)
+        elif choice == "7":
+            settings = _load_settings()
             settings["language"] = choose_language()
             _save_settings(settings)
-        elif choice == "5":
+        elif choice == "8":
             break
         else:
-            print(Fore.RED + "Ungültige Auswahl." + Style.RESET_ALL)
+            print(Fore.RED + t["invalid"] + Style.RESET_ALL)
             time.sleep(1)
 
 
@@ -918,6 +992,7 @@ class Plugin:
         self.settings = _load_settings()
         self.language = self.settings.get("language")
         self._title_seen = False
+        self._title_demo_stage = 0
 
     def _t(self, key: str) -> str:
         language = self.language if self.language in TEXT else "de"
@@ -930,11 +1005,124 @@ class Plugin:
         _save_settings(self.settings)
         return language
 
-    def _show_title_screen(self):
+    def _title_wait_or_timeout(self, timeout: float = 20.0) -> bool:
+        """True wenn irgendeine Taste gedrückt wurde, False bei Timeout."""
+        fd = None
+        old_settings = None
+        try:
+            fd = sys.stdin.fileno()
+            old_settings = termios.tcgetattr(fd)
+            tty.setcbreak(fd)
+            ready, _, _ = select.select([sys.stdin], [], [], timeout)
+            if ready:
+                try:
+                    sys.stdin.read(1)
+                except Exception:
+                    pass
+                return True
+            return False
+        except Exception:
+            try:
+                ready, _, _ = select.select([sys.stdin], [], [], timeout)
+                if ready:
+                    sys.stdin.readline()
+                    return True
+            except Exception:
+                pass
+            return False
+        finally:
+            if fd is not None and old_settings is not None:
+                try:
+                    termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+                except Exception:
+                    pass
+
+    def _title_key_pressed(self) -> bool:
+        return self._title_wait_or_timeout(0.05)
+
+    def _run_title_demo(self, context=None) -> bool:
+        battle_core = None
+        if isinstance(context, dict):
+            battle_core = ((context.get("rpg") or {}).get("battle_core"))
+        if battle_core is None or not hasattr(battle_core, "run_fight"):
+            return False
+
+        cycle = self._title_demo_stage % 2
+        if cycle == 0:
+            mode = "boss"
+            actions = ["3", "1", "3", "5", "4", "1", "3", "1", "5", "2", "1"]
+        else:
+            mode = "final"
+            actions = ["3", "1", "1", "5", "3", "1", "4", "5", "3", "1", "1", "5"]
+
         clear_screen()
-        print(_render_title_screen(self.language or "de"))
-        input()
-        self._title_seen = True
+        self.menu_music.stop()
+        demo_context = {
+            "guide_mode": True,
+            "no_hp_loss": True,
+            "title_demo_mode": True,
+            "title_demo_abort": False,
+            "scripted_actions": list(actions),
+        }
+        result = {"error": None}
+
+        def _run():
+            try:
+                battle_core.run_fight(mode, demo_context)
+            except Exception as e:
+                result["error"] = e
+
+        thread = threading.Thread(target=_run, daemon=True)
+        thread.start()
+
+        aborted = False
+        while thread.is_alive():
+            if self._title_key_pressed():
+                demo_context["title_demo_abort"] = True
+                self.menu_music.stop()
+                _stop_all_afplay()
+                aborted = True
+                break
+
+        if aborted:
+            deadline = time.time() + 4.0
+            while thread.is_alive() and time.time() < deadline:
+                demo_context["title_demo_abort"] = True
+                _stop_all_afplay()
+                thread.join(timeout=0.1)
+            _stop_all_afplay()
+        else:
+            thread.join()
+
+        if result["error"] is not None and not aborted:
+            print(Fore.RED + f"[TITLE DEMO ERROR] {result['error']}" + Style.RESET_ALL)
+            time.sleep(1.2)
+            clear_screen()
+            self.menu_music.stop()
+            _stop_all_afplay()
+            self.menu_music.start()
+            return False
+
+        clear_screen()
+        self.menu_music.stop()
+        _stop_all_afplay()
+        time.sleep(0.35)
+        _stop_all_afplay()
+        if not thread.is_alive():
+            self.menu_music.start()
+        if not aborted:
+            self._title_demo_stage += 1
+        return True
+
+    def _show_title_screen(self, context=None):
+        while True:
+            clear_screen()
+            print(_render_title_screen(self.language or "de"))
+            if self._title_wait_or_timeout(20.0):
+                self._title_seen = True
+                return
+            if not self._run_title_demo(context):
+                continue
 
     # ---------- Hauptmenü ----------
     def _show_menu_once(self) -> str:
@@ -998,7 +1186,7 @@ class Plugin:
         self.menu_music.start()
 
         if not self._title_seen:
-            self._show_title_screen()
+            self._show_title_screen(context)
 
         while True:
             choice = self._show_menu_once()

@@ -4,7 +4,7 @@ MAAT-Memory v6 — AGI Hybrid Memory System
 -----------------------------------------
 ✓ Identity Memory (persistent)
 ✓ Episodic Memory (SQLite)
-✓ Semantic Memory (FAISS)
+✓ Semantic Memory (FAISS or NumPy fallback)
 ✓ Pattern Fact Extractor
 ✓ Topic Slots (identity, friends, places, projects, etc.)
 ✓ Query Rewriting
@@ -20,9 +20,9 @@ import re
 from datetime import datetime
 
 import numpy as np
-import faiss
 import hashlib
 from shared.core.rpg_i18n import get_language
+from shared.core.vector_index import faiss_available, load_vector_index, save_vector_index
 
 EMBED_DIM = 128
 
@@ -75,6 +75,7 @@ class Plugin:
 
         self._init_db()
         self._init_identity()
+        self.vector_backend = "faiss" if faiss_available() else "numpy"
         self._init_index()
 
     def _lang(self):
@@ -141,11 +142,7 @@ class Plugin:
     # Vector index
     # -------------------------------------------------------
     def _init_index(self):
-        if os.path.exists(self.index_path):
-            self.index = faiss.read_index(self.index_path)
-        else:
-            self.index = faiss.IndexFlatL2(EMBED_DIM)
-            faiss.write_index(self.index, self.index_path)
+        self.index = load_vector_index(self.index_path, EMBED_DIM)
 
     # -------------------------------------------------------
     # Maat resonance score
@@ -227,7 +224,7 @@ class Plugin:
         try:
             vec = embed_text(text)
             self.index.add(np.array([vec]).astype("float32"))
-            faiss.write_index(self.index, self.index_path)
+            save_vector_index(self.index, self.index_path)
         except Exception:
             pass
 
@@ -322,6 +319,7 @@ class Plugin:
                 self._t("📦 MAAT-Memory v6 Uebersicht:\n", "📦 MAAT Memory v6 Overview:\n")
                 + f"- {self._t('Identitaet', 'Identity')}: {ident}\n"
                 + f"- DB: {self.db_path}\n"
+                + f"- {self._t('Backend', 'Backend')}: {self.vector_backend}\n"
                 + f"- {self._t('Indexgroesse', 'Index size')}: {self.index.ntotal}\n"
             )
 

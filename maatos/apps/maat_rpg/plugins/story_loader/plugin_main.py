@@ -15,8 +15,12 @@ import os
 import json
 import importlib.util
 import subprocess
+import sys
 import time
 from shared.core.maat_paths import data_file, state_file, log_file
+
+
+SETTINGS_FILE = state_file("settings_state.json")
 from shared.core.rpg_i18n import get_language
 
 
@@ -88,6 +92,26 @@ STORY_UI = {
 }
 
 
+def _load_settings() -> dict:
+    try:
+        with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def _story_text_speed() -> float:
+    settings = _load_settings()
+    mode = str(settings.get("story_text_speed", "fast")).lower()
+    return 0.018 if mode == "slow" else 0.008
+
+
+def _music_enabled() -> bool:
+    settings = _load_settings()
+    return bool(settings.get("music_enabled", True))
+
+
 class Plugin:
     type = "chat"
     commands = {
@@ -128,6 +152,18 @@ class Plugin:
         language = self._language()
         template = STORY_UI.get(language, STORY_UI["de"]).get(key, STORY_UI["de"].get(key, key))
         return template.format(**kwargs) if kwargs else template
+
+    def _stream_story_line(self, text: str, speed: float | None = None):
+        """Gibt eine Story-Zeile sichtbar laufend aus."""
+        if speed is None:
+            speed = _story_text_speed()
+        for ch in text:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(speed)
+        sys.stdout.write("\n")
+        sys.stdout.flush()
+        time.sleep(0.05)
 
     def _load_json(self, path: str) -> dict:
         if os.path.exists(path):
@@ -285,7 +321,7 @@ class Plugin:
         """
         Spielt eine MP3 EINMAL im Hintergrund (kein Loop).
         """
-        if not filename:
+        if not filename or not _music_enabled():
             return
 
         path = os.path.join(self.story_dir, filename)
@@ -388,8 +424,7 @@ class Plugin:
                 print(compact)
                 continue
             input(self._t("continue"))
-            print(line)
-            time.sleep(0.05)
+            self._stream_story_line(line)
 
         if isinstance(choice_result, dict):
             self._handle_story_choice(choice_result)

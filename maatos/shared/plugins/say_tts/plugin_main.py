@@ -14,7 +14,9 @@ import threading
 import platform
 import re
 import time
+import json
 from shared.core.rpg_i18n import get_language
+from shared.core.maat_paths import state_file
 
 
 class Plugin:
@@ -67,18 +69,39 @@ class Plugin:
         if not self.voice_is_manual:
             self.voice = self._default_voice()
 
+    def _show_thinking_enabled(self) -> bool:
+        try:
+            with open(state_file("settings_state.json"), "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return bool(data.get("show_thinking", False))
+        except Exception:
+            return False
+
+    def _thinking_tts_enabled(self) -> bool:
+        return self._lang() == "en" and self._show_thinking_enabled()
+
     def _prepare_tts_text(self, text: str) -> str:
         cleaned = (text or "").strip()
-        if self._lang() == "de":
+        if self._lang() == "de" or not self._thinking_tts_enabled():
             cleaned = re.sub(r"<think>.*?</think>", "", cleaned, flags=re.IGNORECASE | re.DOTALL)
-            cleaned = re.sub(r"</?think>", "", cleaned, flags=re.IGNORECASE)
-            cleaned = re.sub(r"\n{2,}", "\n", cleaned).strip()
+        cleaned = re.sub(r"</?think>", "", cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r"[ \t]{2,}", " ", cleaned)
+        cleaned = re.sub(r" *\n *", "\n", cleaned)
+        cleaned = re.sub(r"\n{2,}", "\n", cleaned).strip()
         return cleaned
+
+    def _append_visible(self, text: str):
+        if not text:
+            return
+        self.buffer += text
+        if any(self.buffer.endswith(end) for end in [".", "!", "?", "…"]):
+            self._speak(self.buffer)
+            self.buffer = ""
 
     # ----------------------------------------------------
     # Startup
     # ----------------------------------------------------
-    def on_startup(self):
+    def on_startup(self, context=None):
         self._sync_voice_with_language()
         choice = input(
             self._t(
@@ -139,46 +162,43 @@ class Plugin:
         if not self.enabled:
             return
 
-        if self._lang() == "de":
-            self._think_buffer += token
+        allow_thinking_tts = self._thinking_tts_enabled()
+        self._think_buffer += token
 
-            while self._think_buffer:
-                if self._inside_think:
-                    end_idx = self._think_buffer.lower().find("</think>")
-                    if end_idx == -1:
-                        return
-                    self._think_buffer = self._think_buffer[end_idx + len("</think>"):]
-                    self._inside_think = False
-                    continue
+        while self._think_buffer:
+            lower = self._think_buffer.lower()
 
-                start_idx = self._think_buffer.lower().find("<think>")
-                visible = self._think_buffer if start_idx == -1 else self._think_buffer[:start_idx]
-
-                if visible:
-                    self.buffer += visible
-                    if any(self.buffer.endswith(end) for end in [".", "!", "?", "…"]):
-                        self._speak(self.buffer)
-                        self.buffer = ""
-
-                if start_idx == -1:
-                    self._think_buffer = ""
+            if self._inside_think:
+                end_idx = lower.find("</think>")
+                if end_idx == -1:
+                    if allow_thinking_tts:
+                        self._append_visible(self._think_buffer)
+                        self._think_buffer = ""
                     return
 
-                self._think_buffer = self._think_buffer[start_idx + len("<think>"):]
-                self._inside_think = True
-            return
+                think_text = self._think_buffer[:end_idx]
+                if allow_thinking_tts and think_text:
+                    self._append_visible(think_text)
+                self._think_buffer = self._think_buffer[end_idx + len("</think>"):]
+                self._inside_think = False
+                continue
 
-        self.buffer += token
+            start_idx = lower.find("<think>")
+            visible = self._think_buffer if start_idx == -1 else self._think_buffer[:start_idx]
+            if visible:
+                self._append_visible(visible)
 
-        # Satzende erkannt → sprechen
-        if any(self.buffer.endswith(end) for end in [".", "!", "?", "…"]):
-            self._speak(self.buffer)
-            self.buffer = ""
+            if start_idx == -1:
+                self._think_buffer = ""
+                return
+
+            self._think_buffer = self._think_buffer[start_idx + len("<think>"):]
+            self._inside_think = True
 
     def after_stream(self, full_text):
         """ Reste sprechen """
-        if self._lang() == "de" and self._think_buffer and not self._inside_think:
-            self.buffer += self._think_buffer
+        if self._think_buffer and not self._inside_think:
+            self.buffer += self._prepare_tts_text(self._think_buffer)
             self._think_buffer = ""
         if self.enabled and self.buffer.strip():
             self._speak(self.buffer)

@@ -16,11 +16,18 @@ import random
 import time
 import threading
 import subprocess
+import select
+import termios
+import tty
 import sys
 from colorama import Fore, Style
 from shared.core.maat_paths import data_file, state_file, log_file
 from shared.core.audio import ManagedAudioPlayer
 from shared.core.rpg_i18n import get_language
+
+
+class TitleDemoAbort(Exception):
+    pass
 
 
 BATTLE_TEXT = {
@@ -567,6 +574,10 @@ class BattleMusicManager:
 
     def stop(self):
         self._player.stop()
+        try:
+            subprocess.call(["killall", "afplay"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception:
+            pass
 
     def victory_jingle(self, path: str | None):
         self._player.play_once(path)
@@ -938,8 +949,39 @@ class BattleCore:
         self.plugin_dir = plugin_dir
         state_dir = os.path.join(plugin_dir, "battle_state")
         self.state = BattleState(state_dir)
+        self._active_context = None
+
+    def _title_demo_should_abort(self, context: dict | None = None) -> bool:
+        if not isinstance(context, dict) or not context.get("title_demo_mode"):
+            return False
+        if context.get("title_demo_abort"):
+            return True
+        fd = None
+        old_settings = None
+        try:
+            fd = sys.stdin.fileno()
+            old_settings = termios.tcgetattr(fd)
+            tty.setcbreak(fd)
+            ready, _, _ = select.select([sys.stdin], [], [], 0)
+            if ready:
+                try:
+                    sys.stdin.read(1)
+                except Exception:
+                    pass
+                return True
+        except Exception:
+            return False
+        finally:
+            if fd is not None and old_settings is not None:
+                try:
+                    termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+                except Exception:
+                    pass
+        return False
 
     def _prompt(self, prompt: str, context: dict | None = None, default: str = "") -> str:
+        if self._title_demo_should_abort(context):
+            raise TitleDemoAbort()
         if isinstance(context, dict):
             queue = context.get("scripted_actions")
             if isinstance(queue, list):
@@ -1989,6 +2031,8 @@ class BattleCore:
         """
         try:
             for ch in text:
+                if self._title_demo_should_abort(self._active_context):
+                    raise TitleDemoAbort()
                 print(ch, end="", flush=True)
                 time.sleep(delay_char)
             print()
@@ -2411,12 +2455,14 @@ class BattleCore:
 
     # ---------- KAMPF-LOOP ----------
     def run_fight(self, ftype: str, context: dict | None = None) -> str:
+        self._active_context = context if isinstance(context, dict) else None
         inner_boss = self._get_inner_boss(context)
         
         s = self.state.state
         p = s["player"]
         stats = s["stats"]
         guide_mode = bool(isinstance(context, dict) and context.get("guide_mode"))
+        title_demo_mode = bool(isinstance(context, dict) and context.get("title_demo_mode"))
         stats_snapshot = dict(stats) if guide_mode else None
 
         # 🔹 MAAT-Felder lesen
@@ -2804,7 +2850,10 @@ class BattleCore:
                     self._slow_line(line)
                     log_lines.append(_battle_text("log_enemy_hit", damage=dmg_in))
 
+        except TitleDemoAbort:
+            return ""
         finally:
+            self._active_context = None
             music.stop()
 
         # Kampfende
@@ -2819,11 +2868,12 @@ class BattleCore:
             self._slow_line(line)
             log_lines.append(_battle_text("log_victory", enemy=enemy_name))
 
-            # Sieges-Jingle – benutze das bereits gewählte victory_track
-            music.victory_jingle(victory_track)
+            if not title_demo_mode:
+                # Sieges-Jingle – benutze das bereits gewählte victory_track
+                music.victory_jingle(victory_track)
 
-            reward_txt = self._reward_on_victory(ftype, xp_reward, context)
-            log_lines.append(reward_txt)
+                reward_txt = self._reward_on_victory(ftype, xp_reward, context)
+                log_lines.append(reward_txt)
             combat_unlocks = self._evaluate_combat_achievements(ftype, turn_state)
             if combat_unlocks:
                 ach_text = "\n".join(f"🏆 Neuer Kampf-Erfolg: {title}" for title in combat_unlocks)

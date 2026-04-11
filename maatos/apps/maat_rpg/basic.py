@@ -565,6 +565,13 @@ def start_classic():
         print(Fore.YELLOW + "⚠️ Self-Evolution Engine ist nicht verfügbar." + Style.RESET_ALL)
 
     # -------------------------------------------------
+    # BATTLE CORE AUTO-BIND (nach Plugin-Load!)
+    # -------------------------------------------------
+    battle_core = resolve_battle_core(pm)
+    if battle_core:
+        context["rpg"]["battle_core"] = battle_core
+
+    # -------------------------------------------------
     # STARTUP HOOKS
     # -------------------------------------------------
     if pm:
@@ -572,16 +579,14 @@ def start_classic():
             on_start = getattr(plugin, "on_startup", None)
             if callable(on_start):
                 try:
-                    on_start()
+                    on_start(context)
                 except Exception as e:
                     print(Fore.RED + f"[PLUGIN STARTUP ERROR] {e}" + Style.RESET_ALL)
 
     # -------------------------------------------------
     # BATTLE CORE AUTO-BIND (nach Plugin-Load!)
     # -------------------------------------------------
-    battle_core = resolve_battle_core(pm)
     if battle_core:
-        context["rpg"]["battle_core"] = battle_core
         print(Fore.GREEN + ("⚔️ BattleCore found and bound automatically." if _ui_language() == "en" else "⚔️ BattleCore automatisch gefunden und gebunden.") + Style.RESET_ALL)
     else:
         print(Fore.YELLOW + ("⚠️ No BattleCore found (check plugin 'battle')." if _ui_language() == "en" else "⚠️ Kein BattleCore gefunden (Plugin 'battle' prüfen).") + Style.RESET_ALL)
@@ -605,8 +610,8 @@ def start_classic():
     print(_render_title_screen())
     try:
         input(Fore.YELLOW + "\n> " + Style.RESET_ALL)
-    except EOFError:
-        pass
+    except (EOFError, StopIteration):
+        print("\n🌿 Kein interaktiver Titelbildschirm-Input verfügbar – Start läuft weiter.\n")
 
     ui_text = _title_text(_ui_language())
     print(Fore.CYAN + f"\n🌿 {ui_text['active']}\n" + Style.RESET_ALL)
@@ -712,6 +717,10 @@ def start_classic():
 
         except KeyboardInterrupt:
             print("\n🌿 Abbruch – bis später.\n")
+            break
+
+        except (EOFError, StopIteration):
+            print("\n🌿 Eingabe beendet – ChatLoop wird sauber geschlossen.\n")
             break
 
         except Exception as e:

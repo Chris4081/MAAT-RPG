@@ -1,14 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Kleine Audio-Helfer fuer lokale afplay-Wiedergabe auf macOS.
-
-Ziel:
-- nur eigene Prozesse stoppen
-- optionales Looping ohne globales killall
-- fail-safe, wenn afplay nicht vorhanden ist
-"""
-
-from __future__ import annotations
+"""Shared audio helpers for macOS-backed playback."""
 
 import os
 import shutil
@@ -27,6 +18,8 @@ class ManagedAudioPlayer:
         self._proc: subprocess.Popen | None = None
         self._thread: threading.Thread | None = None
         self._stop_event = threading.Event()
+        self._lock = threading.Lock()
+        self._run_id = 0
 
     def is_available(self) -> bool:
         return bool(_afplay_path())
@@ -48,15 +41,18 @@ class ManagedAudioPlayer:
         self.stop()
 
         try:
-            self._proc = subprocess.Popen(
+            proc = subprocess.Popen(
                 [afplay, self.track_path],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
             )
-            return True
         except Exception:
-            self._proc = None
             return False
+
+        with self._lock:
+            self._proc = proc
+
+        return True
 
     def start_loop(self, track_path: str | None = None) -> bool:
         if track_path is not None:
@@ -66,40 +62,89 @@ class ManagedAudioPlayer:
             return False
 
         afplay = _afplay_path()
-        if not afplay or self._thread is not None:
+        if not afplay:
             return False
 
-        self._stop_event.clear()
+        self.stop()
 
-        def _runner():
-            while not self._stop_event.is_set():
-                try:
-                    self._proc = subprocess.Popen(
-                        [afplay, self.track_path],
-                        stdout=subprocess.DEVNULL,
-                        stderr=subprocess.DEVNULL,
-                    )
-                    while self._proc.poll() is None and not self._stop_event.is_set():
-                        time.sleep(0.1)
-                except Exception:
-                    time.sleep(0.5)
-                finally:
-                    if self._proc is not None and self._proc.poll() is None:
-                        try:
-                            self._proc.terminate()
-                        except Exception:
-                            pass
-                    self._proc = None
+        with self._lock:
+            self._stop_event.clear()
+            self._run_id += 1
+            run_id = self._run_id
+            track_path = self.track_path
 
-        self._thread = threading.Thread(target=_runner, daemon=True)
-        self._thread.start()
+        def _runner(local_run_id: int, local_track_path: str):
+            current = threading.current_thread()
+            try:
+                while True:
+                    with self._lock:
+                        should_stop = self._stop_event.is_set() or local_run_id != self._run_id
+                    if should_stop:
+                        break
+
+                    proc = None
+                    try:
+                        proc = subprocess.Popen(
+                            [afplay, local_track_path],
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL,
+                        )
+                        with self._lock:
+                            if local_run_id != self._run_id or self._stop_event.is_set():
+                                try:
+                                    proc.terminate()
+                                except Exception:
+                                    pass
+                                break
+                            self._proc = proc
+
+                        while proc.poll() is None:
+                            with self._lock:
+                                should_stop = self._stop_event.is_set() or local_run_id != self._run_id
+                            if should_stop:
+                                try:
+                                    proc.terminate()
+                                except Exception:
+                                    pass
+                                break
+                            time.sleep(0.05)
+                    except Exception:
+                        time.sleep(0.2)
+                    finally:
+                        if proc is not None:
+                            if proc.poll() is None:
+                                try:
+                                    proc.terminate()
+                                    proc.wait(timeout=1)
+                                except Exception:
+                                    try:
+                                        proc.kill()
+                                    except Exception:
+                                        pass
+                            with self._lock:
+                                if self._proc is proc:
+                                    self._proc = None
+            finally:
+                with self._lock:
+                    if self._thread is current:
+                        self._thread = None
+                    if local_run_id == self._run_id:
+                        self._proc = None
+
+        thread = threading.Thread(target=_runner, args=(run_id, track_path), daemon=True)
+        with self._lock:
+            self._thread = thread
+        thread.start()
         return True
 
     def stop(self):
-        self._stop_event.set()
+        with self._lock:
+            self._run_id += 1
+            self._stop_event.set()
+            proc = self._proc
+            thread = self._thread
+            self._proc = None
 
-        proc = self._proc
-        self._proc = None
         if proc is not None and proc.poll() is None:
             try:
                 proc.terminate()
@@ -110,7 +155,9 @@ class ManagedAudioPlayer:
                 except Exception:
                     pass
 
-        thread = self._thread
-        self._thread = None
-        if thread is not None and thread.is_alive():
-            thread.join(timeout=1)
+        if thread is not None and thread.is_alive() and thread is not threading.current_thread():
+            thread.join(timeout=2)
+
+        with self._lock:
+            if self._thread is thread:
+                self._thread = None

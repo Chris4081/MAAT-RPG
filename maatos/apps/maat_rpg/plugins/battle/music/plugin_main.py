@@ -17,9 +17,33 @@ import random
 import time
 import threading
 import subprocess
+import select
+import termios
+import tty
+import sys
 import datetime
 from colorama import Fore, Style
 from shared.core.maat_paths import data_file, state_file, log_file
+
+
+SETTINGS_FILE = state_file("settings_state.json")
+
+
+def _load_settings() -> dict:
+    try:
+        with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def _music_enabled() -> bool:
+    return bool(_load_settings().get("music_enabled", True))
+
+
+class TitleDemoAbort(Exception):
+    pass
 
 
 # =====================================================
@@ -46,7 +70,7 @@ class BattleMusicManager:
                 time.sleep(1)
 
     def start(self):
-        if self._running or not self.track_path:
+        if self._running or not self.track_path or not _music_enabled():
             return
         self._running = True
         self._thread = threading.Thread(target=self._loop, daemon=True)
@@ -64,6 +88,8 @@ class BattleMusicManager:
             pass
 
     def victory_jingle(self, victory_path: str | None):
+        if not _music_enabled():
+            return
         if victory_path and os.path.isfile(victory_path):
             try:
                 subprocess.Popen(
@@ -302,6 +328,52 @@ class BattleCore:
         state_dir = os.path.join(plugin_dir, "battle_state")
         self.state = BattleState(state_dir)
 
+    def _title_demo_should_abort(self, context: dict | None = None) -> bool:
+        if not isinstance(context, dict) or not context.get("title_demo_mode"):
+            return False
+        if context.get("title_demo_abort"):
+            return True
+        fd = None
+        old_settings = None
+        try:
+            fd = sys.stdin.fileno()
+            old_settings = termios.tcgetattr(fd)
+            tty.setcbreak(fd)
+            ready, _, _ = select.select([sys.stdin], [], [], 0)
+            if ready:
+                try:
+                    sys.stdin.read(1)
+                except Exception:
+                    pass
+                return True
+        except Exception:
+            return False
+        finally:
+            if fd is not None and old_settings is not None:
+                try:
+                    termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+                except Exception:
+                    pass
+        return False
+
+    def _prompt(self, prompt: str, context: dict | None = None, default: str = "") -> str:
+        if self._title_demo_should_abort(context):
+            raise TitleDemoAbort()
+        if isinstance(context, dict):
+            queue = context.get("scripted_actions")
+            if isinstance(queue, list):
+                if queue:
+                    choice = str(queue.pop(0))
+                    print(f"{prompt}{choice}")
+                    return choice.strip()
+                if default:
+                    print(f"{prompt}{default}")
+                    return default
+        try:
+            return input(prompt).strip()
+        except EOFError:
+            return default
+
     # ---------- KAMPFTYP-ENTSCHEIDUNG ----------
     def _auto_fight_type(self):
         stats = self.state.state["stats"]
@@ -498,6 +570,7 @@ class BattleCore:
 
     # ---------- KAMPF-LOOP ----------
     def run_fight(self, ftype: str, context: dict | None = None) -> str:
+        title_demo_mode = bool(isinstance(context, dict) and context.get("title_demo_mode"))
         s = self.state.state
         p = s["player"]
         stats = s["stats"]
@@ -548,7 +621,7 @@ class BattleCore:
                 print("1) Angriff")
                 print("2) Skills")
                 print("3) Flucht")
-                choice = input("Aktion: ").strip()
+                choice = self._prompt("Aktion: ", context=context, default="3")
 
                 if choice == "1":
                     # ANGRIFF → Prinzip wählen
@@ -560,7 +633,7 @@ class BattleCore:
                         print("4) Verbundenheit")
                         print("5) Respekt")
                         print("6) Zurück")
-                        sub = input("Wähle [1–6]: ").strip()
+                        sub = self._prompt("Wähle [1–6]: ", context=context, default="6")
                         if sub == "6":
                             break
                         if sub not in principles:
@@ -589,7 +662,7 @@ class BattleCore:
                         for i, sk in enumerate(p["skills"], 1):
                             print(f"{i}) {sk}")
                         print(f"{len(p['skills'])+1}) Zurück")
-                        sub = input("Wähle: ").strip()
+                        sub = self._prompt("Wähle: ", context=context, default=str(len(p["skills"])+1) if p["skills"] else "")
                         try:
                             idx = int(sub) - 1
                             if idx == len(p["skills"]):
@@ -637,6 +710,8 @@ class BattleCore:
                     print(f"💥 {enemy_name} trifft dich für {dmg_in} Schaden!")
                     log_lines.append(f"Gegner trifft: {dmg_in} Schaden")
 
+        except TitleDemoAbort:
+            return ""
         finally:
             music.stop()
 
@@ -648,12 +723,13 @@ class BattleCore:
             print(f"\n🏆 Du hast **{enemy_name}** besiegt!")
             log_lines.append(f"Sieg über {enemy_name}")
 
-            # Sieges-Jingle
-            _, victory_track = self._choose_music(ftype, boss_idx, final_idx)
-            music.victory_jingle(victory_track)
+            if not title_demo_mode:
+                # Sieges-Jingle
+                _, victory_track = self._choose_music(ftype, boss_idx, final_idx)
+                music.victory_jingle(victory_track)
 
-            reward_txt = self._reward_on_victory(ftype, xp_reward, context)
-            log_lines.append(reward_txt)
+                reward_txt = self._reward_on_victory(ftype, xp_reward, context)
+                log_lines.append(reward_txt)
         else:
             # Niederlage
             print(f"\n💀 Du wurdest von **{enemy_name}** besiegt...")

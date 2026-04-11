@@ -28,6 +28,7 @@ class PluginManager:
         self.plugins_chat = []
         self.plugins_stream = []
         self.skipped_plugins = []
+        self.loaded_plugin_ids = set()
 
     def _load_plugin_settings(self, config_path):
         if not config_path or not os.path.isfile(config_path):
@@ -61,12 +62,17 @@ class PluginManager:
 
         self.plugins_chat.clear()
         self.plugins_stream.clear()
+        self.skipped_plugins.clear()
+        self.loaded_plugin_ids.clear()
 
         for root in self.plugin_roots:
             if not os.path.isdir(root):
                 continue
 
             for entry in sorted(os.listdir(root)):
+                if entry.startswith("_"):
+                    continue
+
                 path = os.path.join(root, entry)
 
                 # Ordner mit plugin_main.py
@@ -85,6 +91,9 @@ class PluginManager:
     def _load_single(self, file_path):
         try:
             plugin_id = self._plugin_id_for_path(file_path)
+            if plugin_id in self.loaded_plugin_ids:
+                print(_t(f"⏭ Doppeltes Plugin übersprungen: {plugin_id}", f"⏭ Duplicate plugin skipped: {plugin_id}"))
+                return
             if not self._is_enabled(plugin_id):
                 self.skipped_plugins.append(plugin_id)
                 print(_t(f"⏭ Plugin deaktiviert: {plugin_id}", f"⏭ Plugin disabled: {plugin_id}"))
@@ -111,6 +120,7 @@ class PluginManager:
                 self.plugins_stream.append(inst)
             else:
                 self.plugins_chat.append(inst)
+            self.loaded_plugin_ids.add(plugin_id)
 
         except Exception as e:
             print(_t(f"⚠ Plugin-Ladefehler in {file_path}: {e}", f"⚠ Plugin load error in {file_path}: {e}"))
