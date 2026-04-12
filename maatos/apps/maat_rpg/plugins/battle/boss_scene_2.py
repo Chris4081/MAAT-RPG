@@ -10,9 +10,8 @@ Cinematic nach dem 2. Boss
 """
 
 import os
-import subprocess
 import time
-from shared.core.audio import music_enabled
+from shared.core.audio import music_enabled, play_audio_process, stop_audio_process
 
 
 # ---------------------------------------------------------
@@ -29,24 +28,11 @@ class MusicPlayer:
             return
         if not os.path.isfile(self.path):
             return
-        try:
-            self.proc = subprocess.Popen(
-                ["afplay", self.path],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
-        except Exception:
-            self.proc = None
+        self.proc = play_audio_process(self.path)
 
     def stop(self):
-        try:
-            subprocess.call(
-                ["killall", "afplay"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
-        except Exception:
-            pass
+        stop_audio_process(self.proc)
+        self.proc = None
 
 
 # ---------------------------------------------------------

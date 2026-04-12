@@ -2,26 +2,46 @@
 set -euo pipefail
 clear
 
-# -------------------------------------------------
-# Pfade
-# -------------------------------------------------
 BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$BASE_DIR" || exit 1
 
-APP_SUPPORT_DIR="$HOME/Library/Application Support/MAAT-RPG"
+detect_app_support_dir() {
+BASE_DIR_ENV="$BASE_DIR" python3 - <<'PY'
+import os
+import sys
+
+base_dir = os.environ["BASE_DIR_ENV"]
+if base_dir not in sys.path:
+    sys.path.insert(0, base_dir)
+
+from shared.core.maat_paths import get_app_support_dir
+
+print(get_app_support_dir())
+PY
+}
+
+APP_SUPPORT_DIR="${MAAT_APP_SUPPORT_DIR:-$(detect_app_support_dir)}"
+export MAAT_APP_SUPPORT_DIR="$APP_SUPPORT_DIR"
+export MAAT_DATA_DIR="$APP_SUPPORT_DIR/data"
+export MAAT_MODELS_DIR="$APP_SUPPORT_DIR/models"
+export MAAT_LOGS_DIR="$APP_SUPPORT_DIR/logs"
+export MAAT_CACHE_DIR="$APP_SUPPORT_DIR/cache"
+export MAAT_SAVES_DIR="$APP_SUPPORT_DIR/saves"
+
 ENV_DIR="$APP_SUPPORT_DIR/mos-env"
 REQ_BASE="$BASE_DIR/requirements.base.txt"
-REQ_INTEL="$BASE_DIR/requirements.intel.txt"
-REQ_ARM="$BASE_DIR/requirements.arm.txt"
+REQ_LINUX="$BASE_DIR/requirements.linux.txt"
 
 mkdir -p "$APP_SUPPORT_DIR" || exit 1
 
 detect_language() {
-python3 - <<'PY'
+APP_SUPPORT_DIR_ENV="$APP_SUPPORT_DIR" python3 - <<'PY'
 from pathlib import Path
 import json
 import locale
-path = Path.home() / "Library" / "Application Support" / "MAAT-RPG" / "state" / "settings_state.json"
+import os
+
+path = Path(os.environ["APP_SUPPORT_DIR_ENV"]) / "state" / "settings_state.json"
 try:
     data = json.loads(path.read_text(encoding="utf-8"))
     lang = data.get("language", "de")
@@ -44,90 +64,110 @@ t() {
     fi
 }
 
+OS_NAME="$(uname -s)"
+ARCH="$(uname -m)"
+
 t "🌿 MAAT-RPG Setup" "🌿 MAAT-RPG Setup"
 echo "-----------------"
+t "📁 App-Support: $APP_SUPPORT_DIR" "📁 App support: $APP_SUPPORT_DIR"
+t "🧠 Architektur: $ARCH" "🧠 Architecture: $ARCH"
+t "🖥️ Betriebssystem: $OS_NAME" "🖥️ Operating system: $OS_NAME"
 
-# -------------------------------------------------
-# Xcode Command Line Tools Check
-# -------------------------------------------------
-t "🔍 Prüfe Xcode Command Line Tools..." "🔍 Checking Xcode Command Line Tools..."
+check_macos_toolchain() {
+    t "🔍 Prüfe Xcode Command Line Tools..." "🔍 Checking Xcode Command Line Tools..."
 
-if ! xcode-select -p >/dev/null 2>&1; then
-    t "⚠️ Xcode Command Line Tools fehlen." "⚠️ Xcode Command Line Tools are missing."
-    t "👉 Installation wird gestartet..." "👉 Starting installation..."
-    xcode-select --install
-    t "❗ Bitte Installation abschließen und danach Setup erneut starten." "❗ Please finish the installation and run setup again afterwards."
-    exit 1
-fi
+    if ! xcode-select -p >/dev/null 2>&1; then
+        t "⚠️ Xcode Command Line Tools fehlen." "⚠️ Xcode Command Line Tools are missing."
+        t "👉 Installation wird gestartet..." "👉 Starting installation..."
+        xcode-select --install
+        t "❗ Bitte Installation abschließen und danach Setup erneut starten." "❗ Please finish the installation and run setup again afterwards."
+        exit 1
+    fi
 
-if ! command -v clang >/dev/null 2>&1; then
-    t "❌ clang Compiler fehlt!" "❌ clang compiler is missing!"
-    t "👉 Bitte Xcode Command Line Tools installieren:" "👉 Please install Xcode Command Line Tools:"
-    echo "   xcode-select --install"
-    exit 1
-fi
+    if ! command -v clang >/dev/null 2>&1; then
+        t "❌ clang Compiler fehlt!" "❌ clang compiler is missing!"
+        t "👉 Bitte Xcode Command Line Tools installieren:" "👉 Please install Xcode Command Line Tools:"
+        echo "   xcode-select --install"
+        exit 1
+    fi
 
-if ! clang --version >/dev/null 2>&1; then
-    t "❌ clang ist nicht nutzbar." "❌ clang is not usable."
-    exit 1
-fi
-
-echo 'int main(){return 0;}' > /tmp/maat_test.c
-if ! clang /tmp/maat_test.c -o /tmp/maat_test_bin >/dev/null 2>&1; then
-    t "❌ Compiler-Test fehlgeschlagen." "❌ Compiler test failed."
-    t "👉 Bitte Xcode Command Line Tools prüfen oder neu installieren:" "👉 Please check or reinstall Xcode Command Line Tools:"
-    echo "   xcode-select --install"
+    echo 'int main(){return 0;}' > /tmp/maat_test.c
+    if ! clang /tmp/maat_test.c -o /tmp/maat_test_bin >/dev/null 2>&1; then
+        t "❌ Compiler-Test fehlgeschlagen." "❌ Compiler test failed."
+        t "👉 Bitte Xcode Command Line Tools prüfen oder neu installieren:" "👉 Please check or reinstall Xcode Command Line Tools:"
+        echo "   xcode-select --install"
+        rm -f /tmp/maat_test.c /tmp/maat_test_bin
+        exit 1
+    fi
     rm -f /tmp/maat_test.c /tmp/maat_test_bin
-    exit 1
-fi
-rm -f /tmp/maat_test.c /tmp/maat_test_bin
 
-t "✅ Xcode Tools bereit" "✅ Xcode tools ready"
+    t "✅ Xcode Tools bereit" "✅ Xcode tools ready"
+}
 
-# -------------------------------------------------
-# Python Check
-# -------------------------------------------------
+check_linux_toolchain() {
+    t "🔍 Prüfe Linux-Build-Umgebung..." "🔍 Checking Linux build environment..."
+
+    if ! command -v gcc >/dev/null 2>&1 && ! command -v clang >/dev/null 2>&1; then
+        t "❌ Weder gcc noch clang wurden gefunden." "❌ Neither gcc nor clang was found."
+        t "👉 Installiere z. B.: build-essential oder clang" "👉 Install for example: build-essential or clang"
+        exit 1
+    fi
+
+    if ! command -v cmake >/dev/null 2>&1; then
+        t "❌ cmake fehlt." "❌ cmake is missing."
+        t "👉 Bitte cmake installieren, sonst baut llama-cpp-python nicht stabil." "👉 Please install cmake, otherwise llama-cpp-python will not build reliably."
+        exit 1
+    fi
+
+    if ! command -v make >/dev/null 2>&1; then
+        t "❌ make fehlt." "❌ make is missing."
+        t "👉 Bitte build-essential / make installieren." "👉 Please install build-essential / make."
+        exit 1
+    fi
+
+    if ! command -v ffplay >/dev/null 2>&1 && ! command -v mpg123 >/dev/null 2>&1 && ! command -v aplay >/dev/null 2>&1; then
+        t "⚠️ Kein Linux-Audio-Backend gefunden. Musik bleibt ohne ffplay, mpg123 oder aplay stumm." "⚠️ No Linux audio backend found. Music will stay silent without ffplay, mpg123 or aplay."
+        t "👉 Empfehlung: ffmpeg (ffplay) oder mpg123 installieren." "👉 Recommendation: install ffmpeg (ffplay) or mpg123."
+    fi
+
+    t "✅ Linux-Build-Umgebung bereit" "✅ Linux build environment ready"
+}
+
 if ! command -v python3 >/dev/null 2>&1; then
     t "❌ Python 3 nicht gefunden." "❌ Python 3 was not found."
-    t "👉 Bitte installiere Python von:" "👉 Please install Python from:"
-    echo "https://www.python.org/downloads/macos/"
     exit 1
 fi
 
 echo "🐍 Python: $(python3 --version)"
 
-if [[ "$LANGUAGE" == "en" ]]; then
-    PY_LANG="en"
-else
-    PY_LANG="de"
-fi
-
 t "🔎 Prüfe Python-Version…" "🔎 Checking Python version…"
-PY_LANG="$PY_LANG" python3 - <<'EOF'
-import sys
+PY_LANG="$LANGUAGE" python3 - <<'PY'
 import os
+import sys
+
 major, minor = sys.version_info[:2]
 lang = os.environ.get("PY_LANG", "de")
 if (major, minor) < (3, 10):
     print("❌ Python 3.10 or newer is required." if lang == "en" else "❌ Python 3.10 oder neuer wird benötigt.")
     raise SystemExit(1)
 print(f"✅ Python version ok: {major}.{minor}" if lang == "en" else f"✅ Python-Version ok: {major}.{minor}")
-EOF
+PY
 
-# -------------------------------------------------
-# Architektur erkennen
-# -------------------------------------------------
-ARCH="$(uname -m)"
-t "🧠 Architektur: $ARCH" "🧠 Architecture: $ARCH"
+case "$OS_NAME" in
+    Darwin)
+        check_macos_toolchain
+        REQ_FILE="$REQ_BASE"
+        ;;
+    Linux)
+        check_linux_toolchain
+        REQ_FILE="$REQ_LINUX"
+        ;;
+    *)
+        t "❌ Dieses Setup unterstützt aktuell nur macOS und Linux." "❌ This setup currently supports only macOS and Linux."
+        exit 1
+        ;;
+esac
 
-IS_ARM=false
-if [[ "$ARCH" == "arm64" ]]; then
-    IS_ARM=true
-fi
-
-# -------------------------------------------------
-# Virtual Environment
-# -------------------------------------------------
 if [ ! -d "$ENV_DIR" ]; then
     t "📦 Erstelle virtuelles Environment…" "📦 Creating virtual environment…"
     t "📍 Ziel: $ENV_DIR" "📍 Target: $ENV_DIR"
@@ -143,80 +183,70 @@ fi
 t "🔌 Aktiviere Environment…" "🔌 Activating environment…"
 source "$ENV_DIR/bin/activate" || exit 1
 
-# -------------------------------------------------
-# pip Update
-# -------------------------------------------------
 t "⬆️  Aktualisiere pip…" "⬆️  Updating pip…"
 pip install --upgrade pip setuptools wheel || exit 1
 
-# -------------------------------------------------
-# Requirements prüfen
-# -------------------------------------------------
-if [ ! -f "$REQ_BASE" ]; then
-    t "❌ requirements.base.txt nicht gefunden!" "❌ requirements.base.txt not found!"
-    t "📍 Erwartet in:" "📍 Expected at:"
-    echo "   $REQ_BASE"
+if [ ! -f "$REQ_FILE" ]; then
+    t "❌ Requirements-Datei nicht gefunden!" "❌ Requirements file not found!"
+    echo "   $REQ_FILE"
     exit 1
 fi
 
-# -------------------------------------------------
-# Intel / ARM getrennte Installation
-# -------------------------------------------------
 t "📚 Installiere Abhängigkeiten…" "📚 Installing dependencies…"
+pip install -r "$REQ_FILE" || exit 1
 
-if [ "$IS_ARM" = false ]; then
-    t "⚠️ Intel-Mac erkannt → ARM-Zusatzpakete werden übersprungen" "⚠️ Intel Mac detected → ARM-only packages will be skipped"
-    pip install -r "$REQ_INTEL" || exit 1
-else
-    t "🍏 Apple Silicon erkannt → ARM-Paketliste wird verwendet" "🍏 Apple Silicon detected → ARM package set will be used"
-    pip install -r "$REQ_ARM" || exit 1
+if [[ "$OS_NAME" == "Darwin" && "$ARCH" == "arm64" ]]; then
+    t "🍏 Optional: pruefe mlx_lm fuer Apple Silicon…" "🍏 Optional: checking mlx_lm for Apple Silicon…"
+    if pip install mlx_lm; then
+        t "✅ mlx_lm installiert." "✅ mlx_lm installed."
+    else
+        t "⚠️ mlx_lm konnte nicht installiert werden. MAAT-RPG faellt auf llama.cpp zurueck." "⚠️ mlx_lm could not be installed. MAAT-RPG will fall back to llama.cpp."
+    fi
 fi
 
-# -------------------------------------------------
-# Kurztest
-# -------------------------------------------------
- t "🧪 Prüfe Installation…" "🧪 Checking installation…"
-PY_LANG="$PY_LANG" python3 - <<EOF
-import os
-try:
-    import colorama
-    import yaml
-    print("✅ Base packages installed" if os.environ.get("PY_LANG") == "en" else "✅ Basis-Pakete installiert")
-except ImportError:
-    print("❌ Base packages are missing – installation is incomplete" if os.environ.get("PY_LANG") == "en" else "❌ Basis-Pakete fehlen – Installation unvollständig")
-    raise SystemExit(1)
-EOF
+t "🧠 Optional: pruefe FAISS-Support…" "🧠 Optional: checking FAISS support…"
+if pip install faiss-cpu==1.13.2; then
+    t "✅ FAISS installiert." "✅ FAISS installed."
+else
+    t "⚠️ FAISS konnte nicht installiert werden. Memory v5/v6 nutzt den NumPy-Fallback." "⚠️ FAISS could not be installed. Memory v5/v6 will use the NumPy fallback."
+fi
 
- t "🧠 Prüfe verfügbare Backends…" "🧠 Checking available backends…"
-PY_LANG="$PY_LANG" python3 - <<'EOF'
-import platform
+t "🧪 Prüfe Installation…" "🧪 Checking installation…"
+PY_LANG="$LANGUAGE" PY_OS="$OS_NAME" python3 - <<'PY'
 import importlib.util
 import os
+import platform
 
-arch = platform.machine()
-checks = {
-    "llama_cpp": importlib.util.find_spec("llama_cpp") is not None,
-    "mlx_lm": importlib.util.find_spec("mlx_lm") is not None,
-}
 lang = os.environ.get("PY_LANG", "de")
-print(f"   {'Architecture' if lang == 'en' else 'Architektur'}: {arch}")
-print(f"   llama_cpp: {'ok' if checks['llama_cpp'] else ('missing' if lang == 'en' else 'fehlt')}")
-if arch == "arm64":
-    print(f"   mlx_lm: {'ok' if checks['mlx_lm'] else ('missing' if lang == 'en' else 'fehlt')}")
+os_name = os.environ.get("PY_OS", "")
+arch = platform.machine()
 
-if not checks["llama_cpp"] and not (arch == "arm64" and checks["mlx_lm"]):
-    if lang == "en":
-        print("❌ No usable LLM backend was found.")
-        print("   Installable backends for this build are: llama_cpp on all Macs, mlx_lm on Apple Silicon.")
-    else:
-        print("❌ Kein nutzbares LLM-Backend gefunden.")
-        print("   Nutzbare Backends fuer diesen Build sind: llama_cpp auf allen Macs, mlx_lm auf Apple Silicon.")
+def label(de, en):
+    return en if lang == "en" else de
+
+required = {
+    "colorama": importlib.util.find_spec("colorama") is not None,
+    "yaml": importlib.util.find_spec("yaml") is not None,
+    "requests": importlib.util.find_spec("requests") is not None,
+}
+
+for name, ok in required.items():
+    print(f"   {name}: {'ok' if ok else label('fehlt', 'missing')}")
+    if not ok:
+        raise SystemExit(1)
+
+llama_ok = importlib.util.find_spec("llama_cpp") is not None
+mlx_ok = importlib.util.find_spec("mlx_lm") is not None
+print(f"   {label('Architektur', 'Architecture')}: {arch}")
+print(f"   llama_cpp: {'ok' if llama_ok else label('fehlt', 'missing')}")
+if os_name == "Darwin" and arch == "arm64":
+    print(f"   mlx_lm: {'ok' if mlx_ok else label('optional fehlt', 'optional missing')}")
+
+if not llama_ok and not (os_name == "Darwin" and arch == "arm64" and mlx_ok):
+    print(label("❌ Kein nutzbares LLM-Backend gefunden.", "❌ No usable LLM backend was found."))
     raise SystemExit(1)
-EOF
+PY
 
-# -------------------------------------------------
-# Abschluss
-# -------------------------------------------------
 echo ""
 t "✅ Installation abgeschlossen!" "✅ Installation complete!"
 t "👉 MAAT-RPG startet jetzt…" "👉 MAAT-RPG is starting now…"

@@ -17,6 +17,7 @@ import importlib.util
 import subprocess
 import sys
 import time
+from shared.core.audio import music_enabled, play_audio_process, stop_audio_process
 from shared.core.maat_paths import data_file, state_file, log_file
 
 
@@ -108,8 +109,7 @@ def _story_text_speed() -> float:
 
 
 def _music_enabled() -> bool:
-    settings = _load_settings()
-    return bool(settings.get("music_enabled", True))
+    return music_enabled()
 
 
 class Plugin:
@@ -332,29 +332,16 @@ class Plugin:
         # ggf. alten Prozess beenden
         self._stop_music()
 
-        try:
-            self._music_proc = subprocess.Popen(
-                ["afplay", path],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
-        except Exception as e:
-            print(f"⚠ Konnte Musik nicht starten: {e}")
-            self._music_proc = None
+        self._music_proc = play_audio_process(path)
+        if self._music_proc is None:
+            print("⚠ Konnte Musik nicht starten.")
 
     def _stop_music(self):
         """
         Beendet NUR den eigenen Musikprozess, nicht global alle afplay.
         """
-        if self._music_proc is not None:
-            try:
-                # Falls noch laufend -> terminieren
-                if self._music_proc.poll() is None:
-                    self._music_proc.terminate()
-            except Exception:
-                pass
-            finally:
-                self._music_proc = None
+        stop_audio_process(self._music_proc)
+        self._music_proc = None
 
     # -------------------------------------------------
     # STORY LADEN

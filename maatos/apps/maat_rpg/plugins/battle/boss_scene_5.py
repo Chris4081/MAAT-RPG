@@ -4,7 +4,7 @@
 import os
 import time
 from colorama import Fore, Style
-from shared.core.audio import music_enabled
+from shared.core.audio import music_enabled, play_audio_process, stop_audio_process
 
 # --------------------------------------------------------
 # Musiksteuerung
@@ -16,20 +16,11 @@ def play_scene_music(plugin_dir):
     track = os.path.join(plugin_dir, "music", "boss_scene_5.mp3")
     if not os.path.isfile(track):
         return None
-
-    pid = os.fork()
-    if pid == 0:
-        os.system(f"afplay '{track}' >/dev/null 2>&1")
-        os._exit(0)
-    return pid
+    return play_audio_process(track)
 
 
-def stop_scene_music(pid):
-    if pid:
-        try:
-            os.system("killall afplay >/dev/null 2>&1")
-        except:
-            pass
+def stop_scene_music(proc):
+    stop_audio_process(proc)
 
 
 # --------------------------------------------------------
@@ -52,7 +43,7 @@ class Scene:
         self.plugin_dir = plugin_dir
 
     def run(self):
-        pid = play_scene_music(self.plugin_dir)
+        proc = play_scene_music(self.plugin_dir)
 
         lines = [
             "⸻",
@@ -116,7 +107,7 @@ class Scene:
         choice = input("> ").strip().lower()
 
         if choice != "j":
-            stop_scene_music(pid)
+            stop_scene_music(proc)
             print("\n🎵 Musik gestoppt.\n")
         else:
             print("\n🎵 Musik läuft weiter…\n")

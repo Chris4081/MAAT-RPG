@@ -1,5 +1,18 @@
 # shared/core/backend_router.py
 
+import platform
+
+
+def mlx_supported() -> bool:
+    return platform.system() == "Darwin" and platform.machine().lower() == "arm64"
+
+
+def normalize_backend_name(backend: str | None) -> str:
+    name = (backend or "auto").lower()
+    if name == "mlx" and not mlx_supported():
+        return "llama"
+    return name
+
 def load_backend(
     model_path,
     backend="auto",
@@ -10,10 +23,12 @@ def load_backend(
 ):
     """
     Router für alle Backends:
-    - backend="mlx"   → nur MLX
+    - backend="mlx"   → nur MLX (nur Apple Silicon / macOS)
     - backend="llama" → nur llama.cpp
-    - backend="auto"  → erst llama.cpp, bei Fehler fallback auf MLX
+    - backend="auto"  → erst llama.cpp, bei Fehler fallback auf MLX wenn unterstützt
     """
+
+    backend = normalize_backend_name(backend)
 
     mlx_kwargs = dict(
         max_ctx=max_ctx,
@@ -49,6 +64,8 @@ def load_backend(
         from .llama_backend import load as llama_load
         return llama_load(model_path, **llama_kwargs)
     except Exception as e:
+        if not mlx_supported():
+            raise
         print(f"[AUTO] llama failed -> MLX fallback\n{e}")
         from .mlx_backend import load as mlx_load
         return mlx_load(model_path, **mlx_kwargs)
@@ -79,7 +96,7 @@ def stream_chat(llm, messages, perf=None):
 
     backend = None
     if isinstance(llm, dict):
-        backend = llm.get("backend", "mlx")
+        backend = normalize_backend_name(llm.get("backend", "llama"))
     else:
         backend = "llama"
 

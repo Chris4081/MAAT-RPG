@@ -20,7 +20,7 @@ import termios
 import tty
 import select
 from shared.core.rpg_i18n import get_language
-from shared.core.audio import music_enabled
+from shared.core.audio import music_enabled, play_audio_process, stop_audio_process
 
 # Ziel-Gesamtdauer in Sekunden (3:47 = 3*60 + 47 = 227)
 TOTAL_INTRO_DURATION = 227.0
@@ -185,7 +185,7 @@ class Plugin:
         return False
 
     # -----------------------------------------------
-    # Musik (macOS, optional)
+    # Musik (afplay-first, optional)
     # -----------------------------------------------
     def _play_music(self, path: str) -> bool:
         if not music_enabled():
@@ -194,31 +194,13 @@ class Plugin:
             return False
 
         self._stop_music()
-
-        try:
-            self._music_proc = subprocess.Popen(
-                ["afplay", path],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
-            return True
-        except Exception:
-            self._music_proc = None
-            return False
+        self._music_proc = play_audio_process(path)
+        return self._music_proc is not None
 
     def _stop_music(self):
         proc = self._music_proc
         self._music_proc = None
-        if proc is None or proc.poll() is not None:
-            return
-        try:
-            proc.terminate()
-            proc.wait(timeout=1)
-        except Exception:
-            try:
-                proc.kill()
-            except Exception:
-                pass
+        stop_audio_process(proc)
 
     # -----------------------------------------------
     # Langsames Streaming

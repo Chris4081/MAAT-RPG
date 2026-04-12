@@ -7,11 +7,8 @@ Mit ENTER-Progress, Musik-Loop und J/N-Abfrage am Ende.
 """
 
 import os
-import time
-import subprocess
-import threading
 from colorama import Fore, Style
-from shared.core.audio import music_enabled
+from shared.core.audio import ManagedAudioPlayer, music_enabled
 
 
 # ==========================================================
@@ -22,42 +19,18 @@ class SceneMusic:
     def __init__(self, plugin_dir):
         self.plugin_dir = plugin_dir
         self.track = os.path.join(plugin_dir, "music", "boss_scene_3.mp3")
-        self._running = False
-        self._thread = None
-
-    def _loop(self):
-        while self._running:
-            if os.path.isfile(self.track):
-                try:
-                    subprocess.call(
-                        ["afplay", self.track],
-                        stdout=subprocess.DEVNULL,
-                        stderr=subprocess.DEVNULL
-                    )
-                except Exception:
-                    time.sleep(1)
-            else:
-                time.sleep(1)
+        self._player = ManagedAudioPlayer(self.track)
 
     def start(self):
         if not music_enabled():
             return
         if not os.path.isfile(self.track):
             return
-        self._running = True
-        self._thread = threading.Thread(target=self._loop, daemon=True)
-        self._thread.start()
+        self._player.set_track(self.track)
+        self._player.start_loop()
 
     def stop(self):
-        self._running = False
-        try:
-            subprocess.call(
-                ["killall", "afplay"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
-        except Exception:
-            pass
+        self._player.stop()
 
 
 # ==========================================================

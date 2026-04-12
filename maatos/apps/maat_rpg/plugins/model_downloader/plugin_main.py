@@ -7,7 +7,7 @@ MAAT-OS | Model Downloader Plugin (resumable)
 • Resume via .part Datei
 • Fortschritt immer sichtbar
 • Retries bei Timeout/Verbindungsfehlern
-• Musik während des Downloads (macOS)
+• Musik während des Downloads (afplay-first, Linux-fähig)
 • Kein hartes sys.exit im Plugin
 """
 
@@ -23,6 +23,8 @@ from typing import Optional
 
 import requests
 from colorama import Fore, Style
+from shared.core.audio import ManagedAudioPlayer
+from shared.core.maat_paths import get_models_dir as shared_get_models_dir, state_file
 from shared.core.rpg_i18n import get_language
 
 # ==========================================================
@@ -128,7 +130,7 @@ DOWNLOADER_TEXT = {
         "family_prompt": "Auswahl [1/2, Enter = Empfehlung]: ",
         "family_1": "[1] TeichAI Qwen3-14B Claude Distill (empfohlen)",
         "family_2": "[2] Meta-Llama-3.1-8B Instruct 128k (Alternative ohne Qwen)",
-        "recommend_q3": "💡 Empfehlung: TeichAI Qwen3-14B Q3_K_M fuer Intel oder Macs mit 16 GB RAM und weniger.",
+        "recommend_q3": "💡 Empfehlung: TeichAI Qwen3-14B Q3_K_M fuer x86_64/Intel-Systeme oder Geraete mit 16 GB RAM und weniger.",
         "recommend_q4": "💡 Empfehlung: TeichAI Qwen3-14B Q4_K_M fuer Apple Silicon ab 17 GB RAM.",
         "recommend_q5": "💡 Empfehlung: TeichAI Qwen3-14B Q5_K_M fuer Apple Silicon mit 32 GB RAM oder mehr.",
         "recommend_llama": "💡 Alternative: Meta-Llama-3.1-8B Q4_0 fuer Nutzer, die kein Qwen-Modell moechten.",
@@ -141,7 +143,7 @@ DOWNLOADER_TEXT = {
         "hub_start": "🤗 Download von Hugging Face startet …",
         "download_header": "🌿 MAAT-RPG Modell-Download",
         "tip_header": "💡 MAAT-Hinweise waehrend des Downloads",
-        "tip_1": "• MAAT-RPG laeuft lokal auf deinem Mac.",
+        "tip_1": "• MAAT-RPG laeuft lokal auf deinem System.",
         "tip_2": "• /journal zeigt Maatis' Weg und Entscheidungen.",
         "tip_3": "• Guide-Kaempfe veraendern deinen Spielstand nicht.",
         "tip_4": "• Sprache kannst du spaeter im Menue umstellen.",
@@ -179,7 +181,7 @@ DOWNLOADER_TEXT = {
         "family_prompt": "Choice [1/2, Enter = recommended]: ",
         "family_1": "[1] TeichAI Qwen3-14B Claude Distill (recommended)",
         "family_2": "[2] Meta-Llama-3.1-8B Instruct 128k (non-Qwen alternative)",
-        "recommend_q3": "💡 Recommendation: TeichAI Qwen3-14B Q3_K_M for Intel or Macs with 16 GB RAM and below.",
+        "recommend_q3": "💡 Recommendation: TeichAI Qwen3-14B Q3_K_M for x86_64/Intel systems or devices with 16 GB RAM and below.",
         "recommend_q4": "💡 Recommendation: TeichAI Qwen3-14B Q4_K_M for Apple Silicon with 17 GB RAM or more.",
         "recommend_q5": "💡 Recommendation: TeichAI Qwen3-14B Q5_K_M for Apple Silicon with 32 GB RAM or more.",
         "recommend_llama": "💡 Alternative: Meta-Llama-3.1-8B Q4_0 for users who do not want a Qwen model.",
@@ -192,7 +194,7 @@ DOWNLOADER_TEXT = {
         "hub_start": "🤗 Starting download from Hugging Face …",
         "download_header": "🌿 MAAT-RPG model download",
         "tip_header": "💡 MAAT hints while downloading",
-        "tip_1": "• MAAT-RPG runs locally on your Mac.",
+        "tip_1": "• MAAT-RPG runs locally on your system.",
         "tip_2": "• /journal shows Maatis' path and decisions.",
         "tip_3": "• Guide battles do not change your progression.",
         "tip_4": "• You can change the language later in the menu.",
@@ -218,14 +220,7 @@ def _yes(choice: str) -> bool:
 # PATH HELPERS
 # ==========================================================
 def get_models_dir() -> Path:
-    env_dir = os.environ.get("MAAT_MODELS_DIR")
-    if env_dir:
-        path = Path(env_dir)
-    else:
-        path = Path.home() / "Library" / "Application Support" / "MAAT-RPG" / "models"
-
-    path.mkdir(parents=True, exist_ok=True)
-    return path
+    return shared_get_models_dir()
 
 
 def _detect_ram_gb() -> int:
@@ -233,6 +228,12 @@ def _detect_ram_gb() -> int:
         if sys.platform == "darwin":
             raw = subprocess.check_output(["sysctl", "-n", "hw.memsize"], text=True).strip()
             return max(0, int(int(raw) / (1024 ** 3)))
+        if sys.platform.startswith("linux"):
+            with open("/proc/meminfo", "r", encoding="utf-8") as f:
+                for line in f:
+                    if line.startswith("MemTotal:"):
+                        kb = int(line.split()[1])
+                        return max(0, int(kb / (1024 ** 2)))
     except Exception:
         pass
     return 0
@@ -259,7 +260,7 @@ def _recommended_spec() -> dict:
 
 
 def _preferred_family() -> str:
-    settings_path = Path.home() / "Library" / "Application Support" / "MAAT-RPG" / "state" / "settings_state.json"
+    settings_path = Path(state_file("settings_state.json"))
     try:
         data = json.loads(settings_path.read_text(encoding="utf-8"))
         family = data.get("model_family")
@@ -271,7 +272,7 @@ def _preferred_family() -> str:
 
 
 def _save_preferred_family(family: str):
-    settings_path = Path.home() / "Library" / "Application Support" / "MAAT-RPG" / "state" / "settings_state.json"
+    settings_path = Path(state_file("settings_state.json"))
     settings_path.parent.mkdir(parents=True, exist_ok=True)
     data = {}
     try:
@@ -357,35 +358,16 @@ def _print_recommendation(chosen_family: str, spec: dict, profile: dict):
 class Music:
     def __init__(self, track_path: str):
         self.track = track_path
-        self._run = False
-        self._thread: Optional[threading.Thread] = None
-
-    def _loop(self):
-        while self._run:
-            subprocess.call(
-                ["afplay", self.track],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
+        self._player = ManagedAudioPlayer(track_path)
 
     def start(self):
-        if sys.platform != "darwin":
-            return
         if not os.path.isfile(self.track):
             return
-
-        self._run = True
-        self._thread = threading.Thread(target=self._loop, daemon=True)
-        self._thread.start()
+        self._player.set_track(self.track)
+        self._player.start_loop()
 
     def stop(self):
-        self._run = False
-        if sys.platform == "darwin":
-            subprocess.call(
-                ["killall", "afplay"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
+        self._player.stop()
 
 
 # ==========================================================

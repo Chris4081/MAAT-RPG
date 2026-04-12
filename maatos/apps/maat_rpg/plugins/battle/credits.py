@@ -13,9 +13,8 @@ Cinematic End-Credits nach dem letzten Endboss.
 
 import os
 import time
-import subprocess
 from colorama import Fore, Style
-from shared.core.audio import music_enabled
+from shared.core.audio import music_enabled, play_audio_process, stop_audio_process
 
 
 # ======================================================
@@ -24,27 +23,14 @@ from shared.core.audio import music_enabled
 
 def play_music(path):
     if not music_enabled():
-        return
-    if os.path.isfile(path):
-        try:
-            subprocess.Popen(
-                ["afplay", path],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
-        except Exception:
-            pass
+        return None
+    if not os.path.isfile(path):
+        return None
+    return play_audio_process(path)
 
 
-def stop_music():
-    try:
-        subprocess.call(
-            ["killall", "afplay"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
-        )
-    except:
-        pass
+def stop_music(proc):
+    stop_audio_process(proc)
 
 
 # ======================================================
@@ -223,7 +209,7 @@ def main():
     plugin_dir = os.path.dirname(__file__)
     music_file = os.path.join(plugin_dir, "music", "credits_theme.mp3")
 
-    play_music(music_file)
+    music_proc = play_music(music_file)
 
     lines = get_lines()
 
@@ -231,7 +217,7 @@ def main():
         print(Fore.CYAN + Style.BRIGHT + line + Style.RESET_ALL)
         wait()
 
-    stop_music()
+    stop_music(music_proc)
     print("\n🌿 Danke fürs Spielen.\n")
 
     time.sleep(2)

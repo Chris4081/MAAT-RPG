@@ -35,14 +35,23 @@ if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 _dbg("🧪 basic.py: C – ROOT done")
 
-APP_NAME = "MAAT-RPG"
-APP_SUPPORT_DIR = Path.home() / "Library" / "Application Support" / APP_NAME
-DATA_DIR = APP_SUPPORT_DIR / "data"
-MODELS_DIR = APP_SUPPORT_DIR / "models"
-LOGS_DIR = APP_SUPPORT_DIR / "logs"
-CACHE_DIR = APP_SUPPORT_DIR / "cache"
-SAVES_DIR = APP_SUPPORT_DIR / "saves"
-STATE_DIR = APP_SUPPORT_DIR / "state"
+from shared.core.maat_paths import (
+    get_app_support_dir,
+    get_data_dir,
+    get_models_dir,
+    get_logs_dir,
+    get_cache_dir,
+    get_saves_dir,
+    get_state_dir,
+)
+
+APP_SUPPORT_DIR = get_app_support_dir()
+DATA_DIR = get_data_dir()
+MODELS_DIR = get_models_dir()
+LOGS_DIR = get_logs_dir()
+CACHE_DIR = get_cache_dir()
+SAVES_DIR = get_saves_dir()
+STATE_DIR = get_state_dir()
 
 for p in [APP_SUPPORT_DIR, DATA_DIR, MODELS_DIR, LOGS_DIR, CACHE_DIR, SAVES_DIR, STATE_DIR]:
     p.mkdir(parents=True, exist_ok=True)

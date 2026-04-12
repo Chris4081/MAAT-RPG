@@ -1,8 +1,20 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
 import os
+import sys
 
 APP_NAME = "MAAT-RPG"
+
+
+def _default_app_support_dir() -> Path:
+    if sys.platform == "darwin":
+        return Path.home() / "Library" / "Application Support" / APP_NAME
+
+    xdg_data_home = os.environ.get("XDG_DATA_HOME")
+    if xdg_data_home:
+        return Path(xdg_data_home) / APP_NAME
+
+    return Path.home() / ".local" / "share" / APP_NAME
 
 
 def get_app_support_dir() -> Path:
@@ -10,7 +22,7 @@ def get_app_support_dir() -> Path:
     if env:
         path = Path(env)
     else:
-        path = Path.home() / "Library" / "Application Support" / APP_NAME
+        path = _default_app_support_dir()
     path.mkdir(parents=True, exist_ok=True)
     return path
 

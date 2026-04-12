@@ -29,7 +29,7 @@ import threading
 from colorama import Fore, Style
 import shutil
 from shared.core.maat_paths import state_file, get_data_dir
-from shared.core.audio import ManagedAudioPlayer
+from shared.core.audio import ManagedAudioPlayer, stop_all_audio_backends
 
 
 SETTINGS_FILE = state_file("settings_state.json")
@@ -109,12 +109,12 @@ TEXT = {
         "memory_confirm": "Wirklich alle Erinnerungen loeschen? (ja/nein): ",
         "memory_details": (
             "Dies loescht den Inhalt von:\n"
-            "~/Library/Application Support/MAAT-RPG/data\n\n"
+            "{path}\n\n"
             "Dort liegen globale Erinnerungen, Logs und andere Zustaende\n"
             "deiner MAAT-KI. Spielstaende im RPG (Story/Battle/Quests)\n"
             "bleiben davon unberuehrt.\n"
         ),
-        "memory_progress": "🧠 Loesche globales Memory (~/Library/Application Support/MAAT-RPG/data) ...",
+        "memory_progress": "🧠 Loesche globales Memory ({path}) ...",
         "memory_done": "✅ Alle Erinnerungen im Ordner 'data' wurden geloescht.",
         "memory_restart": (
             "Bitte starte MAAT-KI/MAAT-RPG neu, damit das System mit einem\n"
@@ -229,12 +229,12 @@ TEXT = {
         "memory_confirm": "Really delete all memories? (yes/no): ",
         "memory_details": (
             "This deletes the contents of:\n"
-            "~/Library/Application Support/MAAT-RPG/data\n\n"
+            "{path}\n\n"
             "This folder contains global memories, logs, and other MAAT-KI state.\n"
             "RPG save data (Story/Battle/Quests)\n"
             "will not be affected.\n"
         ),
-        "memory_progress": "🧠 Deleting global memory (~/Library/Application Support/MAAT-RPG/data) ...",
+        "memory_progress": "🧠 Deleting global memory ({path}) ...",
         "memory_done": "✅ All memories in the 'data' folder were deleted.",
         "memory_restart": (
             "Please restart MAAT-KI/MAAT-RPG so the system continues with\n"
@@ -295,10 +295,7 @@ def _save_settings(data: dict):
 
 
 def _stop_all_afplay():
-    try:
-        subprocess.call(["killall", "afplay"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except Exception:
-        pass
+    stop_all_audio_backends()
 
 
 def _setting_text_speed(settings: dict) -> str:
@@ -610,9 +607,10 @@ def confirm_wipe_all_memory(plugin_dir: str, menu_music: MenuMusic):
     settings = _load_settings()
     language = settings.get("language", "de")
     t = TEXT.get(language, TEXT["de"])
+    data_dir = str(get_data_dir())
     clear_screen()
     print(Fore.MAGENTA + Style.BRIGHT + t["memory_warning"] + "\n" + Style.RESET_ALL)
-    print(t["memory_details"])
+    print(t["memory_details"].format(path=data_dir))
 
     ans = input(Fore.RED + t["memory_confirm"] + Style.RESET_ALL).strip().lower()
     if not _yes(ans):
@@ -622,7 +620,7 @@ def confirm_wipe_all_memory(plugin_dir: str, menu_music: MenuMusic):
     menu_music.stop()
 
     print()
-    print(Fore.MAGENTA + t["memory_progress"] + Style.RESET_ALL)
+    print(Fore.MAGENTA + t["memory_progress"].format(path=data_dir) + Style.RESET_ALL)
     reset_global_memory(plugin_dir)
 
     print(Fore.GREEN + t["memory_done"] + Style.RESET_ALL)

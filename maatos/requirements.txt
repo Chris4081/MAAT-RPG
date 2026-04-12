@@ -10,7 +10,6 @@ sqlitedict==2.1.0
 python-dateutil==2.9.0.post0
 pydantic==1.10.13
 wikipedia
-faiss-cpu==1.13.2
 huggingface_hub
 pyyaml
-mlx_lm
+requests

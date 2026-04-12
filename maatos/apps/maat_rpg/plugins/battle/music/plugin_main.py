@@ -7,7 +7,7 @@ MAAT RPG – Battle Plugin (Standalone, Deutsch)
 • Attacke / Skills / Flucht-Menü
 • MAAT-Prinzipien als Schadenstypen
 • Eigenes XP + Level, optionale Kopplung an context["self_evo"]
-• Musik über afplay (macOS)
+• Musik mit afplay-Vorrang und Linux-Fallbacks
 • Zustand in battle_state.json
 """
 
@@ -15,7 +15,6 @@ import os
 import json
 import random
 import time
-import threading
 import subprocess
 import select
 import termios
@@ -24,7 +23,7 @@ import sys
 import datetime
 from colorama import Fore, Style
 from shared.core.maat_paths import data_file, state_file, log_file
-from shared.core.audio import music_enabled
+from shared.core.audio import ManagedAudioPlayer, music_enabled
 
 
 SETTINGS_FILE = state_file("settings_state.json")
@@ -44,58 +43,28 @@ class TitleDemoAbort(Exception):
 
 
 # =====================================================
-# 🎵 EINFACHER MUSIK-MANAGER (afplay, Loop im Thread)
+# 🎵 EINFACHER MUSIK-MANAGER
 # =====================================================
 class BattleMusicManager:
     def __init__(self, track_path: str | None):
         self.track_path = track_path
-        self._running = False
-        self._thread = None
-
-    def _loop(self):
-        while self._running:
-            if self.track_path and os.path.isfile(self.track_path):
-                try:
-                    subprocess.call(
-                        ["afplay", self.track_path],
-                        stdout=subprocess.DEVNULL,
-                        stderr=subprocess.DEVNULL,
-                    )
-                except Exception:
-                    time.sleep(1)
-            else:
-                time.sleep(1)
+        self._player = ManagedAudioPlayer(track_path)
 
     def start(self):
-        if self._running or not self.track_path or not music_enabled():
+        if not self.track_path or not music_enabled():
             return
-        self._running = True
-        self._thread = threading.Thread(target=self._loop, daemon=True)
-        self._thread.start()
+        self._player.set_track(self.track_path)
+        self._player.start_loop()
 
     def stop(self):
-        self._running = False
-        try:
-            subprocess.call(
-                ["killall", "afplay"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
-        except Exception:
-            pass
+        self._player.stop()
 
     def victory_jingle(self, victory_path: str | None):
         if not music_enabled():
             return
         if victory_path and os.path.isfile(victory_path):
-            try:
-                subprocess.Popen(
-                    ["afplay", victory_path],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                )
-            except Exception:
-                pass
+            player = ManagedAudioPlayer(victory_path)
+            player.play_once()
 
 
 # =====================================================

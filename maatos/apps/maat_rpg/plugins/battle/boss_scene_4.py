@@ -4,10 +4,9 @@
 import os
 import time
 from colorama import Fore, Style
-import subprocess
 import json
 from shared.core.maat_paths import state_file
-from shared.core.audio import music_enabled
+from shared.core.audio import music_enabled, play_audio_process, stop_audio_process
 
 
 SETTINGS_FILE = state_file("settings_state.json")
@@ -26,26 +25,18 @@ class BossScene4:
     def __init__(self, plugin_dir: str):
         self.plugin_dir = plugin_dir
         self.music = os.path.join(plugin_dir, "music", "boss_scene_4.mp3")
+        self._music_proc = None
 
     def _play_music(self):
         if not music_enabled():
             return
         if os.path.isfile(self.music):
-            subprocess.Popen(
-                ["afplay", self.music],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
+            self._stop_music()
+            self._music_proc = play_audio_process(self.music)
 
     def _stop_music(self):
-        try:
-            subprocess.call(
-                ["killall", "afplay"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
-        except:
-            pass
+        stop_audio_process(self._music_proc)
+        self._music_proc = None
 
     def run(self):
         self._play_music()

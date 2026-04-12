@@ -8,7 +8,8 @@ import platform
 import subprocess
 from pathlib import Path
 from colorama import Fore, Style
-from .backend_router import load_backend
+from .backend_router import load_backend, normalize_backend_name
+from .maat_paths import get_app_support_dir, get_data_dir, get_models_dir, state_file
 from .rpg_i18n import get_language
 
 # -------------------------------------------------------------
@@ -83,31 +84,13 @@ def _lt(key: str, **kwargs) -> str:
     return template.format(**kwargs) if kwargs else template
 
 def _app_support_dir() -> str:
-    env = os.environ.get("MAAT_APP_SUPPORT_DIR")
-    if env:
-        path = Path(env)
-    else:
-        path = Path.home() / "Library" / "Application Support" / "MAAT-RPG"
-    path.mkdir(parents=True, exist_ok=True)
-    return str(path)
+    return str(get_app_support_dir())
 
 def _data_dir() -> str:
-    env = os.environ.get("MAAT_DATA_DIR")
-    if env:
-        path = Path(env)
-    else:
-        path = Path(_app_support_dir()) / "data"
-    path.mkdir(parents=True, exist_ok=True)
-    return str(path)
+    return str(get_data_dir())
 
 def _models_dir() -> str:
-    env = os.environ.get("MAAT_MODELS_DIR")
-    if env:
-        path = Path(env)
-    else:
-        path = Path(_app_support_dir()) / "models"
-    path.mkdir(parents=True, exist_ok=True)
-    return str(path)
+    return str(get_models_dir())
 
 
 def _detect_ram_gb() -> int:
@@ -115,6 +98,12 @@ def _detect_ram_gb() -> int:
         if platform.system() == "Darwin":
             raw = subprocess.check_output(["sysctl", "-n", "hw.memsize"], text=True).strip()
             return max(0, int(int(raw) / (1024 ** 3)))
+        if platform.system() == "Linux":
+            with open("/proc/meminfo", "r", encoding="utf-8") as f:
+                for line in f:
+                    if line.startswith("MemTotal:"):
+                        kb = int(line.split()[1])
+                        return max(0, int(kb / (1024 ** 2)))
     except Exception:
         pass
     return 0
@@ -141,7 +130,7 @@ def _recommended_model_name(models: list[str]) -> str | None:
 
 
 def _preferred_family() -> str:
-    settings_path = Path.home() / "Library" / "Application Support" / "MAAT-RPG" / "state" / "settings_state.json"
+    settings_path = Path(state_file("settings_state.json"))
     try:
         data = json.loads(settings_path.read_text(encoding="utf-8"))
         family = data.get("model_family")
@@ -322,6 +311,7 @@ def auto_select_model(model_dir: str = None) -> str:
 def choose_performance() -> dict:
     saved = load_saved_perf()
     if isinstance(saved, dict):
+        saved["backend"] = normalize_backend_name(saved.get("backend", "llama"))
         print(
             Fore.GREEN
             + _lt(
@@ -376,7 +366,8 @@ def choose_performance() -> dict:
 # -------------------------------------------------------------
 
 def load_llm(model_path: str, perf: dict):
-    backend = perf.get("backend", "llama")
+    backend = normalize_backend_name(perf.get("backend", "llama"))
+    perf["backend"] = backend
 
     max_ctx = int(perf.get("n_ctx", 4096))
     temperature = float(perf.get("temperature", 0.7))

@@ -17,7 +17,7 @@ import time
 import sqlite3
 import os
 import re
-from pathlib import Path
+from shared.core.maat_paths import data_file
 from shared.core.rpg_i18n import get_language
 
 class Plugin:
@@ -49,15 +49,7 @@ class Plugin:
         # Zeitpunkt der letzten Antwort
         self.last_timestamp = time.time()
 
-        # --------------------------------------
-        # Schreibbarer Benutzerpfad für macOS
-        # --------------------------------------
-        app_support_dir = (
-            Path.home() / "Library" / "Application Support" / "MAAT-RPG" / "data"
-        )
-        app_support_dir.mkdir(parents=True, exist_ok=True)
-
-        self.db_path = str(app_support_dir / "time_memory.db")
+        self.db_path = data_file("time_memory.db")
         self._init_db()
 
     # -----------------------------------------------------
