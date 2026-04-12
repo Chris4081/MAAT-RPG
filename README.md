@@ -13,7 +13,11 @@
 - Journal, boss codex, quests, and combat progression
 - Local GGUF model loading for MAAT-OS / MAAT RPG
 
-## Gameplay Video
+## Gameplay Videos
+
+Here's a look at the intro and the battle mode.
+
+[![MAAT RPG Gameplay](https://img.youtube.com/vi/S3gQ0OWYilo/hqdefault.jpg)](https://www.youtube.com/watch?v=S3gQ0OWYilo)
 
 A first look at **MAAT RPG** in action: story flow, bilingual UI, combat, and atmosphere.
 
