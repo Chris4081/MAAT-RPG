@@ -1006,6 +1006,7 @@ def options_menu(plugin_dir: str, menu_music: MenuMusic):
                 menu_music.start()
             else:
                 menu_music.stop()
+                _stop_all_afplay()
         elif choice == "3":
             enabled = _setting_show_thinking(settings)
             settings["show_thinking"] = not enabled

@@ -4,12 +4,15 @@
 import os
 import time
 from colorama import Fore, Style
+from shared.core.audio import music_enabled
 
 # --------------------------------------------------------
 # Musiksteuerung
 # --------------------------------------------------------
 
 def play_scene_music(plugin_dir):
+    if not music_enabled():
+        return None
     track = os.path.join(plugin_dir, "music", "boss_scene_5.mp3")
     if not os.path.isfile(track):
         return None

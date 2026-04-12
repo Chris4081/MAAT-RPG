@@ -1,15 +1,27 @@
 # -*- coding: utf-8 -*-
 """Shared audio helpers for macOS-backed playback."""
 
+import json
 import os
 import shutil
 import subprocess
 import threading
 import time
 
+from .maat_paths import state_file
+
 
 def _afplay_path() -> str | None:
     return shutil.which("afplay")
+
+
+def music_enabled(default: bool = True) -> bool:
+    try:
+        with open(state_file("settings_state.json"), "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return bool(data.get("music_enabled", default))
+    except Exception:
+        return bool(default)
 
 
 class ManagedAudioPlayer:

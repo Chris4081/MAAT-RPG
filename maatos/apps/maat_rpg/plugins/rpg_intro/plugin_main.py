@@ -20,6 +20,7 @@ import termios
 import tty
 import select
 from shared.core.rpg_i18n import get_language
+from shared.core.audio import music_enabled
 
 # Ziel-Gesamtdauer in Sekunden (3:47 = 3*60 + 47 = 227)
 TOTAL_INTRO_DURATION = 227.0
@@ -187,6 +188,8 @@ class Plugin:
     # Musik (macOS, optional)
     # -----------------------------------------------
     def _play_music(self, path: str) -> bool:
+        if not music_enabled():
+            return False
         if not path or not os.path.isfile(path):
             return False
 

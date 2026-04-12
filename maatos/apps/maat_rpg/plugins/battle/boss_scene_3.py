@@ -11,6 +11,7 @@ import time
 import subprocess
 import threading
 from colorama import Fore, Style
+from shared.core.audio import music_enabled
 
 
 # ==========================================================
@@ -39,6 +40,8 @@ class SceneMusic:
                 time.sleep(1)
 
     def start(self):
+        if not music_enabled():
+            return
         if not os.path.isfile(self.track):
             return
         self._running = True

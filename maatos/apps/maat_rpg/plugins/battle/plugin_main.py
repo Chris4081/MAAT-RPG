@@ -24,7 +24,7 @@ import io
 import contextlib
 from colorama import Fore, Style
 from shared.core.maat_paths import data_file, state_file, log_file
-from shared.core.audio import ManagedAudioPlayer
+from shared.core.audio import ManagedAudioPlayer, music_enabled
 from shared.core.rpg_i18n import get_language
 
 
@@ -574,12 +574,16 @@ class BattleMusicManager:
         self._player = ManagedAudioPlayer(track_path)
 
     def start(self):
+        if not music_enabled():
+            return
         self._player.start_loop(self.track_path)
 
     def stop(self):
         self._player.stop()
 
     def victory_jingle(self, path: str | None):
+        if not music_enabled():
+            return
         self._player.play_once(path)
 
 

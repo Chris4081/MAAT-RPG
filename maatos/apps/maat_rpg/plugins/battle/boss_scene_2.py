@@ -12,6 +12,7 @@ Cinematic nach dem 2. Boss
 import os
 import subprocess
 import time
+from shared.core.audio import music_enabled
 
 
 # ---------------------------------------------------------
@@ -24,6 +25,8 @@ class MusicPlayer:
         self.proc = None
 
     def start(self):
+        if not music_enabled():
+            return
         if not os.path.isfile(self.path):
             return
         try:

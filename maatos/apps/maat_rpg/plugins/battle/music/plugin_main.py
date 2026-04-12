@@ -24,6 +24,7 @@ import sys
 import datetime
 from colorama import Fore, Style
 from shared.core.maat_paths import data_file, state_file, log_file
+from shared.core.audio import music_enabled
 
 
 SETTINGS_FILE = state_file("settings_state.json")
@@ -36,10 +37,6 @@ def _load_settings() -> dict:
         return data if isinstance(data, dict) else {}
     except Exception:
         return {}
-
-
-def _music_enabled() -> bool:
-    return bool(_load_settings().get("music_enabled", True))
 
 
 class TitleDemoAbort(Exception):
@@ -70,7 +67,7 @@ class BattleMusicManager:
                 time.sleep(1)
 
     def start(self):
-        if self._running or not self.track_path or not _music_enabled():
+        if self._running or not self.track_path or not music_enabled():
             return
         self._running = True
         self._thread = threading.Thread(target=self._loop, daemon=True)
@@ -88,7 +85,7 @@ class BattleMusicManager:
             pass
 
     def victory_jingle(self, victory_path: str | None):
-        if not _music_enabled():
+        if not music_enabled():
             return
         if victory_path and os.path.isfile(victory_path):
             try:

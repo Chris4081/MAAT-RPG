@@ -12,6 +12,7 @@ Cinematic Zwischensequenz nach dem 1. Boss-Sieg
 import os
 import subprocess
 import time
+from shared.core.audio import music_enabled
 
 # ---------------------------------------------------------
 # MUSIC PLAYER
@@ -23,6 +24,8 @@ class MusicPlayer:
         self.proc = None
 
     def start(self):
+        if not music_enabled():
+            return
         if not os.path.isfile(self.path):
             return
         try:

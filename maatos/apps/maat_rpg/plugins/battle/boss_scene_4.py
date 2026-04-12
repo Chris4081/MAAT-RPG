@@ -7,6 +7,7 @@ from colorama import Fore, Style
 import subprocess
 import json
 from shared.core.maat_paths import state_file
+from shared.core.audio import music_enabled
 
 
 SETTINGS_FILE = state_file("settings_state.json")
@@ -21,17 +22,13 @@ def _load_settings() -> dict:
         return {}
 
 
-def _music_enabled() -> bool:
-    return bool(_load_settings().get("music_enabled", True))
-
-
 class BossScene4:
     def __init__(self, plugin_dir: str):
         self.plugin_dir = plugin_dir
         self.music = os.path.join(plugin_dir, "music", "boss_scene_4.mp3")
 
     def _play_music(self):
-        if not _music_enabled():
+        if not music_enabled():
             return
         if os.path.isfile(self.music):
             subprocess.Popen(

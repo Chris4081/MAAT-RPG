@@ -15,6 +15,7 @@ import os
 import time
 import subprocess
 from colorama import Fore, Style
+from shared.core.audio import music_enabled
 
 
 # ======================================================
@@ -22,6 +23,8 @@ from colorama import Fore, Style
 # ======================================================
 
 def play_music(path):
+    if not music_enabled():
+        return
     if os.path.isfile(path):
         try:
             subprocess.Popen(
