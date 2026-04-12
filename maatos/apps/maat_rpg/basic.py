@@ -84,7 +84,7 @@ from shared.core.llm_loader import (
 )
 _dbg("🧪 basic.py: F – llm_loader imported")
 
-from shared.core.streaming import stream_chat_completion, stream_to_console
+from shared.core.streaming import stream_chat_completion, stream_to_console, stream_text_to_console
 _dbg("🧪 basic.py: G – streaming imported")
 
 from shared.core.command_router import CommandRouter
@@ -301,6 +301,7 @@ def _localize_path_profile(profile: dict, language: str) -> dict:
         "Grenzhüter der Erinnerung": "Boundary Keeper of Memory",
         "Klangsucher der Harmonie": "Tone Seeker of Harmony",
         "Formträger der Schöpfung": "Form Bearer of Creation",
+        "Formträger der Erinnerung": "Form Bearer of Memory",
         "Wegsucher": "Path Seeker",
     }
     rank_map = {
@@ -312,6 +313,8 @@ def _localize_path_profile(profile: dict, language: str) -> dict:
         "Wahrheit darf Grenzen nicht verletzen.": "Truth must not violate boundaries.",
         "Erinnerung darf nicht zu Besitz werden.": "Memory must not become possession.",
         "Harmonie ohne Wahrheit bleibt fragil.": "Harmony without truth remains fragile.",
+        "Moeglichkeit wird zum Echo der Welt.": "Possibility becomes the echo of the world.",
+        "Möglichkeit wird zum Echo der Welt.": "Possibility becomes the echo of the world.",
     }
 
     title = localized.get("title")
@@ -653,6 +656,8 @@ def start_classic():
 
             # BEFORE HOOKS
             if pm:
+                context["conversation"] = conversation
+                context["last_user_input"] = user_input
                 handled, out = pm.handle_before_chat(user_input, context)
                 if handled:
                     if out:
@@ -663,11 +668,13 @@ def start_classic():
 
             # MODEL CALL (stream)
             conversation.append({"role": "user", "content": user_input})
+            context["conversation"] = conversation
+            use_final_guard = bool(pm and pm.has_before_final_response(context))
 
-            stream_plugins = pm.get_streaming_plugins() if pm else []
+            stream_plugins = [] if use_final_guard else (pm.get_streaming_plugins() if pm else [])
             generator = stream_chat_completion(llm, conversation, perf, stream_plugins)
 
-            reply = stream_to_console(generator)
+            reply = stream_to_console(generator, echo=not use_final_guard)
             original_reply = reply or ""
 
             # AFTER HOOKS
@@ -675,8 +682,17 @@ def start_classic():
                 new_reply = pm.handle_after_response(reply, context)
                 if new_reply is not None:
                     reply = new_reply
+                if use_final_guard:
+                    guarded_reply = pm.handle_before_final_response(reply, context)
+                    if guarded_reply is not None:
+                        reply = guarded_reply
 
-            if reply != original_reply:
+            if use_final_guard:
+                if reply.strip():
+                    stream_text_to_console(reply)
+                if pm:
+                    pm.handle_after_final_response(reply, context)
+            elif reply != original_reply:
                 extra = reply[len(original_reply):]
                 if extra.strip():
                     print(extra)

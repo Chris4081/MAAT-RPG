@@ -79,11 +79,12 @@ TEXT = {
         "opt_text_speed": "[1] Story-Texttempo: {value}",
         "opt_music": "[2] Musik: {value}",
         "opt_thinking": "[3] Thinking anzeigen: {value}",
-        "opt_reset": "[4] Zaehler zuruecksetzen (Story + Battle)",
-        "opt_full_reset": "[5] Alles zuruecksetzen (Story + Battle + Self-Evo)",
-        "opt_memory": "[6] Alle Erinnerungen loeschen (Application Support/MAAT-RPG/data)",
-        "opt_language": "[7] Sprache wechseln",
-        "opt_back": "[8] Zurueck",
+        "opt_hallu": "[4] Hallu-Modus: {value}",
+        "opt_reset": "[5] Zaehler zuruecksetzen (Story + Battle)",
+        "opt_full_reset": "[6] Alles zuruecksetzen (Story + Battle + Self-Evo)",
+        "opt_memory": "[7] Alle Erinnerungen loeschen (Application Support/MAAT-RPG/data)",
+        "opt_language": "[8] Sprache wechseln",
+        "opt_back": "[9] Zurueck",
         "speed_slow": "Langsam",
         "speed_fast": "Schnell",
         "music_on": "An",
@@ -106,8 +107,54 @@ TEXT = {
         "reset_confirm": "Bist du sicher? (ja/nein): ",
         "memory_warning": "⚠ WARNUNG: Alle Erinnerungen loeschen",
         "memory_confirm": "Wirklich alle Erinnerungen loeschen? (ja/nein): ",
+        "memory_details": (
+            "Dies loescht den Inhalt von:\n"
+            "~/Library/Application Support/MAAT-RPG/data\n\n"
+            "Dort liegen globale Erinnerungen, Logs und andere Zustaende\n"
+            "deiner MAAT-KI. Spielstaende im RPG (Story/Battle/Quests)\n"
+            "bleiben davon unberuehrt.\n"
+        ),
+        "memory_progress": "🧠 Loesche globales Memory (~/Library/Application Support/MAAT-RPG/data) ...",
+        "memory_done": "✅ Alle Erinnerungen im Ordner 'data' wurden geloescht.",
+        "memory_restart": (
+            "Bitte starte MAAT-KI/MAAT-RPG neu, damit das System mit einem\n"
+            "frischen Gedaechtnis weiterlaeuft.\n"
+        ),
         "new_game_title": "✨ Neues Spiel – Neues Aeon",
         "new_game_confirm": "Fortfahren und alles loeschen? (ja/nein): ",
+        "reset_full_details": (
+            "Dies setzt zurueck:\n"
+            "  • Story-Fortschritt\n"
+            "  • Battle-Status (Kaempfe, Bosse, Prinzipien)\n"
+            "  • Self-Evolution (Level & XP)\n\n"
+            "Alle Fortschritte gehen verloren. Du beginnst ein neues Aeon."
+        ),
+        "reset_small_details": (
+            "Dies setzt zurueck:\n"
+            "  • Story-Zaehler (Nachrichten, gespielte Kapitel)\n"
+            "  • Battle-Zustand (Kaempfe, Freischaltung Kampfmodus)\n\n"
+            "Self-Evolution (Level & XP) bleibt erhalten."
+        ),
+        "reset_progress_full": "🔁 Setze Story, Battle und Self-Evolution zurueck ...",
+        "reset_progress_small": "🔁 Setze Story- und Battle-Zaehler zurueck ...",
+        "reset_story_done": "📖 Story- und Battle-Zustand zurueckgesetzt.",
+        "reset_quests_done": "🏹 Quests & Achievements wurden zurueckgesetzt.",
+        "reset_self_evo_done": "🧬 Self-Evolution wurde ebenfalls zurueckgesetzt.",
+        "reset_done": "✅ Reset abgeschlossen.",
+        "reset_restart": (
+            "MAAT-KI wird jetzt beendet. Bitte starte MAAT-RPG neu,\n"
+            "um mit einem frischen Spielstand zu beginnen.\n"
+        ),
+        "new_game_details": (
+            "Du beginnst eine neue Reise im Aeon der MAAT.\n"
+            "Dein bisheriger Fortschritt wird vollstaendig geloescht:\n"
+            "  • Story\n"
+            "  • Battle\n"
+            "  • Self-Evolution\n"
+        ),
+        "new_game_done": "📖 Story, ⚔ Battle, 🏹 Quests/Achievements und 🧬 Self-Evo wurden zurueckgesetzt.",
+        "new_game_ready": "✅ Neues Spiel vorbereitet.",
+        "new_game_restart": "Bitte starte MAAT-RPG neu, um das neue Aeon zu beginnen.\n",
     },
     "en": {
         "lang_title": "Choose language",
@@ -152,11 +199,12 @@ TEXT = {
         "opt_text_speed": "[1] Story text speed: {value}",
         "opt_music": "[2] Music: {value}",
         "opt_thinking": "[3] Show thinking: {value}",
-        "opt_reset": "[4] Reset counters (Story + Battle)",
-        "opt_full_reset": "[5] Reset everything (Story + Battle + Self-Evo)",
-        "opt_memory": "[6] Delete all memories (Application Support/MAAT-RPG/data)",
-        "opt_language": "[7] Change language",
-        "opt_back": "[8] Back",
+        "opt_hallu": "[4] Hallu mode: {value}",
+        "opt_reset": "[5] Reset counters (Story + Battle)",
+        "opt_full_reset": "[6] Reset everything (Story + Battle + Self-Evo)",
+        "opt_memory": "[7] Delete all memories (Application Support/MAAT-RPG/data)",
+        "opt_language": "[8] Change language",
+        "opt_back": "[9] Back",
         "speed_slow": "Slow",
         "speed_fast": "Fast",
         "music_on": "On",
@@ -179,8 +227,54 @@ TEXT = {
         "reset_confirm": "Are you sure? (yes/no): ",
         "memory_warning": "⚠ WARNING: Delete all memories",
         "memory_confirm": "Really delete all memories? (yes/no): ",
+        "memory_details": (
+            "This deletes the contents of:\n"
+            "~/Library/Application Support/MAAT-RPG/data\n\n"
+            "This folder contains global memories, logs, and other MAAT-KI state.\n"
+            "RPG save data (Story/Battle/Quests)\n"
+            "will not be affected.\n"
+        ),
+        "memory_progress": "🧠 Deleting global memory (~/Library/Application Support/MAAT-RPG/data) ...",
+        "memory_done": "✅ All memories in the 'data' folder were deleted.",
+        "memory_restart": (
+            "Please restart MAAT-KI/MAAT-RPG so the system continues with\n"
+            "a fresh memory state.\n"
+        ),
         "new_game_title": "✨ New Game – New Aeon",
         "new_game_confirm": "Continue and delete everything? (yes/no): ",
+        "reset_full_details": (
+            "This resets:\n"
+            "  • story progress\n"
+            "  • battle status (fights, bosses, principles)\n"
+            "  • self-evolution (level & XP)\n\n"
+            "All progress will be lost. You begin a new aeon."
+        ),
+        "reset_small_details": (
+            "This resets:\n"
+            "  • story counters (messages, played chapters)\n"
+            "  • battle state (fights, combat unlock)\n\n"
+            "Self-evolution (level & XP) is kept."
+        ),
+        "reset_progress_full": "🔁 Resetting Story, Battle, and Self-Evolution ...",
+        "reset_progress_small": "🔁 Resetting Story and Battle counters ...",
+        "reset_story_done": "📖 Story and battle state reset.",
+        "reset_quests_done": "🏹 Quests and achievements reset.",
+        "reset_self_evo_done": "🧬 Self-evolution was reset as well.",
+        "reset_done": "✅ Reset complete.",
+        "reset_restart": (
+            "MAAT-KI will now close. Please restart MAAT-RPG\n"
+            "to begin with a fresh save state.\n"
+        ),
+        "new_game_details": (
+            "You are beginning a new journey in the Aeon of MAAT.\n"
+            "Your previous progress will be fully deleted:\n"
+            "  • Story\n"
+            "  • Battle\n"
+            "  • Self-Evolution\n"
+        ),
+        "new_game_done": "📖 Story, ⚔ Battle, 🏹 Quests/Achievements, and 🧬 Self-Evo were reset.",
+        "new_game_ready": "✅ New game prepared.",
+        "new_game_restart": "Please restart MAAT-RPG to begin the new aeon.\n",
     },
 }
 
@@ -220,12 +314,17 @@ def _setting_show_thinking(settings: dict) -> bool:
     return bool(settings.get("show_thinking", False))
 
 
-def _settings_labels(language: str, settings: dict) -> tuple[str, str, str]:
+def _setting_hallu_mode(settings: dict) -> bool:
+    return bool(settings.get("hallu_mode", False))
+
+
+def _settings_labels(language: str, settings: dict) -> tuple[str, str, str, str]:
     t = TEXT.get(language, TEXT["de"])
     speed = t["speed_slow"] if _setting_text_speed(settings) == "slow" else t["speed_fast"]
     music = t["music_on"] if _setting_music_enabled(settings) else t["music_off"]
     thinking = t["music_on"] if _setting_show_thinking(settings) else t["music_off"]
-    return speed, music, thinking
+    hallu = t["music_on"] if _setting_hallu_mode(settings) else t["music_off"]
+    return speed, music, thinking, hallu
 # ==========================
 # 🎵 Menü-Musik (optional)
 # ==========================
@@ -289,6 +388,7 @@ def _localize_path_profile(profile: dict, language: str) -> dict:
         "Grenzhüter der Erinnerung": "Boundary Keeper of Memory",
         "Klangsucher der Harmonie": "Tone Seeker of Harmony",
         "Formträger der Schöpfung": "Form Bearer of Creation",
+        "Formträger der Erinnerung": "Form Bearer of Memory",
         "Wegsucher": "Path Seeker",
     }
     rank_map = {
@@ -300,6 +400,8 @@ def _localize_path_profile(profile: dict, language: str) -> dict:
         "Wahrheit darf Grenzen nicht verletzen.": "Truth must not violate boundaries.",
         "Erinnerung darf nicht zu Besitz werden.": "Memory must not become possession.",
         "Harmonie ohne Wahrheit bleibt fragil.": "Harmony without truth remains fragile.",
+        "Moeglichkeit wird zum Echo der Welt.": "Possibility becomes the echo of the world.",
+        "Möglichkeit wird zum Echo der Welt.": "Possibility becomes the echo of the world.",
     }
 
     title = localized.get("title")
@@ -510,13 +612,7 @@ def confirm_wipe_all_memory(plugin_dir: str, menu_music: MenuMusic):
     t = TEXT.get(language, TEXT["de"])
     clear_screen()
     print(Fore.MAGENTA + Style.BRIGHT + t["memory_warning"] + "\n" + Style.RESET_ALL)
-    print(
-        "Dies löscht den Inhalt von:\n"
-        "~/Library/Application Support/MAAT-RPG/data\n\n"
-        "Dort liegen globale Erinnerungen, Logs und andere Zustände\n"
-        "deiner MAAT-KI. Spielstände im RPG (Story/Battle/Quests)\n"
-        "bleiben davon unberührt.\n"
-    )
+    print(t["memory_details"])
 
     ans = input(Fore.RED + t["memory_confirm"] + Style.RESET_ALL).strip().lower()
     if not _yes(ans):
@@ -526,13 +622,12 @@ def confirm_wipe_all_memory(plugin_dir: str, menu_music: MenuMusic):
     menu_music.stop()
 
     print()
-    print(Fore.MAGENTA + "🧠 Lösche globales Memory (~/Library/Application Support/MAAT-RPG/data) ..." + Style.RESET_ALL)
+    print(Fore.MAGENTA + t["memory_progress"] + Style.RESET_ALL)
     reset_global_memory(plugin_dir)
 
-    print(Fore.GREEN + "✅ Alle Erinnerungen im Ordner 'data' wurden gelöscht." + Style.RESET_ALL)
+    print(Fore.GREEN + t["memory_done"] + Style.RESET_ALL)
     print()
-    print("Bitte starte MAAT-KI/MAAT-RPG neu, damit das System mit einem\n"
-          "frischen Gedächtnis weiterläuft.\n")
+    print(t["memory_restart"])
     time.sleep(2)
     sys.exit(0)
 
@@ -540,10 +635,10 @@ def reset_global_memory(plugin_dir: str):
     data_dir = str(get_data_dir())
 
     if not os.path.isdir(data_dir):
-        print(f"[MEMORY RESET] Kein 'data' Verzeichnis gefunden unter: {data_dir}")
+        print(f"[MEMORY RESET] No 'data' directory found under: {data_dir}")
         return
 
-    print(f"[MEMORY RESET] Leere globales Memory-Verzeichnis: {data_dir}")
+    print(f"[MEMORY RESET] Clearing global memory directory: {data_dir}")
 
     for entry in os.listdir(data_dir):
         path = os.path.join(data_dir, entry)
@@ -553,7 +648,7 @@ def reset_global_memory(plugin_dir: str):
             elif os.path.isdir(path):
                 shutil.rmtree(path)
         except Exception as e:
-            print(f"[MEMORY RESET] Fehler beim Löschen von {path}: {e}")
+            print(f"[MEMORY RESET] Error deleting {path}: {e}")
 
 
 
@@ -828,7 +923,7 @@ def show_info_menu():
         elif choice == "4":
             break
         else:
-            print(Fore.RED + "Ungültige Auswahl." + Style.RESET_ALL)
+            print(Fore.RED + t["invalid"] + Style.RESET_ALL)
             time.sleep(1)
 
 
@@ -842,21 +937,10 @@ def confirm_reset(plugin_dir: str, full_reset: bool, menu_music: MenuMusic):
     clear_screen()
     if full_reset:
         print(Fore.MAGENTA + Style.BRIGHT + t["reset_warning_full"] + "\n" + Style.RESET_ALL)
-        print(
-            "Dies setzt zurück:\n"
-            "  • Story-Fortschritt\n"
-            "  • Battle-Status (Kämpfe, Bosse, Prinzipien)\n"
-            "  • Self-Evolution (Level & XP)\n\n"
-            "Alle Fortschritte gehen verloren. Du beginnst ein neues Äon."
-        )
+        print(t["reset_full_details"])
     else:
         print(Fore.MAGENTA + Style.BRIGHT + t["reset_warning_small"] + "\n" + Style.RESET_ALL)
-        print(
-            "Dies setzt zurück:\n"
-            "  • Story-Zähler (Nachrichten, gespielte Kapitel)\n"
-            "  • Battle-Zustand (Kämpfe, Freischaltung Kampfmodus)\n\n"
-            "Self-Evolution (Level & XP) bleibt erhalten."
-        )
+        print(t["reset_small_details"])
 
     print()
     ans = input(Fore.RED + t["reset_confirm"] + Style.RESET_ALL).strip().lower()
@@ -868,9 +952,9 @@ def confirm_reset(plugin_dir: str, full_reset: bool, menu_music: MenuMusic):
 
     print()
     if full_reset:
-        print(Fore.MAGENTA + "🔁 Setze Story, Battle und Self-Evolution zurück ..." + Style.RESET_ALL)
+        print(Fore.MAGENTA + t["reset_progress_full"] + Style.RESET_ALL)
     else:
-        print(Fore.MAGENTA + "🔁 Setze Story- und Battle-Zähler zurück ..." + Style.RESET_ALL)
+        print(Fore.MAGENTA + t["reset_progress_small"] + Style.RESET_ALL)
 
     reset_story_state(plugin_dir)
     reset_battle_state(plugin_dir)
@@ -878,15 +962,14 @@ def confirm_reset(plugin_dir: str, full_reset: bool, menu_music: MenuMusic):
     if full_reset:
         reset_self_evo(plugin_dir)
 
-    print(Fore.CYAN + "📖 Story- und Battle-Zustand zurückgesetzt." + Style.RESET_ALL)
-    print(Fore.CYAN + "🏹 Quests & Achievements wurden zurückgesetzt." + Style.RESET_ALL)
+    print(Fore.CYAN + t["reset_story_done"] + Style.RESET_ALL)
+    print(Fore.CYAN + t["reset_quests_done"] + Style.RESET_ALL)
     if full_reset:
-        print(Fore.CYAN + "🧬 Self-Evolution wurde ebenfalls zurückgesetzt." + Style.RESET_ALL)
+        print(Fore.CYAN + t["reset_self_evo_done"] + Style.RESET_ALL)
 
-    print(Fore.GREEN + "✅ Reset abgeschlossen." + Style.RESET_ALL)
+    print(Fore.GREEN + t["reset_done"] + Style.RESET_ALL)
     print()
-    print("MAAT-KI wird jetzt beendet. Bitte starte MAAT-RPG neu,")
-    print("um mit einem frischen Spielstand zu beginnen.\n")
+    print(t["reset_restart"])
     time.sleep(2)
     sys.exit(0)
 
@@ -896,12 +979,13 @@ def options_menu(plugin_dir: str, menu_music: MenuMusic):
         settings = _load_settings()
         language = settings.get("language", "de")
         t = TEXT.get(language, TEXT["de"])
-        speed_label, music_label, thinking_label = _settings_labels(language, settings)
+        speed_label, music_label, thinking_label, hallu_label = _settings_labels(language, settings)
         clear_screen()
         print(Fore.YELLOW + Style.BRIGHT + t["options_title"] + "\n" + Style.RESET_ALL)
         print("  " + t["opt_text_speed"].format(value=speed_label))
         print("  " + t["opt_music"].format(value=music_label))
         print("  " + t["opt_thinking"].format(value=thinking_label))
+        print("  " + t["opt_hallu"].format(value=hallu_label))
         print(f"  {t['opt_reset']}")
         print(f"  {t['opt_full_reset']}")
         print(f"  {t['opt_memory']}")
@@ -927,16 +1011,20 @@ def options_menu(plugin_dir: str, menu_music: MenuMusic):
             settings["show_thinking"] = not enabled
             _save_settings(settings)
         elif choice == "4":
-            confirm_reset(plugin_dir, full_reset=False, menu_music=menu_music)
+            enabled = _setting_hallu_mode(settings)
+            settings["hallu_mode"] = not enabled
+            _save_settings(settings)
         elif choice == "5":
-            confirm_reset(plugin_dir, full_reset=True, menu_music=menu_music)
+            confirm_reset(plugin_dir, full_reset=False, menu_music=menu_music)
         elif choice == "6":
-            confirm_wipe_all_memory(plugin_dir, menu_music)
+            confirm_reset(plugin_dir, full_reset=True, menu_music=menu_music)
         elif choice == "7":
+            confirm_wipe_all_memory(plugin_dir, menu_music)
+        elif choice == "8":
             settings = _load_settings()
             settings["language"] = choose_language()
             _save_settings(settings)
-        elif choice == "8":
+        elif choice == "9":
             break
         else:
             print(Fore.RED + t["invalid"] + Style.RESET_ALL)
@@ -949,13 +1037,7 @@ def new_game(plugin_dir: str, menu_music: MenuMusic):
     t = TEXT.get(language, TEXT["de"])
     clear_screen()
     print(Fore.MAGENTA + Style.BRIGHT + t["new_game_title"] + "\n" + Style.RESET_ALL)
-    print(
-        "Du beginnst eine neue Reise im Äon der MAAT.\n"
-        "Dein bisheriger Fortschritt wird vollständig gelöscht:\n"
-        "  • Story\n"
-        "  • Battle\n"
-        "  • Self-Evolution\n"
-    )
+    print(t["new_game_details"])
     ans = input(Fore.RED + t["new_game_confirm"] + Style.RESET_ALL).strip().lower()
     if not _yes(ans):
         return
@@ -966,9 +1048,9 @@ def new_game(plugin_dir: str, menu_music: MenuMusic):
     reset_quests_and_achievements(plugin_dir)
     reset_self_evo(plugin_dir)
 
-    print(Fore.CYAN + "📖 Story, ⚔ Battle, 🏹 Quests/Achievements und 🧬 Self-Evo wurden zurückgesetzt." + Style.RESET_ALL)
-    print(Fore.GREEN + "\n✅ Neues Spiel vorbereitet." + Style.RESET_ALL)
-    print("Bitte starte MAAT-RPG neu, um das neue Äon zu beginnen.\n")
+    print(Fore.CYAN + t["new_game_done"] + Style.RESET_ALL)
+    print(Fore.GREEN + f"\n{t['new_game_ready']}" + Style.RESET_ALL)
+    print(t["new_game_restart"])
     time.sleep(2)
     sys.exit(0)
 
@@ -1079,6 +1161,12 @@ class Plugin:
         while thread.is_alive():
             if self._title_key_pressed():
                 demo_context["title_demo_abort"] = True
+                demo_music = demo_context.get("_battle_music_manager")
+                if demo_music is not None and hasattr(demo_music, "stop"):
+                    try:
+                        demo_music.stop()
+                    except Exception:
+                        pass
                 self.menu_music.stop()
                 _stop_all_afplay()
                 aborted = True
@@ -1088,9 +1176,15 @@ class Plugin:
             deadline = time.time() + 4.0
             while thread.is_alive() and time.time() < deadline:
                 demo_context["title_demo_abort"] = True
-                _stop_all_afplay()
+                demo_music = demo_context.get("_battle_music_manager")
+                if demo_music is not None and hasattr(demo_music, "stop"):
+                    try:
+                        demo_music.stop()
+                    except Exception:
+                        pass
                 thread.join(timeout=0.1)
-            _stop_all_afplay()
+            if thread.is_alive():
+                _stop_all_afplay()
         else:
             thread.join()
 

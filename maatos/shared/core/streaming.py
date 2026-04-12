@@ -234,7 +234,7 @@ def stream_chat_completion(llm, messages, perf, plugins=None):
 # 6) Ausgabe in die Konsole
 # =====================================================================
 
-def stream_to_console(generator):
+def stream_to_console(generator, echo: bool = True):
     """
     Liest Text-Chunks aus dem Generator, gibt sie auf der Konsole aus
     und bricht bei ESC sauber ab.
@@ -249,14 +249,16 @@ def stream_to_console(generator):
     inside_think = False
     show_thinking = _show_thinking_enabled()
     announced_thinking = False
-    print(Fore.GREEN, end="")
+    if echo:
+        print(Fore.GREEN, end="")
 
     def flush_visible(text: str):
         nonlocal full
         if not text:
             return
-        sys.stdout.write(text)
-        sys.stdout.flush()
+        if echo:
+            sys.stdout.write(text)
+            sys.stdout.flush()
         full += text
 
     def announce_thinking():
@@ -264,7 +266,8 @@ def stream_to_console(generator):
         if announced_thinking:
             return
         message = "\nMAAT-KI is thinking:\n" if _stream_lang() == "en" else "\nMAAT-KI denkt nach:\n"
-        flush_visible(message)
+        if echo:
+            flush_visible(message)
         announced_thinking = True
 
     try:
@@ -278,7 +281,8 @@ def stream_to_console(generator):
             if r:
                 ch = sys.stdin.read(1)
                 if ch == "\x1b":
-                    print(Style.RESET_ALL + "\n⏹️ Stream mit ESC abgebrochen.\n")
+                    if echo:
+                        print(Style.RESET_ALL + "\n⏹️ Stream mit ESC abgebrochen.\n")
                     return full
 
             pending += tok
@@ -321,7 +325,8 @@ def stream_to_console(generator):
                 inside_think = True
 
     except Exception as e:
-        print(Style.RESET_ALL + Fore.RED + f"[STREAM PRINT ERROR] {e}" + Style.RESET_ALL)
+        if echo:
+            print(Style.RESET_ALL + Fore.RED + f"[STREAM PRINT ERROR] {e}" + Style.RESET_ALL)
 
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
@@ -330,5 +335,28 @@ def stream_to_console(generator):
         pending = re.sub(r"</?think>", "", pending, flags=re.IGNORECASE)
         flush_visible(pending)
 
-    print(Style.RESET_ALL + "\n")
+    if echo:
+        print(Style.RESET_ALL + "\n")
     return full
+
+
+def stream_text_to_console(text: str, chunk_size: int = 8, delay: float = 0.003):
+    """
+    Zeigt bereits vorliegenden Text im selben visuellen Stil wie den normalen Stream an.
+    """
+    if not isinstance(text, str) or not text:
+        return ""
+
+    size = max(1, int(chunk_size))
+
+    def _generator():
+        for i in range(0, len(text), size):
+            yield text[i:i + size]
+            if delay > 0:
+                time.sleep(delay)
+
+    try:
+        return stream_to_console(_generator(), echo=True)
+    except Exception:
+        print(Fore.GREEN + text + Style.RESET_ALL + "\n")
+        return text

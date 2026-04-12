@@ -19,6 +19,20 @@ from shared.core.rpg_i18n import get_language
 from shared.core.maat_paths import state_file
 
 
+_GERMAN_TTS_META_LINE = re.compile(
+    r"^\s*(?:"
+    r"The user is asking\b|"
+    r"They'?ve asked\b|"
+    r"As MAAT-KI\b|"
+    r"I should respond\b|"
+    r"I'll follow\b|"
+    r"Let me craft\b|"
+    r"-\s+(?:Honest|Acknowledging|Brief|Including)\b"
+    r")",
+    re.IGNORECASE,
+)
+
+
 class Plugin:
     type = "stream"
     DEFAULT_VOICES = {
@@ -80,11 +94,32 @@ class Plugin:
     def _thinking_tts_enabled(self) -> bool:
         return self._lang() == "en" and self._show_thinking_enabled()
 
+    def _strip_meta_reasoning_for_german_tts(self, text: str) -> str:
+        if self._lang() != "de":
+            return text
+
+        lines = (text or "").splitlines()
+        kept: list[str] = []
+
+        for line in lines:
+            stripped = line.strip()
+            if not stripped:
+                kept.append(line)
+                continue
+            if _GERMAN_TTS_META_LINE.match(stripped):
+                continue
+            kept.append(line)
+
+        cleaned = "\n".join(kept)
+        cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+        return cleaned.strip()
+
     def _prepare_tts_text(self, text: str) -> str:
         cleaned = (text or "").strip()
         if self._lang() == "de" or not self._thinking_tts_enabled():
             cleaned = re.sub(r"<think>.*?</think>", "", cleaned, flags=re.IGNORECASE | re.DOTALL)
         cleaned = re.sub(r"</?think>", "", cleaned, flags=re.IGNORECASE)
+        cleaned = self._strip_meta_reasoning_for_german_tts(cleaned)
         cleaned = re.sub(r"[ \t]{2,}", " ", cleaned)
         cleaned = re.sub(r" *\n *", "\n", cleaned)
         cleaned = re.sub(r"\n{2,}", "\n", cleaned).strip()
@@ -205,6 +240,11 @@ class Plugin:
         self.buffer = ""
         self._think_buffer = ""
         self._inside_think = False
+
+    def after_final_response(self, reply, context=None):
+        if self.enabled and isinstance(reply, str) and reply.strip():
+            self._speak(reply)
+        return reply
 
     # ----------------------------------------------------
     # CHAT BEFEHLE

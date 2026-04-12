@@ -144,6 +144,22 @@ class PluginManager:
     def get_streaming_plugins(self):
         return list(self.plugins_stream)
 
+    def has_before_final_response(self, context=None):
+        for plugin in self.iter_all_plugins():
+            final_fn = getattr(plugin, "before_final_response", None)
+            if not callable(final_fn):
+                continue
+            enabled_fn = getattr(plugin, "final_response_guard_enabled", None)
+            if callable(enabled_fn):
+                try:
+                    if not enabled_fn(context):
+                        continue
+                except TypeError:
+                    if not enabled_fn():
+                        continue
+            return True
+        return False
+
     # ---------------------------------------------------------
     # BEFORE
     # ---------------------------------------------------------
@@ -266,3 +282,38 @@ class PluginManager:
                     current = new_text
 
         return current
+
+    def handle_before_final_response(self, reply: str, context=None):
+        context = context or {}
+        current = reply
+
+        for plugin in self.iter_all_plugins():
+            final_fn = getattr(plugin, "before_final_response", None)
+            if callable(final_fn):
+                enabled_fn = getattr(plugin, "final_response_guard_enabled", None)
+                if callable(enabled_fn):
+                    try:
+                        if not enabled_fn(context):
+                            continue
+                    except TypeError:
+                        if not enabled_fn():
+                            continue
+                try:
+                    new_text = final_fn(current, context)
+                except TypeError:
+                    new_text = final_fn(current)
+
+                if new_text is not None:
+                    current = new_text
+
+        return current
+
+    def handle_after_final_response(self, reply: str, context=None):
+        context = context or {}
+        for plugin in self.iter_all_plugins():
+            final_fn = getattr(plugin, "after_final_response", None)
+            if callable(final_fn):
+                try:
+                    final_fn(reply, context)
+                except TypeError:
+                    final_fn(reply)

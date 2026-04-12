@@ -210,11 +210,52 @@ class Dungeon:
             try:
                 music_cfg = {}
                 if os.path.isfile(self.boss_theme):
-                    music_cfg["battle"] = self.boss_theme  # z.B. dungeon_60/music/boss_theme.mp3
+                    music_cfg["battle"] = self.boss_theme
 
                 ctx = {
-                    "boss_name": boss_name,
-                    "music": music_cfg,
+                    "battle_profile": {
+                        "boss_name": boss_name,
+                        "narrative_prepend": _t(
+                            "🏰 Das Tor der 60 Stimmen verdichtet sich zum Bossraum. Jede Stimme wird zu einem Echo deines naechsten Schritts.",
+                            "🏰 The Gate of 60 Voices condenses into a boss chamber. Every voice becomes an echo of your next step.",
+                        ),
+                        "intro_lines": [
+                            _t(
+                                "🎭 Die Resonanz des Dungeons liegt offen ueber dem Kampf. Du hoerst nicht nur den Gegner, sondern auch den Raum.",
+                                "🎭 The resonance of the dungeon lies openly across the fight. You hear not only the enemy, but the room itself.",
+                            ),
+                        ],
+                        "victory_lines": [
+                            _t(
+                                "🔔 Mit dem Fall des Waechters antworten die 60 Stimmen nicht chaotisch, sondern geordnet.",
+                                "🔔 With the guardian's fall, the 60 voices answer not chaotically, but in order.",
+                            ),
+                        ],
+                        "defeat_lines": [
+                            _t(
+                                "🌫 Die Stimmen tragen deine Niederlage weiter durch den Tunnel. Der Dungeon merkt sich den Fehltritt.",
+                                "🌫 The voices carry your defeat through the tunnel. The dungeon remembers the misstep.",
+                            ),
+                        ],
+                        "music": music_cfg,
+                        "boss_profile": {
+                            "title": _t("Waechter der Resonanz", "Guardian of Resonance"),
+                            "intro": _t(
+                                "Die Stimmen dieses Ortes haben sich in einem einzigen Widerstand gesammelt.",
+                                "The voices of this place have gathered into a single resistance.",
+                            ),
+                            "entrance": _t(
+                                "Silberne Klanglinien laufen durch den Raum, als wuerde der Dungeon selbst seine Form pruefen.",
+                                "Silver resonance lines move through the chamber as if the dungeon itself were testing its form.",
+                            ),
+                            "taunts": [
+                                _t(
+                                    "»Wenn du durch Stimmen gehen willst, musst du lernen, welcher Klang wirklich deiner ist.«",
+                                    "\"If you want to pass through voices, you must learn which sound is truly yours.\"",
+                                ),
+                            ],
+                        },
+                    }
                 }
                 result = self.battle_core.run_fight("boss", context=ctx)
             except Exception as e:

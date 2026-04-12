@@ -20,6 +20,8 @@ import select
 import termios
 import tty
 import sys
+import io
+import contextlib
 from colorama import Fore, Style
 from shared.core.maat_paths import data_file, state_file, log_file
 from shared.core.audio import ManagedAudioPlayer
@@ -400,6 +402,8 @@ def _localize_path_profile(profile: dict | None) -> dict:
         "Erinnerung darf nicht zu Besitz werden.": "Memory must not become possession.",
         "Harmonie ohne Wahrheit bleibt fragil.": "Harmony without truth remains fragile.",
         "Maatis' Weg formt sich aus Entscheidung und Bewährung.": "Maatis' path is shaped by choice and trial.",
+        "Moeglichkeit wird zum Echo der Welt.": "Possibility becomes the echo of the world.",
+        "Möglichkeit wird zum Echo der Welt.": "Possibility becomes the echo of the world.",
     }
 
     title = profile.get("title")
@@ -574,10 +578,6 @@ class BattleMusicManager:
 
     def stop(self):
         self._player.stop()
-        try:
-            subprocess.call(["killall", "afplay"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except Exception:
-            pass
 
     def victory_jingle(self, path: str | None):
         self._player.play_once(path)
@@ -2029,6 +2029,14 @@ class BattleCore:
         Gibt Text zeichenweise im Terminal aus.
         Rein visuell – beeinflusst keine Logik.
         """
+        if isinstance(self._active_context, dict) and self._active_context.get("fast_output"):
+            delay_char = 0.0
+            delay_line = 0.0
+
+        if "\n" in text:
+            self._slow_print_lines(text.split("\n"), delay_char=delay_char, delay_line=delay_line)
+            return
+
         try:
             for ch in text:
                 if self._title_demo_should_abort(self._active_context):
@@ -2040,6 +2048,13 @@ class BattleCore:
         except KeyboardInterrupt:
             # Falls User abbrechen will → sofort alles ausgeben
             print(text)
+
+    def _slow_print_lines(self, lines, delay_char: float = 0.02, delay_line: float = 0.25):
+        """
+        Gibt mehrere Zeilen konsistent ueber denselben Ausgabepfad aus.
+        """
+        for line in lines:
+            self._slow_line(line, delay_char=delay_char, delay_line=delay_line)
 
     # ------------------------------------------
     # MAAT-FELDER AUS CONTEXT HOLEN (0..1)
@@ -2113,6 +2128,78 @@ class BattleCore:
                 "»Siehst du? Genau das habe ich dir gesagt.«\n\n"
                 "Die Stimme bleibt. Nicht laut. Aber präsent."
             )
+
+    def _resolve_battle_profile(self, context: dict | None) -> dict:
+        """
+        Zentraler Erweiterungspunkt fuer Dungeons und Sonderkaempfe.
+        Alte lose Kontext-Keys bleiben kompatibel, `battle_profile` bekommt aber Vorrang.
+        """
+        if not isinstance(context, dict):
+            return {
+                "boss_name": None,
+                "narrative_prepend": "",
+                "intro_lines": [],
+                "victory_lines": [],
+                "defeat_lines": [],
+                "music": {},
+                "boss_profile": {},
+                "enemy": {},
+            }
+
+        profile = context.get("battle_profile")
+        profile = profile if isinstance(profile, dict) else {}
+
+        music_cfg = {}
+        for candidate in (context.get("music"), profile.get("music")):
+            if isinstance(candidate, dict):
+                music_cfg.update(candidate)
+
+        def _string_list(value):
+            if not isinstance(value, list):
+                return []
+            return [item.strip() for item in value if isinstance(item, str) and item.strip()]
+
+        return {
+            "boss_name": profile.get("boss_name") or context.get("boss_name"),
+            "narrative_prepend": profile.get("narrative_prepend") or context.get("narrative_prepend") or "",
+            "intro_lines": _string_list(profile.get("intro_lines")),
+            "victory_lines": _string_list(profile.get("victory_lines")),
+            "defeat_lines": _string_list(profile.get("defeat_lines")),
+            "music": music_cfg,
+            "boss_profile": profile.get("boss_profile") if isinstance(profile.get("boss_profile"), dict) else {},
+            "enemy": profile.get("enemy") if isinstance(profile.get("enemy"), dict) else {},
+        }
+
+    def _merge_boss_profile(self, base_profile: dict, override: dict) -> dict:
+        if not isinstance(base_profile, dict):
+            base_profile = {}
+        merged = dict(base_profile)
+        if not isinstance(override, dict):
+            return merged
+
+        for key in ("title", "intro", "special", "entrance", "victory_line", "color", "phase2_color", "damage_mult"):
+            value = override.get(key)
+            if value is not None:
+                merged[key] = value
+
+        for key in ("taunts", "aura_cycle"):
+            value = override.get(key)
+            if isinstance(value, list):
+                merged[key] = list(value)
+
+        phase2 = override.get("phase2")
+        if isinstance(phase2, dict):
+            merged_phase2 = dict(merged.get("phase2") or {})
+            for key in ("name", "message", "damage_mult"):
+                value = phase2.get(key)
+                if value is not None:
+                    merged_phase2[key] = value
+            aura_cycle = phase2.get("aura_cycle")
+            if isinstance(aura_cycle, list):
+                merged_phase2["aura_cycle"] = list(aura_cycle)
+            merged["phase2"] = merged_phase2
+
+        return merged
 
     # ---------- KAMPFTYP-ENTSCHEIDUNG ----------
     def _auto_fight_type(self):
@@ -2457,6 +2544,7 @@ class BattleCore:
     def run_fight(self, ftype: str, context: dict | None = None) -> str:
         self._active_context = context if isinstance(context, dict) else None
         inner_boss = self._get_inner_boss(context)
+        battle_profile_cfg = self._resolve_battle_profile(context)
         
         s = self.state.state
         p = s["player"]
@@ -2483,9 +2571,7 @@ class BattleCore:
         stats["fights_total"] += 1
 
         # Optional: Kontext auswerten (z.B. Dungeon übergibt eigenen Bossnamen)
-        boss_name_override = None
-        if isinstance(context, dict):
-            boss_name_override = context.get("boss_name")
+        boss_name_override = battle_profile_cfg.get("boss_name")
 
         # Namen & Indizes wählen
         if ftype == "boss":
@@ -2512,6 +2598,10 @@ class BattleCore:
         enemy_name = _localize_enemy_name(enemy_name)
 
         enemy_hp, enemy_dmg_base, xp_reward = self._enemy_stats(ftype)
+        enemy_cfg = battle_profile_cfg.get("enemy") or {}
+        enemy_hp = max(1, int(round(enemy_hp * float(enemy_cfg.get("hp_mult", 1.0))))) + int(enemy_cfg.get("hp_bonus", 0))
+        enemy_dmg_base = max(1, int(round(enemy_dmg_base * float(enemy_cfg.get("damage_mult", 1.0))))) + int(enemy_cfg.get("damage_bonus", 0))
+        xp_reward = max(1, int(round(xp_reward * float(enemy_cfg.get("xp_mult", 1.0))))) + int(enemy_cfg.get("xp_bonus", 0))
         max_enemy_hp = enemy_hp
         player_hp = p["hp"]
         original_player_hp = p["hp"]
@@ -2520,6 +2610,7 @@ class BattleCore:
         story_choices = story_mods.get("choices", {})
         story_path_profile = self._get_story_path_profile(context)
         boss_profile = self._boss_profile(ftype, boss_idx, final_idx)
+        boss_profile = self._merge_boss_profile(boss_profile, battle_profile_cfg.get("boss_profile"))
         self._register_boss_codex_entry(enemy_name, boss_profile, ftype)
         sigil_line = self._apply_starting_sigil(turn_state, context)
 
@@ -2532,11 +2623,10 @@ class BattleCore:
         battle_track = None
         victory_track = None
 
-        if isinstance(context, dict):
-            music_cfg = context.get("music") or {}
-            if isinstance(music_cfg, dict):
-                battle_track = music_cfg.get("battle")
-                victory_track = music_cfg.get("victory")
+        music_cfg = battle_profile_cfg.get("music") or {}
+        if isinstance(music_cfg, dict):
+            battle_track = music_cfg.get("battle")
+            victory_track = music_cfg.get("victory")
 
         def _exists(p):
             return isinstance(p, str) and os.path.isfile(p)
@@ -2556,14 +2646,15 @@ class BattleCore:
 
         # 3) Musikmanager starten (nur wenn es wirklich eine Datei gibt)
         music = BattleMusicManager(battle_track if _exists(battle_track) else None)
+        if isinstance(context, dict):
+            context["_battle_music_manager"] = music
         music.start()
 
         log_lines = []
-        if isinstance(context, dict):
-            narrative_prepend = context.get("narrative_prepend")
-            if isinstance(narrative_prepend, str) and narrative_prepend.strip():
-                self._slow_line(narrative_prepend.strip(), delay_char=0.008, delay_line=0.3)
-                log_lines.append(narrative_prepend.strip())
+        narrative_prepend = battle_profile_cfg.get("narrative_prepend")
+        if isinstance(narrative_prepend, str) and narrative_prepend.strip():
+            self._slow_line(narrative_prepend.strip(), delay_char=0.008, delay_line=0.3)
+            log_lines.append(narrative_prepend.strip())
         fight_type = _battle_text(f"fight_type_{ftype}", ftype=ftype.upper())
         intro = _battle_text("fight_intro", enemy=enemy_name, ftype=fight_type)
         log_lines.append(intro)
@@ -2591,6 +2682,9 @@ class BattleCore:
             log_lines.append(sigil_line)
         for extra_line in story_mods.get("intro_lines", []):
             self._slow_line(Fore.GREEN + extra_line + Style.RESET_ALL, delay_char=0.008, delay_line=0.25)
+            log_lines.append(extra_line)
+        for extra_line in battle_profile_cfg.get("intro_lines", []):
+            self._slow_line(Fore.CYAN + extra_line + Style.RESET_ALL, delay_char=0.008, delay_line=0.25)
             log_lines.append(extra_line)
 
         principles = {
@@ -2894,6 +2988,9 @@ class BattleCore:
             if profile_victory:
                 self._slow_line(profile_victory, delay_char=0.008, delay_line=0.3)
                 log_lines.append(profile_victory)
+            for extra_line in battle_profile_cfg.get("victory_lines", []):
+                self._slow_line(extra_line, delay_char=0.008, delay_line=0.25)
+                log_lines.append(extra_line)
             
         else:
             # Niederlage
@@ -2923,6 +3020,9 @@ class BattleCore:
             if profile_defeat:
                 self._slow_line(profile_defeat, delay_char=0.008, delay_line=0.3)
                 log_lines.append(profile_defeat)
+            for extra_line in battle_profile_cfg.get("defeat_lines", []):
+                self._slow_line(extra_line, delay_char=0.008, delay_line=0.25)
+                log_lines.append(extra_line)
             if not (isinstance(context, dict) and context.get("guide_mode")):
                 stats["fights_lost"] += 1
                 # Zurück zum letzten Boss-Checkpoint (weiche Rücksetzung)
@@ -3423,8 +3523,14 @@ class Plugin:
                 context = {
                     "scripted_actions": list(actions),
                     "maat_fields": {"H": 0.8, "B": 0.7, "S": 0.9, "V": 0.6, "R": 1.0},
+                    "fast_output": True,
+                    "quiet_test_output": True,
                 }
-                result = self.core.run_fight(ftype, context)
+                if context.get("quiet_test_output"):
+                    with contextlib.redirect_stdout(io.StringIO()):
+                        result = self.core.run_fight(ftype, context)
+                else:
+                    result = self.core.run_fight(ftype, context)
                 if not isinstance(result, str) or not result.strip():
                     raise RuntimeError(f"Leerer Kampflog bei {ftype}")
                 snapshots.append(f"✅ {ftype}: ok")
@@ -3479,19 +3585,7 @@ class Plugin:
         Gibt Zeilen langsam wie ein Stream im Terminal aus (Typewriter-Effekt).
         """
         for line in lines:
-            for ch in line:
-                try:
-                    sys.stdout.write(ch)
-                    sys.stdout.flush()
-                except Exception:
-                    pass
-                time.sleep(delay_char)
-            try:
-                sys.stdout.write("\n")
-                sys.stdout.flush()
-            except Exception:
-                pass
-            time.sleep(delay_line)
+            self._slow_line(line, delay_char=delay_char, delay_line=delay_line)
 
     # =====================================================
     # AFTER RESPONSE → automatische Heilung

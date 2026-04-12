@@ -129,17 +129,19 @@ def start_classic():
             # BEFORE-HOOK (Plugin-Befehle & Interception)
             # --------------------------------------------
             reply = None
+            turn_context = {
+                "pm": pm,
+                "profile_loader": profile_loader,
+                "conversation": conversation,
+                "llm": llm,
+                "last_user_input": user_input,
+            }
 
             if pm is not None:
                 try:
                     handled, output = pm.handle_before_chat(
                         user_input,
-                        context={
-                            "pm": pm,
-                            "profile_loader": profile_loader,
-                            "conversation": conversation,
-                            "llm": llm
-                        }
+                        context=turn_context,
                     )
 
                     if handled:
@@ -156,11 +158,14 @@ def start_classic():
             # MODEL CALL
             # --------------------------------------------
             conversation.append({"role": "user", "content": user_input})
+            turn_context["conversation"] = conversation
+            use_final_guard = bool(pm and pm.has_before_final_response(turn_context))
 
-            stream_plugins = pm.get_streaming_plugins() if pm else []
+            stream_plugins = [] if use_final_guard else (pm.get_streaming_plugins() if pm else [])
             generator = stream_chat_completion(llm, conversation, perf, stream_plugins)
 
-            reply = stream_to_console(generator)
+            reply = stream_to_console(generator, echo=not use_final_guard)
+            original_reply = reply or ""
 
             # --------------------------------------------
             # AFTER-HOOK (Antwort verändern)
@@ -169,14 +174,23 @@ def start_classic():
                 try:
                     reply = pm.handle_after_response(
                         reply,
-                        context={
-                            "pm": pm,
-                            "conversation": conversation,
-                            "profile_loader": profile_loader
-                        }
+                        context=turn_context,
                     )
+                    if use_final_guard:
+                        reply = pm.handle_before_final_response(reply, turn_context)
                 except Exception as e:
                     print(Fore.RED + f"[PLUGIN AFTER ERROR] {e}" + Style.RESET_ALL)
+
+            if use_final_guard:
+                if isinstance(reply, str) and reply.strip():
+                    from shared.core.streaming import stream_text_to_console
+                    stream_text_to_console(reply)
+                if pm is not None:
+                    pm.handle_after_final_response(reply, turn_context)
+            elif reply != original_reply:
+                extra = reply[len(original_reply):]
+                if extra.strip():
+                    print(extra)
 
             # --------------------------------------------
             # SPEICHERN

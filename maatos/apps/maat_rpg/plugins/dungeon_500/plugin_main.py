@@ -239,23 +239,64 @@ class Dungeon500:
 
         if self.battle_core:
             try:
-                # Musikpfade absolut erzeugen
                 music_cfg = {}
                 if os.path.isfile(self.boss_theme):
-                    music_cfg["battle"] = self.boss_theme   # d500 Bossmusik
+                    music_cfg["battle"] = self.boss_theme
 
-                # Victory-Jingle für Dungeon 500:
                 victory_path = os.path.join(self.base_dir, "music", "victory_500.mp3")
                 if os.path.isfile(victory_path):
                     music_cfg["victory"] = victory_path
 
-                # Kontext an BattleCore übergeben
                 ctx = {
-                    "boss_name": boss_name,
-                    "music": music_cfg,
+                    "battle_profile": {
+                        "boss_name": boss_name,
+                        "narrative_prepend": _t(
+                            "💎 Der Kristallpfad wird still. Selbst das Licht scheint zu warten, bevor es den Kampf freigibt.",
+                            "💎 The crystal path falls quiet. Even the light seems to wait before releasing the battle.",
+                        ),
+                        "intro_lines": [
+                            _t(
+                                "✨ Splitter aus Spiegellicht legen sich ueber die Arena. Jede Bewegung erzeugt ein Echo aus moeglichen Wegen.",
+                                "✨ Splinters of mirrored light spread across the arena. Every movement creates an echo of possible paths.",
+                            ),
+                        ],
+                        "victory_lines": [
+                            _t(
+                                "🔷 Die Kristalle beruhigen sich. Fuer einen Moment wirkt der ganze Pfad wie ausgerichtet.",
+                                "🔷 The crystals settle. For a moment, the whole path feels aligned.",
+                            ),
+                        ],
+                        "defeat_lines": [
+                            _t(
+                                "🪞 In den Kristallen bleibt dein Scheitern nicht verborgen. Der Pfad spiegelt es dir unerbittlich zurueck.",
+                                "🪞 In the crystals your failure does not stay hidden. The path reflects it back without mercy.",
+                            ),
+                        ],
+                        "music": music_cfg,
+                        "boss_profile": {
+                            "title": boss_name,
+                            "intro": _t(
+                                "Der Boss wirkt, als haette der Dungeon seine vielen Spiegel zu einem einzigen Urteil zusammengezogen.",
+                                "The boss feels as if the dungeon had drawn its many mirrors into a single judgment.",
+                            ),
+                            "entrance": _t(
+                                "Glashelle Kanten schneiden durch den Raum. Jeder Splitter scheint eine andere Zukunft zu zeigen.",
+                                "Glass-bright edges cut through the room. Every shard seems to show a different future.",
+                            ),
+                            "taunts": [
+                                _t(
+                                    "»Du siehst viele Wege. Aber welcher davon traegt dich wirklich?«",
+                                    "\"You see many paths. But which one can truly carry you?\"",
+                                ),
+                            ],
+                        },
+                        "enemy": {
+                            "hp_mult": 1.08,
+                            "damage_mult": 1.05,
+                        },
+                    }
                 }
 
-                # WICHTIG: BattleCore verwendet NUR die Musik aus dem Kontext
                 result = self.battle_core.run_fight("boss", context=ctx)
 
             except Exception as e:
