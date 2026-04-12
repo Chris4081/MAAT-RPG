@@ -106,7 +106,7 @@ Die vollständige zweisprachige Übersicht aller Systeme, Features und Kommandos
 
 ### 🚀 Installation
 
-**Option 1 — Download (empfohlen für Spieler)**
+**Option 1 — MAC OS Version Download (empfohlen für Spieler)**
 
 ```bash
 curl -L https://maat-research.com/data/downloads/MAAT-RPG.zip -o MAAT-RPG.zip
@@ -125,6 +125,34 @@ cd MAAT-RPG/maatos
 ./start.sh
 ```
 
+
+**Option 3 — Linux Gamer**
+
+```bash
+git clone https://github.com/Chris4081/MAAT-RPG.git
+cd MAAT-RPG/maatos
+# --- System Dependencies ---
+sudo apt update
+sudo apt install -y \
+    python3 python3-venv python3-pip \
+    build-essential cmake \
+    ffmpeg mpg123 alsa-utils \
+    gfortran
+
+# --- Setup ---
+chmod +x setup.sh start.sh
+
+# --- Virtual Environment ---
+python3 -m venv ~/.local/share/MAAT-RPG/mos-env
+source ~/.local/share/MAAT-RPG/mos-env/bin/activate
+
+# --- Python Dependencies ---
+python -m pip install --upgrade pip setuptools wheel
+python -m pip install -r requirements.txt
+
+# --- Start MAAT-RPG ---
+./start.sh
+```
 ---
 
 ### 🔐 macOS Sicherheit (Gatekeeper)
@@ -239,7 +267,7 @@ The full bilingual overview of all systems, features, and commands is available 
 
 ### 🚀 Installation
 
-**Option 1 — Download (recommended for players)**
+**Option 1 — Download (recommended for MAC OS players)**
 
 ```bash
 curl -L https://maat-research.com/data/downloads/MAAT-RPG.zip -o MAAT-RPG.zip
@@ -255,6 +283,34 @@ open "MAAT RPG.app"
 git clone https://github.com/Chris4081/MAAT-RPG.git
 cd MAAT-RPG/maatos
 ./setup.sh # or manually pip install -r requirements.txt
+./start.sh
+```
+
+**Option 3 — Linux Gamer**
+
+```bash
+git clone https://github.com/Chris4081/MAAT-RPG.git
+cd MAAT-RPG/maatos
+# --- System Dependencies ---
+sudo apt update
+sudo apt install -y \
+    python3 python3-venv python3-pip \
+    build-essential cmake \
+    ffmpeg mpg123 alsa-utils \
+    gfortran
+
+# --- Setup ---
+chmod +x setup.sh start.sh
+
+# --- Virtual Environment ---
+python3 -m venv ~/.local/share/MAAT-RPG/mos-env
+source ~/.local/share/MAAT-RPG/mos-env/bin/activate
+
+# --- Python Dependencies ---
+python -m pip install --upgrade pip setuptools wheel
+python -m pip install -r requirements.txt
+
+# --- Start MAAT-RPG ---
 ./start.sh
 ```
 
