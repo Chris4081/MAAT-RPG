@@ -21,9 +21,8 @@ A first look at **MAAT RPG** in action: story flow, bilingual UI, combat, and at
 
 ### Links
 
-- GitHub: [MAAT-RPG](https://github.com/Chris4081/MAAT-RPG)
 - Full feature list: [FUNKTIONEN.md](./FUNKTIONEN.md)
-
+- Website [MAAT-RPG](https://maat-research.com/maat-rpg.html)
 
 
 ---
