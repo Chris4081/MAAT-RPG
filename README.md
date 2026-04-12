@@ -120,9 +120,9 @@ open "MAAT RPG.app"
 
 ```bash
 git clone https://github.com/Chris4081/MAAT-RPG.git
-cd MAAT-RPG
-pip install -r requirements.txt
-python3 start.py
+cd MAAT-RPG/maatos
+./setup.sh          # oder manuell pip install -r requirements.txt
+./start.sh
 ```
 
 ---
@@ -253,9 +253,9 @@ open "MAAT RPG.app"
 
 ```bash
 git clone https://github.com/Chris4081/MAAT-RPG.git
-cd MAAT-RPG
-pip install -r requirements.txt
-python3 start.py
+cd MAAT-RPG/maatos
+./setup.sh # or manually pip install -r requirements.txt
+./start.sh
 ```
 
 ---
