@@ -112,7 +112,8 @@ Die vollständige zweisprachige Übersicht aller Systeme, Features und Kommandos
 curl -L https://maat-research.com/data/downloads/MAAT-RPG.zip -o MAAT-RPG.zip
 unzip MAAT-RPG.zip
 cd MAAT-RPG
-python3 start.py
+xattr -dr com.apple.quarantine "MAAT-RPG.app"
+open "MAAT-RPG.app"
 ```
 
 **Option 2 — Git Clone (für Entwickler)**
