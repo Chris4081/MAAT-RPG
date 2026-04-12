@@ -1,9 +1,10 @@
 > 🇩🇪 [Deutsch](#-deutsch) · 🇬🇧 [English](#-english)
 
-# 🌿 MAAT-RPG ALPHA
+# 🌿 MAAT-RPG ALPHA  
+**macOS • Linux • Local • Offline • Ethical**
 
 **MAAT RPG** is a bilingual, local AI role-playing game in the terminal, based on story, combat, path identity, journal progression and the five principles of MAAT.
-
+### Platforms: 🍎 macOS · 🐧 Linux
 
 ### Highlights
 
@@ -89,10 +90,11 @@ Die vollständige zweisprachige Übersicht aller Systeme, Features und Kommandos
 
 ### 🖥️ Systemanforderungen
 
-**macOS**
-- macOS **12 Monterey** oder neuer
-- Apple Silicon (M3 / M4 / M5 empfohlen)
-- *(Intel Mac: experimentell unterstützt)*
+**Operating Systems**
+- ✅ macOS 12+
+- ✅ Linux (Ubuntu, Debian, Fedora)
+- ? Theoretically: Windows (WSL2 + Python)
+
 
 **Hardware**
 - Mindestens **16 GB RAM** (24 GB empfohlen)
@@ -248,6 +250,9 @@ The full bilingual overview of all systems, features, and commands is available 
 - macOS **12 Monterey** or newer
 - Apple Silicon (M3 / M4 / M5 recommended)
 - *(Intel Mac: experimentally supported)*
+
+- Linux (Ubuntu, Debian, Fedora)
+- ? Theoretically: Windows (WSL2 + Python)
 
 **Hardware**
 - At least **16 GB RAM** (24 GB recommended)
