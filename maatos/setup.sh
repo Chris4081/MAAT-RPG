@@ -5,8 +5,26 @@ clear
 BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$BASE_DIR" || exit 1
 
+choose_python() {
+    for candidate in python3.12 python3.11 python3; do
+        if command -v "$candidate" >/dev/null 2>&1; then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+    done
+    return 1
+}
+
+PYTHON_BIN="${MAAT_SETUP_PYTHON:-$(choose_python || true)}"
+
+if [ -z "${PYTHON_BIN}" ]; then
+    echo "❌ Kein passender Python-Interpreter gefunden."
+    echo "👉 Bitte installiere Python 3.11 oder 3.12."
+    exit 1
+fi
+
 detect_app_support_dir() {
-BASE_DIR_ENV="$BASE_DIR" python3 - <<'PY'
+BASE_DIR_ENV="$BASE_DIR" "$PYTHON_BIN" - <<'PY'
 import os
 import sys
 
@@ -35,7 +53,7 @@ REQ_LINUX="$BASE_DIR/requirements.linux.txt"
 mkdir -p "$APP_SUPPORT_DIR" || exit 1
 
 detect_language() {
-APP_SUPPORT_DIR_ENV="$APP_SUPPORT_DIR" python3 - <<'PY'
+APP_SUPPORT_DIR_ENV="$APP_SUPPORT_DIR" "$PYTHON_BIN" - <<'PY'
 from pathlib import Path
 import json
 import locale
@@ -135,18 +153,13 @@ check_linux_toolchain() {
         t "👉 Empfehlung: speech-dispatcher oder espeak-ng installieren." "👉 Recommendation: install speech-dispatcher or espeak-ng."
     fi
 
-    t "✅ Linux-Build-Umgebung bereit" "✅ Linux build environment ready"
+	    t "✅ Linux-Build-Umgebung bereit" "✅ Linux build environment ready"
 }
 
-if ! command -v python3 >/dev/null 2>&1; then
-    t "❌ Python 3 nicht gefunden." "❌ Python 3 was not found."
-    exit 1
-fi
-
-echo "🐍 Python: $(python3 --version)"
+echo "🐍 Python: $($PYTHON_BIN --version)"
 
 t "🔎 Prüfe Python-Version…" "🔎 Checking Python version…"
-PY_LANG="$LANGUAGE" python3 - <<'PY'
+PY_LANG="$LANGUAGE" "$PYTHON_BIN" - <<'PY'
 import os
 import sys
 
@@ -155,6 +168,11 @@ lang = os.environ.get("PY_LANG", "de")
 if (major, minor) < (3, 10):
     print("❌ Python 3.10 or newer is required." if lang == "en" else "❌ Python 3.10 oder neuer wird benötigt.")
     raise SystemExit(1)
+if (major, minor) not in ((3, 11), (3, 12)):
+    if (major, minor) >= (3, 13):
+        print("⚠️ Recommended: Python 3.11 or 3.12. Python 3.13 may fail during dependency installation (for example scipy)." if lang == "en" else "⚠️ Empfohlen: Python 3.11 oder 3.12. Python 3.13 kann bei der Installation von Abhängigkeiten scheitern (z. B. scipy).")
+    else:
+        print(f"⚠️ Recommended: Python 3.11 or 3.12. Current interpreter: {major}.{minor}" if lang == "en" else f"⚠️ Empfohlen: Python 3.11 oder 3.12. Aktueller Interpreter: {major}.{minor}")
 print(f"✅ Python version ok: {major}.{minor}" if lang == "en" else f"✅ Python-Version ok: {major}.{minor}")
 PY
 
@@ -176,7 +194,7 @@ esac
 if [ ! -d "$ENV_DIR" ]; then
     t "📦 Erstelle virtuelles Environment…" "📦 Creating virtual environment…"
     t "📍 Ziel: $ENV_DIR" "📍 Target: $ENV_DIR"
-    python3 -m venv "$ENV_DIR" || exit 1
+    "$PYTHON_BIN" -m venv "$ENV_DIR" || exit 1
 fi
 
 if [ ! -f "$ENV_DIR/bin/activate" ]; then
@@ -217,7 +235,7 @@ else
 fi
 
 t "🧪 Prüfe Installation…" "🧪 Checking installation…"
-PY_LANG="$LANGUAGE" PY_OS="$OS_NAME" python3 - <<'PY'
+PY_LANG="$LANGUAGE" PY_OS="$OS_NAME" python - <<'PY'
 import importlib.util
 import os
 import platform

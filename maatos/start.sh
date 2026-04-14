@@ -3,8 +3,26 @@ set -euo pipefail
 
 BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
 
+choose_python() {
+    for candidate in python3.12 python3.11 python3; do
+        if command -v "$candidate" >/dev/null 2>&1; then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+    done
+    return 1
+}
+
+PYTHON_BIN="${MAAT_SETUP_PYTHON:-$(choose_python || true)}"
+
+if [ -z "${PYTHON_BIN}" ]; then
+    echo "❌ Kein passender Python-Interpreter gefunden."
+    echo "👉 Bitte installiere Python 3.11 oder 3.12."
+    exit 1
+fi
+
 detect_app_support_dir() {
-BASE_DIR_ENV="$BASE_DIR" python3 - <<'PY'
+BASE_DIR_ENV="$BASE_DIR" "$PYTHON_BIN" - <<'PY'
 import os
 import sys
 
@@ -33,7 +51,7 @@ SETTINGS_FILE="$STATE_DIR/settings_state.json"
 mkdir -p "$APP_SUPPORT_DIR"
 
 detect_language() {
-SETTINGS_PATH_ENV="$SETTINGS_FILE" python3 - <<'PY'
+SETTINGS_PATH_ENV="$SETTINGS_FILE" "$PYTHON_BIN" - <<'PY'
 from pathlib import Path
 import json
 import locale
@@ -66,6 +84,7 @@ OS_NAME="$(uname -s)"
 
 t "🌿 MAAT-RPG wird gestartet …" "🌿 MAAT-RPG is starting …"
 t "📁 App-Support: $APP_SUPPORT_DIR" "📁 App support: $APP_SUPPORT_DIR"
+t "🐍 Python: $($PYTHON_BIN --version)" "🐍 Python: $($PYTHON_BIN --version)"
 
 if [ ! -d "$ENV_DIR" ]; then
     t "⚠️ Keine Installation gefunden." "⚠️ No installation was found."
@@ -92,7 +111,7 @@ source "$ENV_DIR/bin/activate" || exit 1
 cd "$BASE_DIR" || exit 1
 
 t "🧪 Starte Systemdiagnose…" "🧪 Starting system diagnostics…"
-PY_LANG="$LANGUAGE" PY_OS="$OS_NAME" APP_SUPPORT_DIR_ENV="$APP_SUPPORT_DIR" python3 - <<'PY'
+PY_LANG="$LANGUAGE" PY_OS="$OS_NAME" APP_SUPPORT_DIR_ENV="$APP_SUPPORT_DIR" python - <<'PY'
 import importlib.util
 import os
 import platform
@@ -136,4 +155,4 @@ else:
     print(label(f"   Modelle: {models_dir}", f"   Models: {models_dir}"))
 PY
 
-python3 maatki.py
+python maatki.py
