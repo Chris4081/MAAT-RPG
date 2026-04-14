@@ -1171,20 +1171,7 @@ class Plugin:
         raise SystemExit(0)
 
     def _run_title_music_phase(self) -> bool:
-        clear_screen()
-        print(_render_title_screen(self.language or "de"))
-        self.menu_music.start()
-
-        deadline = time.time() + 180.0
-        aborted = False
-        while time.time() < deadline:
-            if self._title_key_pressed():
-                aborted = True
-                break
-            time.sleep(0.05)
-
-        _restore_terminal_input_mode()
-        if not aborted:
+        if not self._title_wait_or_timeout(180.0):
             self._title_demo_stage += 1
         return True
 
