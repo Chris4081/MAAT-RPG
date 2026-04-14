@@ -65,7 +65,7 @@ TEXT = {
         "menu_new": "[3] Neues Aeon beginnen",
         "menu_info": "[4] Info MAAT-OS",
         "menu_exit": "[5] Beenden",
-        "menu_shortcuts": "Direkt im Spiel wichtig: /journal  /erfolge  /xp  /maatbond",
+        "menu_shortcuts": "Direkt im Spiel wichtig: /fight  /journal  /erfolge  /xp  /maatbond",
         "menu_hint_restart": "Wenn MAAT-KI ein Problem beim Antworten hat, starte das System einfach mit /restart neu.",
         "menu_hint_language": "Tipp: Sage MAAT-KI, in welcher Sprache er mit dir sprechen soll.",
         "choice": "Auswahl: ",
@@ -74,17 +74,18 @@ TEXT = {
         "invalid": "Ungueltige Auswahl. Bitte nochmal.",
         "active_game": "Du bist bereits im aktiven Spiel.",
         "restart_hint": "Starte MAAT-RPG neu, um das Hauptmenue vollstaendig zu nutzen.",
-        "active_shortcuts": "Im aktuellen Lauf helfen dir besonders: /journal, /erfolge, /xp, /maatbond",
+        "active_shortcuts": "Im aktuellen Lauf helfen dir besonders: /fight, /journal, /erfolge, /xp, /maatbond",
         "options_title": "⚙ Optionen",
         "opt_text_speed": "[1] Story-Texttempo: {value}",
         "opt_music": "[2] Musik: {value}",
-        "opt_thinking": "[3] Thinking anzeigen: {value}",
-        "opt_hallu": "[4] Hallu-Modus: {value}",
-        "opt_reset": "[5] Zaehler zuruecksetzen (Story + Battle)",
-        "opt_full_reset": "[6] Alles zuruecksetzen (Story + Battle + Self-Evo)",
-        "opt_memory": "[7] Alle Erinnerungen loeschen (Application Support/MAAT-RPG/data)",
-        "opt_language": "[8] Sprache wechseln",
-        "opt_back": "[9] Zurueck",
+        "opt_voice": "[3] Voice / TTS: {value}",
+        "opt_thinking": "[4] Thinking anzeigen: {value}",
+        "opt_hallu": "[5] Hallu-Modus: {value}",
+        "opt_reset": "[6] Zaehler zuruecksetzen (Story + Battle)",
+        "opt_full_reset": "[7] Alles zuruecksetzen (Story + Battle + Self-Evo)",
+        "opt_memory": "[8] Alle Erinnerungen loeschen (Application Support/MAAT-RPG/data)",
+        "opt_language": "[9] Sprache wechseln",
+        "opt_back": "[10] Zurueck",
         "speed_slow": "Langsam",
         "speed_fast": "Schnell",
         "music_on": "An",
@@ -185,7 +186,7 @@ TEXT = {
         "menu_new": "[3] Begin a new aeon",
         "menu_info": "[4] MAAT-OS info",
         "menu_exit": "[5] Quit",
-        "menu_shortcuts": "Useful in game: /journal  /erfolge  /xp  /maatbond",
+        "menu_shortcuts": "Useful in game: /fight  /journal  /erfolge  /xp  /maatbond",
         "menu_hint_restart": "If MAAT-KI has trouble answering, simply restart the system with /restart.",
         "menu_hint_language": "Tip: Tell MAAT-KI which language it should speak with you.",
         "choice": "Choice: ",
@@ -194,17 +195,18 @@ TEXT = {
         "invalid": "Invalid choice. Please try again.",
         "active_game": "You are already inside the active game.",
         "restart_hint": "Restart MAAT-RPG to use the full main menu.",
-        "active_shortcuts": "Helpful right now: /journal, /erfolge, /xp, /maatbond",
+        "active_shortcuts": "Helpful right now: /fight, /journal, /erfolge, /xp, /maatbond",
         "options_title": "⚙ Options",
         "opt_text_speed": "[1] Story text speed: {value}",
         "opt_music": "[2] Music: {value}",
-        "opt_thinking": "[3] Show thinking: {value}",
-        "opt_hallu": "[4] Hallu mode: {value}",
-        "opt_reset": "[5] Reset counters (Story + Battle)",
-        "opt_full_reset": "[6] Reset everything (Story + Battle + Self-Evo)",
-        "opt_memory": "[7] Delete all memories (Application Support/MAAT-RPG/data)",
-        "opt_language": "[8] Change language",
-        "opt_back": "[9] Back",
+        "opt_voice": "[3] Voice / TTS: {value}",
+        "opt_thinking": "[4] Show thinking: {value}",
+        "opt_hallu": "[5] Hallu mode: {value}",
+        "opt_reset": "[6] Reset counters (Story + Battle)",
+        "opt_full_reset": "[7] Reset everything (Story + Battle + Self-Evo)",
+        "opt_memory": "[8] Delete all memories (Application Support/MAAT-RPG/data)",
+        "opt_language": "[9] Change language",
+        "opt_back": "[10] Back",
         "speed_slow": "Slow",
         "speed_fast": "Fast",
         "music_on": "On",
@@ -298,6 +300,20 @@ def _stop_all_afplay():
     stop_all_audio_backends()
 
 
+def _restore_terminal_input_mode():
+    try:
+        if not getattr(sys.stdin, "isatty", lambda: False)():
+            return
+        fd = sys.stdin.fileno()
+        attrs = termios.tcgetattr(fd)
+        attrs[3] |= termios.ECHO | termios.ICANON
+        attrs[6][termios.VMIN] = 1
+        attrs[6][termios.VTIME] = 0
+        termios.tcsetattr(fd, termios.TCSADRAIN, attrs)
+    except Exception:
+        pass
+
+
 def _setting_text_speed(settings: dict) -> str:
     value = str(settings.get("story_text_speed", "fast")).lower()
     return value if value in {"slow", "fast"} else "fast"
@@ -311,17 +327,22 @@ def _setting_show_thinking(settings: dict) -> bool:
     return bool(settings.get("show_thinking", False))
 
 
+def _setting_say_tts_enabled(settings: dict) -> bool:
+    return bool(settings.get("say_tts_enabled", True))
+
+
 def _setting_hallu_mode(settings: dict) -> bool:
     return bool(settings.get("hallu_mode", False))
 
 
-def _settings_labels(language: str, settings: dict) -> tuple[str, str, str, str]:
+def _settings_labels(language: str, settings: dict) -> tuple[str, str, str, str, str]:
     t = TEXT.get(language, TEXT["de"])
     speed = t["speed_slow"] if _setting_text_speed(settings) == "slow" else t["speed_fast"]
     music = t["music_on"] if _setting_music_enabled(settings) else t["music_off"]
+    voice = t["music_on"] if _setting_say_tts_enabled(settings) else t["music_off"]
     thinking = t["music_on"] if _setting_show_thinking(settings) else t["music_off"]
     hallu = t["music_on"] if _setting_hallu_mode(settings) else t["music_off"]
-    return speed, music, thinking, hallu
+    return speed, music, voice, thinking, hallu
 # ==========================
 # 🎵 Menü-Musik (optional)
 # ==========================
@@ -587,6 +608,21 @@ def reset_quests_and_achievements(plugin_dir: str):
                 os.remove(p)
         except Exception:
             pass
+
+    battle_state_path = state_file("battle_state.json")
+    try:
+        if os.path.isfile(battle_state_path):
+            with open(battle_state_path, "r", encoding="utf-8") as f:
+                battle_state = json.load(f)
+            if isinstance(battle_state, dict):
+                battle_state.pop("quests", None)
+                achievements = battle_state.get("achievements")
+                if isinstance(achievements, dict):
+                    achievements["combat"] = []
+                with open(battle_state_path, "w", encoding="utf-8") as f:
+                    json.dump(battle_state, f, indent=2, ensure_ascii=False)
+    except Exception:
+        pass
 
 
 def reset_self_evo(plugin_dir: str):
@@ -977,11 +1013,12 @@ def options_menu(plugin_dir: str, menu_music: MenuMusic):
         settings = _load_settings()
         language = settings.get("language", "de")
         t = TEXT.get(language, TEXT["de"])
-        speed_label, music_label, thinking_label, hallu_label = _settings_labels(language, settings)
+        speed_label, music_label, voice_label, thinking_label, hallu_label = _settings_labels(language, settings)
         clear_screen()
         print(Fore.YELLOW + Style.BRIGHT + t["options_title"] + "\n" + Style.RESET_ALL)
         print("  " + t["opt_text_speed"].format(value=speed_label))
         print("  " + t["opt_music"].format(value=music_label))
+        print("  " + t["opt_voice"].format(value=voice_label))
         print("  " + t["opt_thinking"].format(value=thinking_label))
         print("  " + t["opt_hallu"].format(value=hallu_label))
         print(f"  {t['opt_reset']}")
@@ -1006,24 +1043,28 @@ def options_menu(plugin_dir: str, menu_music: MenuMusic):
                 menu_music.stop()
                 _stop_all_afplay()
         elif choice == "3":
+            enabled = _setting_say_tts_enabled(settings)
+            settings["say_tts_enabled"] = not enabled
+            _save_settings(settings)
+        elif choice == "4":
             enabled = _setting_show_thinking(settings)
             settings["show_thinking"] = not enabled
             _save_settings(settings)
-        elif choice == "4":
+        elif choice == "5":
             enabled = _setting_hallu_mode(settings)
             settings["hallu_mode"] = not enabled
             _save_settings(settings)
-        elif choice == "5":
-            confirm_reset(plugin_dir, full_reset=False, menu_music=menu_music)
         elif choice == "6":
-            confirm_reset(plugin_dir, full_reset=True, menu_music=menu_music)
+            confirm_reset(plugin_dir, full_reset=False, menu_music=menu_music)
         elif choice == "7":
-            confirm_wipe_all_memory(plugin_dir, menu_music)
+            confirm_reset(plugin_dir, full_reset=True, menu_music=menu_music)
         elif choice == "8":
+            confirm_wipe_all_memory(plugin_dir, menu_music)
+        elif choice == "9":
             settings = _load_settings()
             settings["language"] = choose_language()
             _save_settings(settings)
-        elif choice == "9":
+        elif choice == "10":
             break
         else:
             print(Fore.RED + t["invalid"] + Style.RESET_ALL)
@@ -1121,6 +1162,32 @@ class Plugin:
     def _title_key_pressed(self) -> bool:
         return self._title_wait_or_timeout(0.05)
 
+    def _graceful_exit(self):
+        _restore_terminal_input_mode()
+        self.menu_music.stop()
+        _stop_all_afplay()
+        print(f"\n{self._t('bye')}\n")
+        time.sleep(0.3)
+        raise SystemExit(0)
+
+    def _run_title_music_phase(self) -> bool:
+        clear_screen()
+        print(_render_title_screen(self.language or "de"))
+        self.menu_music.start()
+
+        deadline = time.time() + 180.0
+        aborted = False
+        while time.time() < deadline:
+            if self._title_key_pressed():
+                aborted = True
+                break
+            time.sleep(0.05)
+
+        _restore_terminal_input_mode()
+        if not aborted:
+            self._title_demo_stage += 1
+        return True
+
     def _run_title_demo(self, context=None) -> bool:
         battle_core = None
         if isinstance(context, dict):
@@ -1128,22 +1195,47 @@ class Plugin:
         if battle_core is None or not hasattr(battle_core, "run_fight"):
             return False
 
-        cycle = self._title_demo_stage % 2
+        cycle = self._title_demo_stage % 4
         if cycle == 0:
+            mode = "normal"
+            actions = [
+                "1", "3", "1", "1", "5", "1", "4", "1", "5",
+                "1", "2", "1", "3", "1", "5", "1", "1", "4",
+                "1", "3", "5",
+            ]
+        elif cycle == 1:
             mode = "boss"
-            actions = ["3", "1", "3", "5", "4", "1", "3", "1", "5", "2", "1"]
-        else:
+            actions = [
+                "1", "3", "1", "5", "1", "2", "1", "1", "5",
+                "1", "4", "1", "3", "1", "5", "3", "1", "2",
+                "5", "1", "1", "1", "4", "1", "3", "5", "1",
+                "2", "1", "5",
+            ]
+        elif cycle == 2:
             mode = "final"
-            actions = ["3", "1", "1", "5", "3", "1", "4", "5", "3", "1", "1", "5"]
+            actions = [
+                "1", "5", "1", "3", "1", "2", "1", "4", "5",
+                "1", "1", "1", "5", "3", "1", "2", "1", "3",
+                "5", "1", "4", "1", "1", "1", "2", "5", "1",
+                "3", "1", "5",
+            ]
+        else:
+            return self._run_title_music_phase()
 
         clear_screen()
         self.menu_music.stop()
         demo_context = {
             "guide_mode": True,
-            "no_hp_loss": True,
+            # Titel-Demo darf sichtbaren Schaden zeigen, ohne den echten Spielstand zu veraendern.
+            "no_hp_loss": False,
             "title_demo_mode": True,
             "title_demo_abort": False,
             "scripted_actions": list(actions),
+            "battle_profile": {
+                "enemy": {
+                    "hp_mult": 0.9 if mode == "normal" else (0.78 if mode == "boss" else 0.72),
+                }
+            },
         }
         result = {"error": None}
 
@@ -1197,6 +1289,7 @@ class Plugin:
             return False
 
         clear_screen()
+        _restore_terminal_input_mode()
         self.menu_music.stop()
         _stop_all_afplay()
         time.sleep(0.35)
@@ -1219,6 +1312,7 @@ class Plugin:
 
     # ---------- Hauptmenü ----------
     def _show_menu_once(self) -> str:
+        _restore_terminal_input_mode()
         clear_screen()
         print(_render_progress_panel(self.language or "de"))
         print()
@@ -1258,10 +1352,7 @@ class Plugin:
             return "menu"
 
         if choice == "5":
-            self.menu_music.stop()
-            print(f"\n{self._t('bye')}\n")
-            time.sleep(1)
-            sys.exit(0)
+            self._graceful_exit()
 
         print(Fore.RED + f"\n{self._t('invalid')}\n" + Style.RESET_ALL)
         time.sleep(1)
@@ -1273,20 +1364,23 @@ class Plugin:
         Wird direkt nach dem Laden aller Plugins vom ChatLoop aufgerufen.
         Hier zeigen wir EINMAL das Startmenü.
         """
-        if self.language not in TEXT:
-            self._choose_language()
+        try:
+            if self.language not in TEXT:
+                self._choose_language()
 
-        self.menu_music.start()
+            self.menu_music.start()
 
-        if not self._title_seen:
-            self._show_title_screen(context)
+            if not self._title_seen:
+                self._show_title_screen(context)
 
-        while True:
-            choice = self._show_menu_once()
-            result = self._handle_choice(choice)
-            if result == "start":
-                # ChatLoop fortsetzen
-                return
+            while True:
+                choice = self._show_menu_once()
+                result = self._handle_choice(choice)
+                if result == "start":
+                    # ChatLoop fortsetzen
+                    return
+        except KeyboardInterrupt:
+            self._graceful_exit()
 
     def command(self, cmd, context=None):
         if cmd.strip().lower().startswith("/menu"):

@@ -130,6 +130,11 @@ check_linux_toolchain() {
         t "👉 Empfehlung: ffmpeg (ffplay) oder mpg123 installieren." "👉 Recommendation: install ffmpeg (ffplay) or mpg123."
     fi
 
+    if ! command -v spd-say >/dev/null 2>&1 && ! command -v espeak-ng >/dev/null 2>&1 && ! command -v espeak >/dev/null 2>&1; then
+        t "⚠️ Kein Linux-TTS-Backend gefunden. /say bleibt ohne spd-say, espeak-ng oder espeak stumm." "⚠️ No Linux TTS backend found. /say will stay silent without spd-say, espeak-ng, or espeak."
+        t "👉 Empfehlung: speech-dispatcher oder espeak-ng installieren." "👉 Recommendation: install speech-dispatcher or espeak-ng."
+    fi
+
     t "✅ Linux-Build-Umgebung bereit" "✅ Linux build environment ready"
 }
 

@@ -16,9 +16,6 @@ import random
 import time
 import threading
 import subprocess
-import select
-import termios
-import tty
 import sys
 import io
 import contextlib
@@ -958,30 +955,10 @@ class BattleCore:
     def _title_demo_should_abort(self, context: dict | None = None) -> bool:
         if not isinstance(context, dict) or not context.get("title_demo_mode"):
             return False
-        if context.get("title_demo_abort"):
-            return True
-        fd = None
-        old_settings = None
-        try:
-            fd = sys.stdin.fileno()
-            old_settings = termios.tcgetattr(fd)
-            tty.setcbreak(fd)
-            ready, _, _ = select.select([sys.stdin], [], [], 0)
-            if ready:
-                try:
-                    sys.stdin.read(1)
-                except Exception:
-                    pass
-                return True
-        except Exception:
-            return False
-        finally:
-            if fd is not None and old_settings is not None:
-                try:
-                    termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-                except Exception:
-                    pass
-        return False
+        # Die Titel-Demo verwaltet Tasteneingaben bereits im Menu-Thread.
+        # Der Kampf-Thread reagiert hier nur noch auf das gemeinsame Abort-Flag,
+        # damit unter Linux kein zweiter cbreak-Wechsel mehr am selben TTY passiert.
+        return bool(context.get("title_demo_abort"))
 
     def _prompt(self, prompt: str, context: dict | None = None, default: str = "") -> str:
         if self._title_demo_should_abort(context):
@@ -1949,6 +1926,9 @@ class BattleCore:
         }
 
     def _evaluate_combat_achievements(self, ftype: str, turn_state: dict) -> list[str]:
+        if isinstance(self._active_context, dict) and self._active_context.get("title_demo_mode"):
+            return []
+
         catalog = self._combat_achievement_catalog()
         unlocked = []
         player = self.state.state["player"]
@@ -2000,16 +1980,16 @@ class BattleCore:
             reasons.append(_battle_text("reason_potion_loss"))
         return _battle_text("summary_loss", enemy=enemy_name, reasons="; ".join(reasons))
 
-    def _use_potion_in_fight(self, turn_state: dict | None = None) -> str:
+    def _use_potion_in_fight(self, turn_state: dict | None = None) -> tuple[str, bool]:
         p = self.state.state["player"]
         potions = int(p.get("potions", 0))
         max_hp = int(p.get("max_hp", 100))
         hp = int(p.get("hp", max_hp))
 
         if potions <= 0:
-            return _battle_text("potion_none")
+            return _battle_text("potion_none"), False
         if hp >= max_hp:
-            return _battle_text("potion_full", hp=hp, max_hp=max_hp)
+            return _battle_text("potion_full", hp=hp, max_hp=max_hp), False
 
         heal_amount = max(10, max_hp // 2)
         bonus = int((turn_state or {}).get("potion_heal_bonus", 0))
@@ -2018,7 +1998,10 @@ class BattleCore:
         p["potions"] = potions - 1
         p["hp"] = new_hp
         self.state.save()
-        return _battle_text("potion_used", heal=new_hp - hp, hp=new_hp, max_hp=max_hp, potions=p["potions"])
+        return (
+            _battle_text("potion_used", heal=new_hp - hp, hp=new_hp, max_hp=max_hp, potions=p["potions"]),
+            True,
+        )
 
     # ------------------------------------------
     # 🐢 LANGSAME KAMPFZEILEN (Terminal-Immersion)
@@ -2854,14 +2837,18 @@ class BattleCore:
                     log_lines.append(_battle_text("log_player_focus"))
 
                 elif choice == "4":
-                    potion_msg = self._use_potion_in_fight(turn_state)
-                    if "regenerierst" in potion_msg:
+                    potion_msg, did_heal = self._use_potion_in_fight(turn_state)
+                    if did_heal:
                         turn_state["used_potion"] = True
                     player_hp, extra_txt = self._modify_player_action(choice, turn_state, player_hp, p["max_hp"])
                     if extra_txt:
                         potion_msg += extra_txt
                     self._slow_line(potion_msg)
-                    log_lines.append(_battle_text("log_player_potion_used") if ("regenerierst" in potion_msg or "restore" in potion_msg) else _battle_text("log_player_potion_skip"))
+                    log_lines.append(
+                        _battle_text("log_player_potion_used")
+                        if did_heal
+                        else _battle_text("log_player_potion_skip")
+                    )
                     player_hp = p["hp"]
 
                 elif choice == "5":
@@ -3275,58 +3262,6 @@ class Plugin:
         return "[" + ("█" * filled) + ("·" * empty) + "]"
 
 
-    def _shop(self, cmd: str) -> str:
-        s = self.core.state.state
-        p = s["player"]
-        gold = p.get("gold", 0)
-        potions = p.get("potions", 0)
-
-        parts = cmd.split()
-        # Nur /shop → Übersicht
-        if len(parts) == 1:
-            lines = [
-                "🏪 **MAAT-RPG Laden**",
-                "",
-                f"Gold: {gold}",
-                f"Heiltränke im Inventar: {potions}",
-                "",
-                "Verfügbare Items:",
-                "  • Heiltrank – 25 Gold (stellt 50% deiner Max-HP wieder her)",
-                "",
-                "Kaufen mit: `/shop buy potion 1` oder `/shop buy potion 3`",
-            ]
-            return "\n".join(lines)
-
-        # Kauf: /shop buy potion <anzahl>
-        if len(parts) >= 3 and parts[1].lower() == "buy":
-            item = parts[2].lower()
-            amount = 1
-            if len(parts) >= 4:
-                try:
-                    amount = max(1, int(parts[3]))
-                except ValueError:
-                    return "Bitte gib eine gültige Anzahl an, z.B. `/shop buy potion 2`."
-
-            if item not in ("potion", "trank", "heiltrank"):
-                return "Dieses Item gibt es (noch) nicht. Verfügbar: `potion`."
-
-            price_per = 25
-            cost = price_per * amount
-
-            if gold < cost:
-                return f"Du hast nicht genug Gold. Kosten: {cost}, Gold: {gold}."
-
-            p["gold"] = gold - cost
-            p["potions"] = potions + amount
-            self.core.state.save()
-
-            return (
-                f"✅ Gekauft: {amount} Heiltrank(e) für {cost} Gold.\n"
-                f"Gold: {p['gold']}   |   Tränke: {p['potions']}"
-            )
-
-        return "Syntax: `/shop` oder `/shop buy potion <anzahl>`."
-
     def _get_title_for_level(self, level: int) -> str:
         return get_title_for_level(level)
 
@@ -3573,12 +3508,22 @@ class Plugin:
         elif mode == "boss":
             merged.setdefault(
                 "scripted_actions",
-                ["3", "1", "3", "5", "4", "1", "3", "1", "5", "2", "1"],
+                [
+                    "1", "3", "1", "5", "1", "2", "1", "1", "5",
+                    "1", "4", "1", "3", "1", "5", "3", "1", "2",
+                    "5", "1", "1", "1", "4", "1", "3", "5", "1",
+                    "2", "1", "5",
+                ],
             )
         elif mode == "final":
             merged.setdefault(
                 "scripted_actions",
-                ["3", "1", "1", "5", "3", "1", "4", "5", "3", "1", "1", "5"],
+                [
+                    "1", "5", "1", "3", "1", "2", "1", "4", "5",
+                    "1", "1", "1", "5", "3", "1", "2", "1", "3",
+                    "5", "1", "4", "1", "1", "1", "2", "5", "1",
+                    "3", "1", "5",
+                ],
             )
         return merged
     #--------------------------------

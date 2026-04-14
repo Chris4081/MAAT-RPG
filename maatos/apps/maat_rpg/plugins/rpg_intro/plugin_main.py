@@ -157,6 +157,10 @@ class Plugin:
     def on_startup(self, context=None):
         try:
             self.play_intro()
+        except KeyboardInterrupt:
+            self._stop_music()
+            print(self._t("\n🌿 Intro beendet. Bis spaeter.\n", "\n🌿 Intro closed. See you later.\n"))
+            raise SystemExit(0)
         except Exception as e:
             print(f"[MAAT-RPG Intro Fehler] {e}")
 
