@@ -101,7 +101,9 @@ Die vollständige zweisprachige Übersicht aller Systeme, Features und Kommandos
 - Ca. **10 GB freier Speicher** (inkl. Modelle)
 
 **Python**
-- **Python 3.10 oder neuer** erforderlich
+- **Empfohlen: Python 3.11 oder 3.12**
+- Python 3.10 kann funktionieren, ist aber nicht die bevorzugte Zielversion
+- Python 3.13 wird derzeit **nicht empfohlen**, da einzelne Abhängigkeiten (z. B. `scipy`) bei der Installation scheitern können
 - 👉 [python.org/downloads/macos](https://www.python.org/downloads/macos/)
 
 ---
@@ -118,42 +120,46 @@ xattr -dr com.apple.quarantine "MAAT RPG.app"
 open "MAAT RPG.app"
 ```
 
-**Option 2 — Git Clone (für Entwickler)**
+**Option 2 — Git Clone (empfohlen für Entwickler auf Linux/macOS)**
 
 ```bash
-git clone https://github.com/Chris4081/MAAT-RPG.git
-cd MAAT-RPG/maatos
-./setup.sh          # oder manuell pip install -r requirements.txt
-./start.sh
+git clone https://github.com/Chris4081/MAAT-RPG.git && cd MAAT-RPG/maatos && bash setup.sh
 ```
 
+Der Installer bevorzugt automatisch:
+- `python3.12`
+- dann `python3.11`
+- erst danach `python3`
 
-**Option 3 — Linux Gamer**
+Wenn dein System standardmäßig Python 3.13 nutzt, installiere am besten Python 3.11 oder 3.12 und starte dann:
 
 ```bash
-git clone https://github.com/Chris4081/MAAT-RPG.git
-cd MAAT-RPG/maatos
-# --- System Dependencies ---
+MAAT_SETUP_PYTHON=python3.11 bash setup.sh
+```
+
+**Option 3 — Linux (Ubuntu / Debian)**
+
+```bash
 sudo apt update
 sudo apt install -y \
-    python3 python3-venv python3-pip \
+    python3.11 python3.11-venv python3.11-dev \
     build-essential cmake \
     ffmpeg mpg123 alsa-utils \
-    gfortran
+    speech-dispatcher espeak-ng
 
-# --- Setup ---
-chmod +x setup.sh start.sh
+git clone https://github.com/Chris4081/MAAT-RPG.git
+cd MAAT-RPG/maatos
+MAAT_SETUP_PYTHON=python3.11 bash setup.sh
+```
 
-# --- Virtual Environment ---
-python3 -m venv ~/.local/share/MAAT-RPG/mos-env
-source ~/.local/share/MAAT-RPG/mos-env/bin/activate
+**Troubleshooting**
 
-# --- Python Dependencies ---
-python -m pip install --upgrade pip setuptools wheel
-python -m pip install -r requirements.txt
+Wenn bei der Installation ein Fehler rund um `scipy` auftaucht, verwendest du sehr wahrscheinlich eine ungeeignete Python-Version, oft Python 3.13.
 
-# --- Start MAAT-RPG ---
-./start.sh
+Empfohlene Lösung:
+
+```bash
+MAAT_SETUP_PYTHON=python3.11 bash setup.sh
 ```
 ---
 
@@ -259,7 +265,9 @@ The full bilingual overview of all systems, features, and commands is available 
 - Approx. **10 GB free storage** (incl. models)
 
 **Python**
-- **Python 3.10 or newer** required
+- **Recommended: Python 3.11 or 3.12**
+- Python 3.10 may work, but it is not the preferred target version
+- Python 3.13 is currently **not recommended**, because some dependencies (for example `scipy`) may fail during installation
 - 👉 [python.org/downloads/macos](https://www.python.org/downloads/macos/)
 
 ---
@@ -282,41 +290,46 @@ xattr -dr com.apple.quarantine "MAAT RPG.app"
 open "MAAT RPG.app"
 ```
 
-**Option 2 — Git Clone (for developers)**
+**Option 2 — Git Clone (recommended for developers on Linux/macOS)**
 
 ```bash
-git clone https://github.com/Chris4081/MAAT-RPG.git
-cd MAAT-RPG/maatos
-./setup.sh # or manually pip install -r requirements.txt
-./start.sh
+git clone https://github.com/Chris4081/MAAT-RPG.git && cd MAAT-RPG/maatos && bash setup.sh
 ```
 
-**Option 3 — Linux Gamer**
+The installer automatically prefers:
+- `python3.12`
+- then `python3.11`
+- and only after that `python3`
+
+If your system default is Python 3.13, install Python 3.11 or 3.12 first and then run:
 
 ```bash
-git clone https://github.com/Chris4081/MAAT-RPG.git
-cd MAAT-RPG/maatos
-# --- System Dependencies ---
+MAAT_SETUP_PYTHON=python3.11 bash setup.sh
+```
+
+**Option 3 — Linux (Ubuntu / Debian)**
+
+```bash
 sudo apt update
 sudo apt install -y \
-    python3 python3-venv python3-pip \
+    python3.11 python3.11-venv python3.11-dev \
     build-essential cmake \
     ffmpeg mpg123 alsa-utils \
-    gfortran
+    speech-dispatcher espeak-ng
 
-# --- Setup ---
-chmod +x setup.sh start.sh
+git clone https://github.com/Chris4081/MAAT-RPG.git
+cd MAAT-RPG/maatos
+MAAT_SETUP_PYTHON=python3.11 bash setup.sh
+```
 
-# --- Virtual Environment ---
-python3 -m venv ~/.local/share/MAAT-RPG/mos-env
-source ~/.local/share/MAAT-RPG/mos-env/bin/activate
+**Troubleshooting**
 
-# --- Python Dependencies ---
-python -m pip install --upgrade pip setuptools wheel
-python -m pip install -r requirements.txt
+If installation fails around `scipy`, you are most likely using an unsupported Python version, often Python 3.13.
 
-# --- Start MAAT-RPG ---
-./start.sh
+Recommended fix:
+
+```bash
+MAAT_SETUP_PYTHON=python3.11 bash setup.sh
 ```
 
 ---
@@ -363,7 +376,6 @@ you must also release the source code of your changes.
 **[🌐 maat-research.com](https://maat-research.com)**  
 &nbsp;·&nbsp;
 **[📄 Paper 21](https://maat-research.com)**  
-&nbsp;·&nbsp;
-**[⚖️ MAAT Framework](https://doi.org/10.5281/zenodo.18489336)**
+
 
 </div>
