@@ -161,6 +161,7 @@ BATTLE_TEXT = {
         "flee_fail": "❌ Flucht fehlgeschlagen!",
         "enemy_hit": "💥 {enemy} trifft dich fuer {damage} Schaden!{guard}{aura} Resonanz {resonance}/100.",
         "victory_line": "\n🏆 Du hast **{enemy}** besiegt!",
+        "defeat_line": "\n💀 Du wurdest von **{enemy}** besiegt...",
         "fight_intro": "🎮 **{enemy}** erscheint! (Typ: {ftype})",
         "fight_type_normal": "NORMAL",
         "fight_type_boss": "BOSS",
@@ -311,6 +312,7 @@ BATTLE_TEXT = {
         "flee_fail": "❌ Escape failed!",
         "enemy_hit": "💥 {enemy} hits you for {damage} damage!{guard}{aura} Resonance {resonance}/100.",
         "victory_line": "\n🏆 You defeated **{enemy}**!",
+        "defeat_line": "\n💀 You were defeated by **{enemy}**...",
         "fight_intro": "🎮 **{enemy}** appears! (Type: {ftype})",
         "fight_type_normal": "NORMAL",
         "fight_type_boss": "BOSS",
@@ -2986,7 +2988,7 @@ class BattleCore:
             
         else:
             # Niederlage
-            line = f"\n💀 Du wurdest von **{enemy_name}** besiegt..."
+            line = _battle_text("defeat_line", enemy=enemy_name)
             self._slow_line(line)
             log_lines.append(f"Niederlage gegen {enemy_name}")
             if ftype in ("boss", "final"):

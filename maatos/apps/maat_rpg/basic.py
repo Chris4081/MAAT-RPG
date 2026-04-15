@@ -15,6 +15,7 @@ import sys
 import sqlite3
 import subprocess
 import json
+import shutil
 from pathlib import Path
 from colorama import Fore, Style, init
 from shared.core.rpg_i18n import get_language
@@ -37,15 +38,19 @@ _dbg("🧪 basic.py: C – ROOT done")
 
 from shared.core.maat_paths import (
     get_app_support_dir,
+    get_default_app_support_dir,
     get_data_dir,
     get_models_dir,
     get_logs_dir,
     get_cache_dir,
     get_saves_dir,
     get_state_dir,
+    get_profiles_dir,
 )
 
 APP_SUPPORT_DIR = get_app_support_dir()
+BASE_APP_SUPPORT_DIR = get_default_app_support_dir()
+PROFILES_DIR = get_profiles_dir()
 DATA_DIR = get_data_dir()
 MODELS_DIR = get_models_dir()
 LOGS_DIR = get_logs_dir()
@@ -65,6 +70,7 @@ os.environ["MAAT_MODELS_DIR"] = str(MODELS_DIR)
 os.environ["MAAT_LOGS_DIR"] = str(LOGS_DIR)
 os.environ["MAAT_CACHE_DIR"] = str(CACHE_DIR)
 os.environ["MAAT_SAVES_DIR"] = str(SAVES_DIR)
+os.environ["MAAT_STATE_DIR"] = str(STATE_DIR)
 
 _dbg(f"🧪 basic.py: App Support = {APP_SUPPORT_DIR}")
 _dbg(f"🧪 basic.py: Data Dir    = {DATA_DIR}")
@@ -258,6 +264,286 @@ def _ui_language() -> str:
     return get_language(("de", "en"))
 
 
+PROFILE_SLOT_COUNT = 4
+PROFILE_MANAGER_STATE_PATH = BASE_APP_SUPPORT_DIR / "state" / "profile_manager_state.json"
+
+
+def _profile_text(language: str) -> dict:
+    if language == "en":
+        return {
+            "title": "MAAT-RPG Profile Manager",
+            "subtitle": "Choose a profile before the game starts.",
+            "slot_default": "Standard profile",
+            "slot_extra": "Profile {slot}",
+            "active": "active",
+            "empty": "empty",
+            "empty_hint": "Fresh save slot with its own memory and states.",
+            "path_profile": "Path Profile",
+            "level": "Level",
+            "boss_wins": "Boss Wins",
+            "principles": "Principles",
+            "memory": "Memory",
+            "delete_hint": "Press D or L to delete a profile slot.",
+            "prompt": "Choose [1-4, ENTER = active profile {active}, D/L = delete]: ",
+            "delete_slot_prompt": "Which slot should be deleted? [2-4]: ",
+            "delete_default": "The standard profile cannot be deleted.",
+            "delete_empty": "That profile slot is already empty.",
+            "delete_confirm": "Really delete profile {slot} including save data and memory? (yes/no): ",
+            "delete_done": "Profile {slot} was deleted.",
+            "invalid": "Invalid choice. Please try again.",
+            "current_path": "Storage",
+        }
+    return {
+        "title": "MAAT-RPG Profilmanager",
+        "subtitle": "Waehle ein Profil, bevor das Spiel startet.",
+        "slot_default": "Standardprofil",
+        "slot_extra": "Profil {slot}",
+        "active": "aktiv",
+        "empty": "leer",
+        "empty_hint": "Frischer Spielstand-Slot mit eigener Erinnerung und eigenen Zustaenden.",
+        "path_profile": "Pfadprofil",
+        "level": "Level",
+        "boss_wins": "Boss-Siege",
+        "principles": "Prinzipien",
+        "memory": "Erinnerung",
+        "delete_hint": "Druecke D oder L, um einen Profil-Slot zu loeschen.",
+        "prompt": "Waehle [1-4, ENTER = aktives Profil {active}, D/L = loeschen]: ",
+        "delete_slot_prompt": "Welcher Slot soll geloescht werden? [2-4]: ",
+        "delete_default": "Das Standardprofil kann nicht geloescht werden.",
+        "delete_empty": "Dieser Profil-Slot ist bereits leer.",
+        "delete_confirm": "Profil {slot} wirklich inklusive Spielstand und Erinnerung loeschen? (ja/nein): ",
+        "delete_done": "Profil {slot} wurde geloescht.",
+        "invalid": "Ungueltige Auswahl. Bitte nochmal.",
+        "current_path": "Speicherort",
+    }
+
+
+def _yes_choice(choice: str) -> bool:
+    return choice.strip().lower() in {"j", "ja", "y", "yes"}
+
+
+def _profile_slot_root(slot: int) -> Path:
+    if slot <= 1:
+        return BASE_APP_SUPPORT_DIR
+    return PROFILES_DIR / f"profile_{slot}"
+
+
+def _profile_slot_label(slot: int, language: str) -> str:
+    t = _profile_text(language)
+    return t["slot_default"] if slot == 1 else t["slot_extra"].format(slot=slot)
+
+
+def _profile_settings_path(slot: int) -> Path:
+    return _profile_slot_root(slot) / "state" / "settings_state.json"
+
+
+def _profile_language(slot: int) -> str:
+    settings = _load_json_file(_profile_settings_path(slot))
+    language = settings.get("language")
+    return language if language in ("de", "en") else "de"
+
+
+def _profile_has_explicit_language(slot: int) -> bool:
+    settings = _load_json_file(_profile_settings_path(slot))
+    return settings.get("language") in ("de", "en")
+
+
+def _read_profile_manager_state() -> dict:
+    data = _load_json_file(PROFILE_MANAGER_STATE_PATH)
+    slot = int(data.get("active_profile", 1) or 1)
+    if slot < 1 or slot > PROFILE_SLOT_COUNT:
+        slot = 1
+    return {"active_profile": slot}
+
+
+def _write_profile_manager_state(state: dict):
+    PROFILE_MANAGER_STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "active_profile": int(state.get("active_profile", 1) or 1),
+    }
+    with open(PROFILE_MANAGER_STATE_PATH, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2, ensure_ascii=False)
+
+
+def _profile_slot_used(slot: int) -> bool:
+    if slot == 1:
+        return True
+    root = _profile_slot_root(slot)
+    if not root.exists():
+        return False
+    try:
+        return any(root.iterdir())
+    except Exception:
+        return False
+
+
+def _profile_summary(slot: int, language: str | None = None) -> dict:
+    language = language if language in ("de", "en") else _profile_language(slot)
+    root = _profile_slot_root(slot)
+    story_state = _load_json_file(root / "state" / "story_state.json")
+    battle_state = _load_json_file(root / "state" / "battle_state.json")
+    player = battle_state.get("player", {})
+    stats = battle_state.get("stats", {})
+    world = battle_state.get("world", {})
+    path_profile = story_state.get("path_profile", {}) if isinstance(story_state.get("path_profile"), dict) else {}
+    path_profile = _localize_path_profile(path_profile, language)
+
+    return {
+        "slot": slot,
+        "used": _profile_slot_used(slot),
+        "language": language,
+        "root": root,
+        "title": path_profile.get("title"),
+        "rank": path_profile.get("rank"),
+        "motif": path_profile.get("motif"),
+        "level": int(player.get("level", 1) or 1),
+        "boss_wins": int(stats.get("boss_wins", 0) or 0),
+        "principles": int(world.get("principles_restored", 0) or 0),
+    }
+
+
+def _render_profile_manager(language: str, active_slot: int) -> str:
+    t = _profile_text(language)
+    lines = [
+        Fore.CYAN + Style.BRIGHT + "╔════════════════════════════════════════════════════╗" + Style.RESET_ALL,
+        Fore.CYAN + Style.BRIGHT + "║              MAAT-RPG PROFILE MANAGER             ║" + Style.RESET_ALL,
+        Fore.CYAN + Style.BRIGHT + "╚════════════════════════════════════════════════════╝" + Style.RESET_ALL,
+        "",
+        Fore.YELLOW + t["subtitle"] + Style.RESET_ALL,
+        "",
+    ]
+
+    for slot in range(1, PROFILE_SLOT_COUNT + 1):
+        info = _profile_summary(slot, language=language)
+        slot_name = t["slot_default"] if slot == 1 else t["slot_extra"].format(slot=slot)
+        marker = "★" if slot == active_slot else " "
+        state_label = t["active"] if slot == active_slot else t["empty"] if not info["used"] else ""
+        state_suffix = f" ({state_label})" if state_label else ""
+        lines.append(Fore.GREEN + f"{marker} [{slot}] {slot_name}{state_suffix}" + Style.RESET_ALL)
+        if info["used"] and info["title"]:
+            lines.append(f"    🜂 {t['path_profile']}: {info['title']}" + (f" — {info['rank']}" if info["rank"] else ""))
+            if info["motif"]:
+                lines.append(f"       {info['motif']}")
+            lines.append(
+                f"    📘 {t['level']} {info['level']}   ⚔️ {t['boss_wins']} {info['boss_wins']}   🌿 {t['principles']} {info['principles']}"
+            )
+        else:
+            lines.append(f"    {t['empty_hint']}")
+        lines.append(f"    📁 {t['current_path']}: {info['root']}")
+        lines.append("")
+
+    lines.append(Fore.CYAN + t["delete_hint"] + Style.RESET_ALL)
+    return "\n".join(lines)
+
+
+def _delete_profile_slot(slot: int):
+    if slot <= 1:
+        return
+    root = _profile_slot_root(slot)
+    if root.exists():
+        shutil.rmtree(root, ignore_errors=False)
+
+
+def _apply_profile_runtime(slot: int, language_hint: str | None = None):
+    global APP_SUPPORT_DIR, DATA_DIR, MODELS_DIR, LOGS_DIR, CACHE_DIR, SAVES_DIR, STATE_DIR, MODEL_DIR
+
+    profile_root = _profile_slot_root(slot)
+    models_dir = BASE_APP_SUPPORT_DIR / "models"
+    data_dir = profile_root / "data"
+    logs_dir = profile_root / "logs"
+    cache_dir = profile_root / "cache"
+    saves_dir = profile_root / "saves"
+    state_dir = profile_root / "state"
+
+    for path in [profile_root, models_dir, data_dir, logs_dir, cache_dir, saves_dir, state_dir]:
+        path.mkdir(parents=True, exist_ok=True)
+
+    os.environ["MAAT_APP_SUPPORT_DIR"] = str(profile_root)
+    os.environ["MAAT_DATA_DIR"] = str(data_dir)
+    os.environ["MAAT_MODELS_DIR"] = str(models_dir)
+    os.environ["MAAT_LOGS_DIR"] = str(logs_dir)
+    os.environ["MAAT_CACHE_DIR"] = str(cache_dir)
+    os.environ["MAAT_SAVES_DIR"] = str(saves_dir)
+    os.environ["MAAT_STATE_DIR"] = str(state_dir)
+
+    APP_SUPPORT_DIR = profile_root
+    DATA_DIR = data_dir
+    MODELS_DIR = models_dir
+    LOGS_DIR = logs_dir
+    CACHE_DIR = cache_dir
+    SAVES_DIR = saves_dir
+    STATE_DIR = state_dir
+    MODEL_DIR = str(MODELS_DIR)
+
+    settings_path = state_dir / "settings_state.json"
+    if language_hint in ("de", "en"):
+        settings = _load_json_file(settings_path)
+        if settings.get("language") not in ("de", "en"):
+            settings["language"] = language_hint
+            with open(settings_path, "w", encoding="utf-8") as f:
+                json.dump(settings, f, indent=2, ensure_ascii=False)
+
+
+def _choose_start_profile(preferred_language: str | None = None) -> tuple[int, str]:
+    state = _read_profile_manager_state()
+
+    while True:
+        active_slot = int(state.get("active_profile", 1) or 1)
+        if active_slot < 1 or active_slot > PROFILE_SLOT_COUNT:
+            active_slot = 1
+            state["active_profile"] = active_slot
+
+        language = preferred_language if preferred_language in ("de", "en") else _profile_language(active_slot)
+        t = _profile_text(language)
+
+        try:
+            subprocess.call("clear", shell=True)
+        except Exception:
+            pass
+
+        print(_render_profile_manager(language, active_slot))
+        choice = input(Fore.YELLOW + t["prompt"].format(active=active_slot) + Style.RESET_ALL).strip()
+
+        if not choice:
+            _write_profile_manager_state(state)
+            return active_slot, language
+
+        lowered = choice.lower()
+        if lowered in {"d", "l"}:
+            slot_raw = input(Fore.YELLOW + t["delete_slot_prompt"] + Style.RESET_ALL).strip()
+            if slot_raw not in {"2", "3", "4"}:
+                print(Fore.RED + t["invalid"] + Style.RESET_ALL)
+                time.sleep(1)
+                continue
+            slot = int(slot_raw)
+            if slot == 1:
+                print(Fore.RED + t["delete_default"] + Style.RESET_ALL)
+                time.sleep(1)
+                continue
+            if not _profile_slot_used(slot):
+                print(Fore.YELLOW + t["delete_empty"] + Style.RESET_ALL)
+                time.sleep(1)
+                continue
+            confirm = input(Fore.RED + t["delete_confirm"].format(slot=slot) + Style.RESET_ALL).strip()
+            if _yes_choice(confirm):
+                _delete_profile_slot(slot)
+                if active_slot == slot:
+                    state["active_profile"] = 1
+                _write_profile_manager_state(state)
+                print(Fore.GREEN + t["delete_done"].format(slot=slot) + Style.RESET_ALL)
+                time.sleep(1)
+            continue
+
+        if choice in {"1", "2", "3", "4"}:
+            slot = int(choice)
+            state["active_profile"] = slot
+            _write_profile_manager_state(state)
+            return slot, language
+
+        print(Fore.RED + t["invalid"] + Style.RESET_ALL)
+        time.sleep(1)
+
+
 def _title_text(language: str) -> dict:
     if language == "en":
         return {
@@ -272,6 +558,7 @@ def _title_text(language: str) -> dict:
             "level": "Level",
             "boss_wins": "Boss Victories",
             "principles": "Principles",
+            "profile_slot": "Profile",
             "enter": "ENTER - Awaken",
             "journal": "/journal - Decisions",
             "achievements": "/erfolge - Achievements",
@@ -291,6 +578,7 @@ def _title_text(language: str) -> dict:
         "level": "Level",
         "boss_wins": "Boss-Siege",
         "principles": "Prinzipien",
+        "profile_slot": "Profil",
         "enter": "ENTER - Erwachen",
         "journal": "/journal - Entscheidungen",
         "achievements": "/erfolge - Erfolge",
@@ -366,6 +654,7 @@ def _title_context() -> dict:
     restored = int(world.get("principles_restored", 0) or 0)
     boss_wins = int(stats.get("boss_wins", 0) or 0)
     level = int(player.get("level", 1) or 1)
+    active_profile = int(_read_profile_manager_state().get("active_profile", 1) or 1)
 
     if restored > 0:
         subtitle = text["subtitle_restored"]
@@ -385,6 +674,7 @@ def _title_context() -> dict:
         "level": level,
         "boss_wins": boss_wins,
         "restored": restored,
+        "active_profile_label": _profile_slot_label(active_profile, language),
     }
 
 
@@ -399,6 +689,7 @@ def _render_title_screen() -> str:
         "",
         Fore.YELLOW + ctx["subtitle"] + Style.RESET_ALL,
         "",
+        f"👤 {text['profile_slot']}: {ctx['active_profile_label']}",
         f"🜂 {text['profile']}: {ctx['title']} — {ctx['rank']}",
         f"   {ctx['motif']}",
         "",
@@ -417,6 +708,10 @@ def _render_title_screen() -> str:
 # -------------------------------------------------
 def start_classic():
     init(autoreset=True)
+    startup_language = _ui_language()
+    selected_profile, profile_language = _choose_start_profile(preferred_language=startup_language)
+    profile_language_hint = None if _profile_has_explicit_language(selected_profile) else (profile_language or startup_language)
+    _apply_profile_runtime(selected_profile, language_hint=profile_language_hint)
     print(Fore.GREEN + ("🌟 MAAT-KI RPG is starting …\n" if _ui_language() == "en" else "🌟 MAAT-KI RPG wird gestartet …\n") + Style.RESET_ALL)
 
     # -------------------------------------------------

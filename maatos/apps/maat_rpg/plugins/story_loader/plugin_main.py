@@ -578,6 +578,7 @@ class Plugin:
 
     def _render_journal(self) -> str:
         lines = [self._t("journal_title"), ""]
+        self._refresh_path_profile()
         profile = self.state.get("path_profile") or self._build_path_profile()
         if profile:
             lines.append(f"{self._t('journal_profile')}: {profile.get('title', self._t('journal_unknown'))} — {profile.get('rank', 'Erwachend')}")
@@ -1077,4 +1078,6 @@ class Plugin:
         return reply
 
     def on_startup(self, context=None):
+        self._refresh_path_profile()
+        self._save_state()
         print(self._t("startup"))

@@ -28,11 +28,14 @@ import time
 import threading
 from colorama import Fore, Style
 import shutil
-from shared.core.maat_paths import state_file, get_data_dir
+from pathlib import Path
+from shared.core.maat_paths import state_file, get_data_dir, get_default_app_support_dir, get_profiles_dir
 from shared.core.audio import ManagedAudioPlayer, stop_all_audio_backends
 
 
 SETTINGS_FILE = state_file("settings_state.json")
+PROFILE_MANAGER_STATE_PATH = get_default_app_support_dir() / "state" / "profile_manager_state.json"
+PROFILES_ROOT = get_profiles_dir()
 
 
 TEXT = {
@@ -49,6 +52,7 @@ TEXT = {
         "fallback_title": "Suchender im Aeon der Maat",
         "fallback_rank": "Erwachend",
         "fallback_motif": "Die Welt tastet nach der Form, die Maatis annimmt.",
+        "profile_slot": "Profil",
         "profile": "Pfadprofil",
         "rank": "Rang",
         "motif": "Motiv",
@@ -85,11 +89,23 @@ TEXT = {
         "opt_full_reset": "[7] Alles zuruecksetzen (Story + Battle + Self-Evo)",
         "opt_memory": "[8] Alle Erinnerungen loeschen (Application Support/MAAT-RPG/data)",
         "opt_language": "[9] Sprache wechseln",
-        "opt_back": "[10] Zurueck",
+        "opt_profile_switch": "[10] Profil wechseln: {value}",
+        "opt_profile_delete": "[11] Profil loeschen",
+        "opt_back": "[12] Zurueck",
         "speed_slow": "Langsam",
         "speed_fast": "Schnell",
         "music_on": "An",
         "music_off": "Aus",
+        "profile_standard": "Standardprofil",
+        "profile_slot": "Profil",
+        "profile_change_prompt": "Welches Profil soll aktiv werden? [1-4]: ",
+        "profile_change_done": "✅ Aktives Profil gesetzt: {label}",
+        "profile_change_restart": "Bitte starte MAAT-RPG neu, damit das neue Profil geladen wird.\n",
+        "profile_delete_prompt": "Welches Profil soll geloescht werden? [2-4]: ",
+        "profile_delete_active": "Das aktuell aktive Profil kann hier nicht geloescht werden. Bitte zuerst wechseln.",
+        "profile_delete_empty": "Dieser Profil-Slot ist bereits leer.",
+        "profile_delete_confirm": "Profil {label} wirklich inklusive Spielstand und Erinnerung loeschen? (ja/nein): ",
+        "profile_delete_done": "🗑 Profil {label} wurde geloescht.",
         "info_title": "ℹ MAAT-OS – Info",
         "info_overview": "[1] Was ist MAAT-OS?",
         "info_plugins": "[2] Wie funktioniert das Plugin-System?",
@@ -170,6 +186,7 @@ TEXT = {
         "fallback_title": "Seeker in the Aeon of Maat",
         "fallback_rank": "Awakening",
         "fallback_motif": "The world is feeling for the shape Maatis is becoming.",
+        "profile_slot": "Profile",
         "profile": "Path Profile",
         "rank": "Rank",
         "motif": "Motive",
@@ -206,11 +223,23 @@ TEXT = {
         "opt_full_reset": "[7] Reset everything (Story + Battle + Self-Evo)",
         "opt_memory": "[8] Delete all memories (Application Support/MAAT-RPG/data)",
         "opt_language": "[9] Change language",
-        "opt_back": "[10] Back",
+        "opt_profile_switch": "[10] Change profile: {value}",
+        "opt_profile_delete": "[11] Delete profile",
+        "opt_back": "[12] Back",
         "speed_slow": "Slow",
         "speed_fast": "Fast",
         "music_on": "On",
         "music_off": "Off",
+        "profile_standard": "Standard profile",
+        "profile_slot": "Profile",
+        "profile_change_prompt": "Which profile should become active? [1-4]: ",
+        "profile_change_done": "✅ Active profile set: {label}",
+        "profile_change_restart": "Please restart MAAT-RPG so the new profile can be loaded.\n",
+        "profile_delete_prompt": "Which profile should be deleted? [2-4]: ",
+        "profile_delete_active": "The currently active profile cannot be deleted here. Please switch first.",
+        "profile_delete_empty": "That profile slot is already empty.",
+        "profile_delete_confirm": "Really delete {label} including save data and memory? (yes/no): ",
+        "profile_delete_done": "🗑 Profile {label} was deleted.",
         "info_title": "ℹ MAAT-OS – Info",
         "info_overview": "[1] What is MAAT-OS?",
         "info_plugins": "[2] How does the plugin system work?",
@@ -407,6 +436,51 @@ def _load_state(name: str) -> dict:
         return {}
 
 
+def _active_profile_slot() -> int:
+    try:
+        data = json.loads(Path(PROFILE_MANAGER_STATE_PATH).read_text(encoding="utf-8"))
+        slot = int(data.get("active_profile", 1) or 1)
+        return slot if 1 <= slot <= 4 else 1
+    except Exception:
+        return 1
+
+
+def _active_profile_label(language: str) -> str:
+    slot = _active_profile_slot()
+    return _profile_slot_label(slot, language)
+
+
+def _profile_slot_label(slot: int, language: str) -> str:
+    t = TEXT.get(language, TEXT["de"])
+    if slot == 1:
+        return t["profile_standard"]
+    return f"Profile {slot}" if language == "en" else f"Profil {slot}"
+
+
+def _profile_slot_root(slot: int) -> Path:
+    if slot <= 1:
+        return get_default_app_support_dir()
+    return PROFILES_ROOT / f"profile_{slot}"
+
+
+def _profile_slot_used(slot: int) -> bool:
+    if slot == 1:
+        return True
+    root = _profile_slot_root(slot)
+    if not root.exists():
+        return False
+    try:
+        return any(root.iterdir())
+    except Exception:
+        return False
+
+
+def _save_active_profile_slot(slot: int):
+    PROFILE_MANAGER_STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(PROFILE_MANAGER_STATE_PATH, "w", encoding="utf-8") as f:
+        json.dump({"active_profile": slot}, f, indent=2, ensure_ascii=False)
+
+
 def _localize_path_profile(profile: dict, language: str) -> dict:
     localized = dict(profile or {})
     if language != "en":
@@ -468,6 +542,7 @@ def _menu_context() -> dict:
     profile = _localize_path_profile(profile, language)
 
     return {
+        "active_profile_label": _active_profile_label(language),
         "profile_title": profile.get("title"),
         "profile_rank": profile.get("rank"),
         "profile_motif": profile.get("motif"),
@@ -493,6 +568,8 @@ def _render_progress_panel(language: str) -> str:
         Fore.YELLOW + Style.BRIGHT + t["brand"] + Style.RESET_ALL,
         Fore.CYAN + Style.BRIGHT + t["version"] + Style.RESET_ALL,
         "",
+        Fore.GREEN + f"{t['profile_slot']}: {ctx['active_profile_label']}" + Style.RESET_ALL,
+        "",
         Fore.MAGENTA + Style.BRIGHT + f"{t['profile']}: {profile_title}" + Style.RESET_ALL,
         f"{t['rank']}: {profile_rank}",
         f"{t['motif']}: {profile_motif}",
@@ -507,11 +584,14 @@ def _render_progress_panel(language: str) -> str:
 
 def _render_title_screen(language: str) -> str:
     t = TEXT.get(language, TEXT["de"])
+    active_profile_label = _active_profile_label(language)
     lines = [
         Fore.CYAN + Style.BRIGHT + PYRAMID + Style.RESET_ALL,
         "",
         Fore.YELLOW + Style.BRIGHT + t["brand"] + Style.RESET_ALL,
         Fore.CYAN + Style.BRIGHT + t["version"] + Style.RESET_ALL,
+        "",
+        Fore.GREEN + f"{t['profile_slot']}: {active_profile_label}" + Style.RESET_ALL,
         "",
         Fore.GREEN + Style.BRIGHT + t["title_continue"] + Style.RESET_ALL,
         Fore.CYAN + t["title_idle_hint"] + Style.RESET_ALL,
@@ -1028,12 +1108,67 @@ def confirm_reset(plugin_dir: str, full_reset: bool, menu_music: MenuMusic):
     sys.exit(0)
 
 
+def _change_profile_from_settings(menu_music: MenuMusic, language: str):
+    t = TEXT.get(language, TEXT["de"])
+    choice = input(Fore.GREEN + t["profile_change_prompt"] + Style.RESET_ALL).strip()
+    if choice not in {"1", "2", "3", "4"}:
+        print(Fore.RED + t["invalid"] + Style.RESET_ALL)
+        time.sleep(1)
+        return
+
+    slot = int(choice)
+    label = _profile_slot_label(slot, language)
+    current = _active_profile_slot()
+    if slot == current:
+        print(Fore.CYAN + t["profile_change_done"].format(label=label) + Style.RESET_ALL)
+        time.sleep(1)
+        return
+
+    _save_active_profile_slot(slot)
+    menu_music.stop()
+    print(Fore.GREEN + t["profile_change_done"].format(label=label) + Style.RESET_ALL)
+    print()
+    print(t["profile_change_restart"])
+    time.sleep(2)
+    sys.exit(0)
+
+
+def _delete_profile_from_settings(language: str):
+    t = TEXT.get(language, TEXT["de"])
+    choice = input(Fore.GREEN + t["profile_delete_prompt"] + Style.RESET_ALL).strip()
+    if choice not in {"2", "3", "4"}:
+        print(Fore.RED + t["invalid"] + Style.RESET_ALL)
+        time.sleep(1)
+        return
+
+    slot = int(choice)
+    if slot == _active_profile_slot():
+        print(Fore.YELLOW + t["profile_delete_active"] + Style.RESET_ALL)
+        time.sleep(1.4)
+        return
+
+    if not _profile_slot_used(slot):
+        print(Fore.YELLOW + t["profile_delete_empty"] + Style.RESET_ALL)
+        time.sleep(1)
+        return
+
+    label = _profile_slot_label(slot, language)
+    confirm = input(Fore.RED + t["profile_delete_confirm"].format(label=label) + Style.RESET_ALL).strip()
+    if not _yes(confirm):
+        return
+
+    shutil.rmtree(_profile_slot_root(slot), ignore_errors=False)
+    print(Fore.GREEN + t["profile_delete_done"].format(label=label) + Style.RESET_ALL)
+    time.sleep(1.2)
+
+
 def options_menu(plugin_dir: str, menu_music: MenuMusic):
     while True:
         settings = _load_settings()
         language = settings.get("language", "de")
         t = TEXT.get(language, TEXT["de"])
         speed_label, music_label, voice_label, thinking_label, hallu_label = _settings_labels(language, settings)
+        active_profile_label = _active_profile_label(language)
         clear_screen()
         print(Fore.YELLOW + Style.BRIGHT + t["options_title"] + "\n" + Style.RESET_ALL)
         print("  " + t["opt_text_speed"].format(value=speed_label))
@@ -1045,6 +1180,8 @@ def options_menu(plugin_dir: str, menu_music: MenuMusic):
         print(f"  {t['opt_full_reset']}")
         print(f"  {t['opt_memory']}")
         print(f"  {t['opt_language']}")
+        print("  " + t["opt_profile_switch"].format(value=active_profile_label))
+        print(f"  {t['opt_profile_delete']}")
         print(f"  {t['opt_back']}\n")
 
         choice = input(Fore.GREEN + t["choice"] + Style.RESET_ALL).strip()
@@ -1088,6 +1225,10 @@ def options_menu(plugin_dir: str, menu_music: MenuMusic):
                 menu_music.stop()
                 menu_music.start()
         elif choice == "10":
+            _change_profile_from_settings(menu_music, language)
+        elif choice == "11":
+            _delete_profile_from_settings(language)
+        elif choice == "12":
             break
         else:
             print(Fore.RED + t["invalid"] + Style.RESET_ALL)
@@ -1351,6 +1492,8 @@ class Plugin:
 
         if choice == "2":
             options_menu(self.plugin_dir, self.menu_music)
+            self.settings = _load_settings()
+            self.language = self.settings.get("language")
             return "menu"
 
         if choice == "3":

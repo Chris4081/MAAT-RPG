@@ -698,7 +698,7 @@ class BattleCore:
                 log_lines.append(reward_txt)
         else:
             # Niederlage
-            print(f"\n💀 Du wurdest von **{enemy_name}** besiegt...")
+            print(f"\n💀 You were defeated by **{enemy_name}**..." if self._lang() == "en" else f"\n💀 Du wurdest von **{enemy_name}** besiegt...")
             log_lines.append(f"Niederlage gegen {enemy_name}")
             stats["fights_lost"] += 1
             # Zurück zum letzten Boss-Checkpoint (weiche Rücksetzung)

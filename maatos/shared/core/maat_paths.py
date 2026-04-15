@@ -17,50 +17,52 @@ def _default_app_support_dir() -> Path:
     return Path.home() / ".local" / "share" / APP_NAME
 
 
-def get_app_support_dir() -> Path:
-    env = os.environ.get("MAAT_APP_SUPPORT_DIR")
-    if env:
-        path = Path(env)
-    else:
-        path = _default_app_support_dir()
+def _ensure_dir(path: Path) -> Path:
     path.mkdir(parents=True, exist_ok=True)
     return path
+
+
+def _dir_from_env(env_name: str, fallback: Path) -> Path:
+    env = os.environ.get(env_name)
+    if env:
+        return _ensure_dir(Path(env))
+    return _ensure_dir(fallback)
+
+
+def get_default_app_support_dir() -> Path:
+    return _ensure_dir(_default_app_support_dir())
+
+
+def get_app_support_dir() -> Path:
+    return _dir_from_env("MAAT_APP_SUPPORT_DIR", _default_app_support_dir())
 
 
 def get_data_dir() -> Path:
-    path = get_app_support_dir() / "data"
-    path.mkdir(parents=True, exist_ok=True)
-    return path
+    return _dir_from_env("MAAT_DATA_DIR", get_app_support_dir() / "data")
 
 
 def get_models_dir() -> Path:
-    path = get_app_support_dir() / "models"
-    path.mkdir(parents=True, exist_ok=True)
-    return path
+    return _dir_from_env("MAAT_MODELS_DIR", get_app_support_dir() / "models")
 
 
 def get_logs_dir() -> Path:
-    path = get_app_support_dir() / "logs"
-    path.mkdir(parents=True, exist_ok=True)
-    return path
+    return _dir_from_env("MAAT_LOGS_DIR", get_app_support_dir() / "logs")
 
 
 def get_cache_dir() -> Path:
-    path = get_app_support_dir() / "cache"
-    path.mkdir(parents=True, exist_ok=True)
-    return path
+    return _dir_from_env("MAAT_CACHE_DIR", get_app_support_dir() / "cache")
 
 
 def get_saves_dir() -> Path:
-    path = get_app_support_dir() / "saves"
-    path.mkdir(parents=True, exist_ok=True)
-    return path
+    return _dir_from_env("MAAT_SAVES_DIR", get_app_support_dir() / "saves")
 
 
 def get_state_dir() -> Path:
-    path = get_app_support_dir() / "state"
-    path.mkdir(parents=True, exist_ok=True)
-    return path
+    return _dir_from_env("MAAT_STATE_DIR", get_app_support_dir() / "state")
+
+
+def get_profiles_dir() -> Path:
+    return _ensure_dir(get_default_app_support_dir() / "profiles")
 
 
 def data_file(name: str) -> str:
