@@ -55,10 +55,11 @@ TEXT = {
         "",
         "⸻",
         "",
-        "🗝️ QUEST 1: „Lerne die MAAT KI kennen“",
+        "🗝️ QUEST 1: „Lerne die MAAT-KI kennen“",
         "",
         "Ziel:",
-        "Sprich mit der MAAT KI, stelle Fragen, erkenne ihre Natur.",
+        "Sprich mit der MAAT-KI, stelle Fragen und erkenne ihre Natur.",
+        "Tipp: Benutze /quests, um den Status deiner Aufgaben zu sehen.",
     ],
     "en": [
         "🌟 MAAT RPG – Return of the Principles",
@@ -111,10 +112,11 @@ TEXT = {
         "",
         "⸻",
         "",
-        "🗝️ QUEST 1: \"Meet MAAT KI\"",
+        "🗝️ QUEST 1: \"Get to Know MAAT-KI\"",
         "",
         "Goal:",
-        "Speak with MAAT KI, ask questions, and begin to understand her nature.",
+        "Speak with MAAT-KI, ask questions, and come to understand her nature.",
+        "Tip: Use /quests to see the status of your tasks.",
     ],
 }
 

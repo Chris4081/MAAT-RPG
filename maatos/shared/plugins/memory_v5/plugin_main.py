@@ -19,6 +19,7 @@ from datetime import datetime
 
 import numpy as np
 from shared.core.rpg_i18n import get_language
+from shared.core.maat_paths import data_file
 from shared.core.vector_index import faiss_available, load_vector_index, save_vector_index
 
 # -------------------------------------------------------------
@@ -64,19 +65,11 @@ class Plugin:
     # INIT
     # -------------------------------------------------------------
     def __init__(self):
-        # 🔹 Schreibbarer Benutzerpfad für macOS
-        app_support_dir = os.path.join(
-            os.path.expanduser("~"),
-            "Library",
-            "Application Support",
-            "MAAT-RPG",
-            "data"
-        )
-        os.makedirs(app_support_dir, exist_ok=True)
-
-        self.db_path = os.path.join(app_support_dir, "memory_v5.db")
-        self.index_path = os.path.join(app_support_dir, "memory_v5.index")
-        self.identity_path = os.path.join(app_support_dir, "memory_v5_identity.json")
+        # Nutzt den aktiven MAAT-Datenpfad, damit Profile automatisch getrennte
+        # Memory-Dateien erhalten.
+        self.db_path = data_file("memory_v5.db")
+        self.index_path = data_file("memory_v5.index")
+        self.identity_path = data_file("memory_v5_identity.json")
 
         self.debug = False
         self.debug_once = False
@@ -251,6 +244,7 @@ class Plugin:
                 self._t("📦 MAAT-Memory v5 Uebersicht\n", "📦 MAAT Memory v5 Overview\n")
                 + f"• {self._t('Identitaet', 'Identity')}: {ident.get('name')} v{ident.get('version')}\n"
                 + f"• {self._t('Zweck', 'Purpose')}: {ident.get('purpose')}\n"
+                + f"• {self._t('Speicherordner', 'Storage directory')}: {os.path.dirname(self.db_path)}\n"
                 + f"• {self._t('DB-Pfad', 'DB path')}: {self.db_path}\n"
                 + f"• {self._t('Index', 'Index')}: {self.index_path}\n"
                 + f"• {self._t('Backend', 'Backend')}: {self.vector_backend}\n"
@@ -305,6 +299,7 @@ class Plugin:
                 + self._t("- Episodisches Memory: SQLite (table: episodic)\n", "- Episodic memory: SQLite (table: episodic)\n")
                 + self._t(f"- Semantisches Memory: {self.vector_backend.upper()}-Index (Dim={EMBED_DIM}, Vektoren={self.index.ntotal})\n", f"- Semantic memory: {self.vector_backend.upper()} index (dim={EMBED_DIM}, vectors={self.index.ntotal})\n")
                 + self._t("- Resonanz: Maat-Felder H,B,S,V,R -> Spalte 'resonance'\n", "- Resonance: MAAT fields H,B,S,V,R -> column 'resonance'\n")
+                + self._t("- Speicherort: aktiver Profil-Datenordner, nicht der Spielordner\n", "- Storage location: active profile data directory, not the game folder\n")
                 + self._t("- Hooks: before_chat() und after_response() speichern automatisch.", "- Hooks: before_chat() and after_response() save automatically.")
             )
 

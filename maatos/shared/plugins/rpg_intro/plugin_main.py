@@ -20,9 +20,19 @@ import sys
 import time
 import threading
 import subprocess
-import termios
-import tty
 import select
+
+try:
+    import termios  # type: ignore
+    import tty  # type: ignore
+except Exception:
+    termios = None  # type: ignore
+    tty = None  # type: ignore
+
+try:
+    import msvcrt  # type: ignore
+except Exception:
+    msvcrt = None  # type: ignore
 
 
 # -----------------------------------------------------------
@@ -130,6 +140,17 @@ class Plugin:
         if self._abort:
             return True
 
+        if msvcrt is not None:
+            try:
+                if msvcrt.kbhit():
+                    ch = msvcrt.getwch()
+                    if ch == "\x1b":
+                        self._abort = True
+                        return True
+            except Exception:
+                return False
+            return False
+
         try:
             dr, _, _ = select.select([sys.stdin], [], [], 0)
             if dr:
@@ -231,9 +252,16 @@ class Plugin:
         self._abort = False
 
         # Terminal in cbreak-Modus für ESC
-        fd = sys.stdin.fileno()
-        old_settings = termios.tcgetattr(fd)
-        tty.setcbreak(fd)
+        fd = None
+        old_settings = None
+        if termios is not None and tty is not None:
+            try:
+                fd = sys.stdin.fileno()
+                old_settings = termios.tcgetattr(fd)
+                tty.setcbreak(fd)
+            except Exception:
+                fd = None
+                old_settings = None
 
         base_dir = os.path.dirname(__file__)
 
@@ -272,12 +300,21 @@ class Plugin:
                     return
 
                 # normaler Input, aber Zeichenweise
-                dr, _, _ = select.select([sys.stdin], [], [], 0.05)
-                if dr:
-                    ch = sys.stdin.read(1)
-                    if ch == "\n":  # ENTER
-                        break
-                    # andere Tasten ignorieren
+                if msvcrt is not None:
+                    try:
+                        if msvcrt.kbhit():
+                            ch = msvcrt.getwch()
+                            if ch in ("\n", "\r"):
+                                break
+                    except Exception:
+                        pass
+                else:
+                    dr, _, _ = select.select([sys.stdin], [], [], 0.05)
+                    if dr:
+                        ch = sys.stdin.read(1)
+                        if ch == "\n":  # ENTER
+                            break
+                        # andere Tasten ignorieren
                 # kleine Pause, um CPU zu schonen
                 time.sleep(0.01)
 
@@ -310,4 +347,8 @@ class Plugin:
 
         finally:
             # Terminal-Einstellungen zurücksetzen
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            if fd is not None and old_settings is not None and termios is not None:
+                try:
+                    termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+                except Exception:
+                    pass

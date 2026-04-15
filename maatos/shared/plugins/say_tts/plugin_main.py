@@ -97,6 +97,11 @@ class Plugin:
                 return "espeak-ng"
             if shutil.which("espeak"):
                 return "espeak"
+        if system == "windows":
+            if shutil.which("powershell"):
+                return "powershell"
+            if shutil.which("pwsh"):
+                return "pwsh"
         return None
 
     def _backend_label(self) -> str:
@@ -134,6 +139,8 @@ class Plugin:
             return self.SPDSAY_LANGS.get(lang, "en")
         if self.tts_backend in {"espeak-ng", "espeak"}:
             return self.ESPEAK_VOICES.get(lang, "en-us")
+        if self.tts_backend in {"powershell", "pwsh"}:
+            return ""
         return ""
 
     def _sync_voice_with_language(self):
@@ -147,10 +154,18 @@ class Plugin:
             return "de, en"
         if self.tts_backend in {"espeak-ng", "espeak"}:
             return "de, en-us"
+        if self.tts_backend in {"powershell", "pwsh"}:
+            return "default, Microsoft Zira Desktop, Microsoft David Desktop"
         return "de, en"
 
     def _spd_rate(self) -> str:
         return str(max(-100, min(100, int((self.rate - 175) * 0.8))))
+
+    def _windows_rate(self) -> int:
+        return max(-10, min(10, int(round((self.rate - 180) / 18))))
+
+    def _ps_quote(self, value: str) -> str:
+        return (value or "").replace("'", "''")
 
     def _tts_command(self, text: str) -> list[str] | None:
         if not self.tts_backend:
@@ -167,6 +182,19 @@ class Plugin:
         if self.tts_backend in {"espeak-ng", "espeak"}:
             voice = self.voice or self._default_voice() or self.ESPEAK_VOICES.get(self._lang(), "en-us")
             return [self.tts_backend, "-s", str(self.rate), "-v", voice, text]
+
+        if self.tts_backend in {"powershell", "pwsh"}:
+            exe = shutil.which(self.tts_backend) or self.tts_backend
+            text_q = self._ps_quote(text)
+            voice_q = self._ps_quote(self.voice or "")
+            command = (
+                "Add-Type -AssemblyName System.Speech; "
+                "$s = New-Object System.Speech.Synthesis.SpeechSynthesizer; "
+                f"$s.Rate = {self._windows_rate()}; "
+                f"if ('{voice_q}' -ne '') {{ try {{ $s.SelectVoice('{voice_q}') }} catch {{ }} }}; "
+                f"$s.Speak('{text_q}')"
+            )
+            return [exe, "-NoProfile", "-Command", command]
 
         return None
 
@@ -365,8 +393,8 @@ class Plugin:
         if c == "/say on":
             if not self.tts_backend:
                 return True, self._t(
-                    "✖ Kein TTS-Backend gefunden. Unter Linux bitte spd-say, espeak-ng oder espeak installieren.",
-                    "✖ No TTS backend found. On Linux, please install spd-say, espeak-ng, or espeak.",
+                    "✖ Kein TTS-Backend gefunden. Unter macOS wird 'say', unter Linux spd-say/espeak und unter Windows PowerShell mit System.Speech erwartet.",
+                    "✖ No TTS backend found. Expected: 'say' on macOS, spd-say/espeak on Linux, or PowerShell with System.Speech on Windows.",
                 )
             self._set_tts_enabled_setting(True)
             return True, self._t("🔊 Say-TTS aktiviert.", "🔊 Say-TTS enabled.")

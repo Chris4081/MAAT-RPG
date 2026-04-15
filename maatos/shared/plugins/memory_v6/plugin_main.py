@@ -22,6 +22,7 @@ from datetime import datetime
 import numpy as np
 import hashlib
 from shared.core.rpg_i18n import get_language
+from shared.core.maat_paths import data_file
 from shared.core.vector_index import faiss_available, load_vector_index, save_vector_index
 
 EMBED_DIM = 128
@@ -58,18 +59,11 @@ class Plugin:
     # INIT
     # -------------------------------------------------------
     def __init__(self):
-        app_support_dir = os.path.join(
-            os.path.expanduser("~"),
-            "Library",
-            "Application Support",
-            "MAAT-RPG",
-            "data"
-        )
-        os.makedirs(app_support_dir, exist_ok=True)
-
-        self.db_path = os.path.join(app_support_dir, "mem6.db")
-        self.index_path = os.path.join(app_support_dir, "mem6.index")
-        self.identity_path = os.path.join(app_support_dir, "mem6_identity.json")
+        # Nutzt den aktiven MAAT-Datenpfad, damit Profile automatisch getrennte
+        # Memory-Dateien erhalten.
+        self.db_path = data_file("mem6.db")
+        self.index_path = data_file("mem6.index")
+        self.identity_path = data_file("mem6_identity.json")
         self.debug = False
         self.debug_once = False
 
@@ -318,6 +312,7 @@ class Plugin:
             return (
                 self._t("📦 MAAT-Memory v6 Uebersicht:\n", "📦 MAAT Memory v6 Overview:\n")
                 + f"- {self._t('Identitaet', 'Identity')}: {ident}\n"
+                + f"- {self._t('Speicherordner', 'Storage directory')}: {os.path.dirname(self.db_path)}\n"
                 + f"- DB: {self.db_path}\n"
                 + f"- {self._t('Backend', 'Backend')}: {self.vector_backend}\n"
                 + f"- {self._t('Indexgroesse', 'Index size')}: {self.index.ntotal}\n"
@@ -330,6 +325,7 @@ class Plugin:
                 + self._t("- Topic-Slots\n", "- Topic slots\n")
                 + self._t("- Safe Context Injection\n", "- Safe context injection\n")
                 + self._t("- Identity-Store\n", "- Identity store\n")
+                + self._t("- Speicherort: aktiver Profil-Datenordner, nicht der Spielordner\n", "- Storage location: active profile data directory, not the game folder\n")
                 + self._t("- Debug-Modus verfuegbar", "- Debug mode available")
             )
 

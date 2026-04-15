@@ -11,12 +11,22 @@ MAAT-KI Streaming Engine — v4.0 Router Edition
 import sys
 import time
 import threading
-import tty
-import termios
 import select
 import re
 import json
 from colorama import Fore, Style
+
+try:
+    import tty  # type: ignore
+    import termios  # type: ignore
+except Exception:
+    tty = None  # type: ignore
+    termios = None  # type: ignore
+
+try:
+    import msvcrt  # type: ignore
+except Exception:
+    msvcrt = None  # type: ignore
 
 from .backend_router import stream_chat as backend_stream_chat
 from .rpg_i18n import get_language
@@ -34,11 +44,29 @@ FIRST_RUN_DONE = False
 # =====================================================================
 
 def key_pressed():
+    if msvcrt is not None:
+        try:
+            return bool(msvcrt.kbhit())
+        except Exception:
+            return False
     dr, _, _ = select.select([sys.stdin], [], [], 0)
     return bool(dr)
 
 def read_key():
+    if msvcrt is not None:
+        try:
+            return msvcrt.getwch()
+        except Exception:
+            return ""
     return sys.stdin.read(1)
+
+
+def _can_use_posix_cbreak() -> bool:
+    return (
+        termios is not None
+        and tty is not None
+        and bool(getattr(sys.stdin, "isatty", lambda: False)())
+    )
 
 
 # =====================================================================
@@ -148,9 +176,16 @@ def _router_stream(llm, messages, perf, plugin_api):
             target=rainbow_progress, args=(stop_event,), daemon=True
         ).start()
 
-    fd = sys.stdin.fileno()
-    old = termios.tcgetattr(fd)
-    tty.setcbreak(fd)
+    fd = None
+    old = None
+    if _can_use_posix_cbreak():
+        try:
+            fd = sys.stdin.fileno()
+            old = termios.tcgetattr(fd)
+            tty.setcbreak(fd)
+        except Exception:
+            fd = None
+            old = None
 
     try:
         # Router → liefert Generator mit String-Chunks
@@ -200,7 +235,11 @@ def _router_stream(llm, messages, perf, plugin_api):
 
     finally:
         stop_event.set()
-        termios.tcsetattr(fd, termios.TCSADRAIN, old)
+        if fd is not None and old is not None and termios is not None:
+            try:
+                termios.tcsetattr(fd, termios.TCSADRAIN, old)
+            except Exception:
+                pass
 
     plugin_api.call_after(full)
 
@@ -241,8 +280,8 @@ def stream_to_console(generator, echo: bool = True):
     Gibt immer den bisher gesammelten Text zurück.
     """
 
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
+    fd = None
+    old_settings = None
 
     full = ""
     pending = ""
@@ -271,15 +310,21 @@ def stream_to_console(generator, echo: bool = True):
         announced_thinking = True
 
     try:
-        tty.setcbreak(fd)
+        if _can_use_posix_cbreak():
+            try:
+                fd = sys.stdin.fileno()
+                old_settings = termios.tcgetattr(fd)
+                tty.setcbreak(fd)
+            except Exception:
+                fd = None
+                old_settings = None
 
         for tok in generator:
             if tok is None:
                 continue
 
-            r, _, _ = select.select([sys.stdin], [], [], 0)
-            if r:
-                ch = sys.stdin.read(1)
+            if key_pressed():
+                ch = read_key()
                 if ch == "\x1b":
                     if echo:
                         print(Style.RESET_ALL + "\n⏹️ Stream mit ESC abgebrochen.\n")
@@ -329,7 +374,11 @@ def stream_to_console(generator, echo: bool = True):
             print(Style.RESET_ALL + Fore.RED + f"[STREAM PRINT ERROR] {e}" + Style.RESET_ALL)
 
     finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        if fd is not None and old_settings is not None and termios is not None:
+            try:
+                termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            except Exception:
+                pass
 
     if pending and not inside_think:
         pending = re.sub(r"</?think>", "", pending, flags=re.IGNORECASE)

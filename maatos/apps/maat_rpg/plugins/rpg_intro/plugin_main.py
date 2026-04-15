@@ -16,11 +16,21 @@ import os
 import sys
 import time
 import subprocess
-import termios
-import tty
 import select
 from shared.core.rpg_i18n import get_language
 from shared.core.audio import music_enabled, play_audio_process, stop_audio_process
+
+try:
+    import termios  # type: ignore
+    import tty  # type: ignore
+except Exception:
+    termios = None  # type: ignore
+    tty = None  # type: ignore
+
+try:
+    import msvcrt  # type: ignore
+except Exception:
+    msvcrt = None  # type: ignore
 
 # Ziel-Gesamtdauer in Sekunden (3:47 = 3*60 + 47 = 227)
 TOTAL_INTRO_DURATION = 227.0
@@ -186,6 +196,17 @@ class Plugin:
         if self._abort:
             return True
 
+        if msvcrt is not None:
+            try:
+                if msvcrt.kbhit():
+                    ch = msvcrt.getwch()
+                    if ch in ("\x1b", "\n", "\r"):
+                        self._abort = True
+                        return True
+            except Exception:
+                return False
+            return False
+
         try:
             dr, _, _ = select.select([sys.stdin], [], [], 0)
             if dr:
@@ -294,9 +315,16 @@ class Plugin:
             return
 
         self._abort = False
-        fd = sys.stdin.fileno()
-        old_settings = termios.tcgetattr(fd)
-        tty.setcbreak(fd)
+        fd = None
+        old_settings = None
+        if termios is not None and tty is not None:
+            try:
+                fd = sys.stdin.fileno()
+                old_settings = termios.tcgetattr(fd)
+                tty.setcbreak(fd)
+            except Exception:
+                fd = None
+                old_settings = None
 
         base_dir = os.path.dirname(__file__)
         start_time = time.time()
@@ -345,4 +373,8 @@ class Plugin:
         finally:
             # Musik immer stoppen + Terminal zurücksetzen
             self._stop_music()
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            if fd is not None and old_settings is not None and termios is not None:
+                try:
+                    termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+                except Exception:
+                    pass

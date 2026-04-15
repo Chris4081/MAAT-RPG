@@ -17,13 +17,23 @@ import random
 import time
 import subprocess
 import select
-import termios
-import tty
 import sys
 import datetime
 from colorama import Fore, Style
 from shared.core.maat_paths import data_file, state_file, log_file
 from shared.core.audio import ManagedAudioPlayer, music_enabled
+
+try:
+    import termios  # type: ignore
+    import tty  # type: ignore
+except Exception:
+    termios = None  # type: ignore
+    tty = None  # type: ignore
+
+try:
+    import msvcrt  # type: ignore
+except Exception:
+    msvcrt = None  # type: ignore
 
 
 SETTINGS_FILE = state_file("settings_state.json")
@@ -299,12 +309,23 @@ class BattleCore:
             return False
         if context.get("title_demo_abort"):
             return True
+
+        if msvcrt is not None:
+            try:
+                if msvcrt.kbhit():
+                    msvcrt.getwch()
+                    return True
+            except Exception:
+                return False
+            return False
+
         fd = None
         old_settings = None
         try:
             fd = sys.stdin.fileno()
-            old_settings = termios.tcgetattr(fd)
-            tty.setcbreak(fd)
+            if termios is not None and tty is not None:
+                old_settings = termios.tcgetattr(fd)
+                tty.setcbreak(fd)
             ready, _, _ = select.select([sys.stdin], [], [], 0)
             if ready:
                 try:
@@ -315,7 +336,7 @@ class BattleCore:
         except Exception:
             return False
         finally:
-            if fd is not None and old_settings is not None:
+            if fd is not None and old_settings is not None and termios is not None:
                 try:
                     termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
                 except Exception:

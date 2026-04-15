@@ -14,6 +14,16 @@ from shared.core.maat_paths import state_file
 # damit Spieler das kommende Quest-System schon erahnen und MAAT erkunden.
 PRE_INTRO_QUESTS = [
     {
+        "id": "know_maat_ki",
+        "name": "Lerne die MAAT-KI kennen",
+        "desc": "Sprich in den ersten zehn Nachrichten mit der MAAT-KI, um ihren Ton und ihren Weg kennenzulernen.",
+        "type": "counter",
+        "counter_key": "messages_total",
+        "target": 10,
+        "reward_xp": 20,
+        "level_tier": -2,
+    },
+    {
         "id": "maat_first_calc",
         "name": "Erste Maat-Berechnung",
         "desc": "Berechne mit der MAAT-KI deine ersten Maat-Werte — siehe Einführung. Frage zum Beispiel: 'Berechne den Maat-Wert von X'.",
@@ -540,6 +550,10 @@ LOCKED_QUESTS = [
 _QUEST_TIER_MAP = {q["id"]: q.get("level_tier", 0) for q in PRE_INTRO_QUESTS + BASE_QUESTS + LOCKED_QUESTS}
 
 QUEST_I18N = {
+    "know_maat_ki": {
+        "en_name": "Get to Know MAAT-KI",
+        "en_desc": "Talk with MAAT-KI during your first ten messages to get to know its tone and path.",
+    },
     "maat_first_calc": {
         "en_name": "First Maat Calculation",
         "en_desc": "Calculate your first Maat values with MAAT-KI — see the introduction. Try asking: 'Calculate the Maat value of X'.",
@@ -1281,6 +1295,12 @@ class Plugin:
         if qtype in ("counter", "battle_win"):
             cur = int(q.get("progress", 0))
             target = int(q.get("target", 1))
+            if q.get("counter_key") == "messages_total":
+                remaining = max(0, target - cur)
+                return self._t(
+                    f"Noch {remaining}/{target} Nachrichten uebrig",
+                    f"{remaining}/{target} messages remaining",
+                )
             return self._t(f"Fortschritt: {cur}/{target}", f"Progress: {cur}/{target}")
 
         # 💬 Chat-Keyword-Quests (Maat-Wert, Mona Lisa, Licht, etc.)
@@ -1358,6 +1378,17 @@ class Plugin:
         notify_msgs = []
         newly_active = []
 
+        # ── -1) STARTER-QUEST ab der ersten Nachricht ───────────────
+        if total >= 1:
+            for q in list(self.qstate["locked"]):
+                if q.get("id") != "know_maat_ki":
+                    continue
+                self.qstate["locked"].remove(q)
+                active_q = dict(q)
+                active_q["progress"] = min(total, int(active_q.get("target", 10) or 10))
+                self.qstate["active"].append(active_q)
+                newly_active.append(active_q)
+
         # ── 0) PRE-INTRO TEASER bei Nachricht 10 ─────────────────────
         # Zwischen Nachricht 10 und 19: eine Teaser-Quest zum Erkunden
         if not pre_intro_shown and not intro_shown and total >= 10:
@@ -1373,12 +1404,12 @@ class Plugin:
 
             notify_msgs.append(self._t(
                 "\n┌─────────────────────────────────────────────┐\n"
-                "│  💡 Eine erste Quest wartet auf dich!       │\n"
+                "│  💡 Eine weitere Quest wartet auf dich!     │\n"
                 "└─────────────────────────────────────────────┘\n"
                 "   → Tippe  /quests  um sie zu sehen.\n"
                 "   (Das volle Quest-System erwacht ab 20 Nachrichten.)",
                 "\n┌─────────────────────────────────────────────┐\n"
-                "│  💡 A first quest awaits you!               │\n"
+                "│  💡 Another quest awaits you!               │\n"
                 "└─────────────────────────────────────────────┘\n"
                 "   → Type  /quests  to see it.\n"
                 "   (The full quest system awakens after 20 messages.)",
@@ -1690,6 +1721,7 @@ class Plugin:
             stats = root.get("stats") if isinstance(root.get("stats"), dict) else {}
             fights_won = int(stats.get("fights_won", root.get("fights", 0)) or 0)
             fights_total = int(stats.get("fights_total", fights_won) or 0)
+            messages_total = int(self.qstate.get("meta", {}).get("messages_total", 0) or 0)
         except Exception:
             return
 
@@ -1701,7 +1733,9 @@ class Plugin:
             progress_source = fights_won
             if qtype == "counter":
                 key = q.get("counter_key", "")
-                if key in ("fights", "fights_total"):
+                if key == "messages_total":
+                    progress_source = messages_total
+                elif key in ("fights", "fights_total"):
                     progress_source = fights_total
                 elif key in ("battle_wins", "fights_won"):
                     progress_source = fights_won

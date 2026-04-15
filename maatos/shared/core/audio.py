@@ -86,6 +86,21 @@ def stop_audio_process(proc: subprocess.Popen | None, timeout: float = 1.0):
 
 
 def stop_all_audio_backends():
+    if os.name == "nt":
+        taskkill = shutil.which("taskkill")
+        if taskkill:
+            for name in _AUDIO_PROCESS_NAMES:
+                proc_name = name if name.lower().endswith(".exe") else f"{name}.exe"
+                try:
+                    subprocess.call(
+                        [taskkill, "/IM", proc_name, "/F"],
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                    )
+                except Exception:
+                    pass
+        return
+
     pkill = shutil.which("pkill")
     if pkill:
         for name in _AUDIO_PROCESS_NAMES:

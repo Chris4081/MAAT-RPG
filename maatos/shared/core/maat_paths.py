@@ -10,6 +10,12 @@ def _default_app_support_dir() -> Path:
     if sys.platform == "darwin":
         return Path.home() / "Library" / "Application Support" / APP_NAME
 
+    if sys.platform.startswith("win"):
+        base = os.environ.get("LOCALAPPDATA") or os.environ.get("APPDATA")
+        if base:
+            return Path(base) / APP_NAME
+        return Path.home() / "AppData" / "Local" / APP_NAME
+
     xdg_data_home = os.environ.get("XDG_DATA_HOME")
     if xdg_data_home:
         return Path(xdg_data_home) / APP_NAME

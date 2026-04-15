@@ -22,8 +22,6 @@ import sys
 import json
 import subprocess
 import select
-import termios
-import tty
 import time
 import threading
 from colorama import Fore, Style
@@ -31,6 +29,18 @@ import shutil
 from pathlib import Path
 from shared.core.maat_paths import state_file, get_data_dir, get_default_app_support_dir, get_profiles_dir
 from shared.core.audio import ManagedAudioPlayer, stop_all_audio_backends
+
+try:
+    import termios  # type: ignore
+    import tty  # type: ignore
+except Exception:
+    termios = None  # type: ignore
+    tty = None  # type: ignore
+
+try:
+    import msvcrt  # type: ignore
+except Exception:
+    msvcrt = None  # type: ignore
 
 
 SETTINGS_FILE = state_file("settings_state.json")
@@ -331,6 +341,8 @@ def _stop_all_afplay():
 
 def _restore_terminal_input_mode():
     try:
+        if msvcrt is not None or termios is None:
+            return
         if not getattr(sys.stdin, "isatty", lambda: False)():
             return
         fd = sys.stdin.fileno()
@@ -1293,12 +1305,25 @@ class Plugin:
 
     def _title_wait_or_timeout(self, timeout: float = 20.0) -> bool:
         """True wenn irgendeine Taste gedrückt wurde, False bei Timeout."""
+        if msvcrt is not None:
+            end = time.time() + max(0.0, timeout)
+            while time.time() < end:
+                try:
+                    if msvcrt.kbhit():
+                        msvcrt.getwch()
+                        return True
+                except Exception:
+                    return False
+                time.sleep(min(0.05, max(0.0, end - time.time())))
+            return False
+
         fd = None
         old_settings = None
         try:
             fd = sys.stdin.fileno()
-            old_settings = termios.tcgetattr(fd)
-            tty.setcbreak(fd)
+            if termios is not None and tty is not None:
+                old_settings = termios.tcgetattr(fd)
+                tty.setcbreak(fd)
             ready, _, _ = select.select([sys.stdin], [], [], timeout)
             if ready:
                 try:
@@ -1317,7 +1342,7 @@ class Plugin:
                 pass
             return False
         finally:
-            if fd is not None and old_settings is not None:
+            if fd is not None and old_settings is not None and termios is not None:
                 try:
                     termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
                 except Exception:
