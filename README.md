@@ -276,6 +276,13 @@ The full bilingual overview of all systems, features, and commands is available 
 - Wikipedia (CC BY-SA 4.0) via Wikimedia API
 - https://foundation.wikimedia.org/wiki/Policy:API_usage_guidelines
 
+## 🎵 Musik
+
+Die Musik in diesem Projekt wurde mit Suno (lizenzierter Account) generiert.
+
+Die Audioinhalte sind für Demonstrations- und Gameplay-Zwecke enthalten.
+
+---
 ---
 
 ### 🚀 Installation
@@ -366,7 +373,13 @@ you must also release the source code of your changes.
 - https://foundation.wikimedia.org/wiki/Policy:API_usage_guidelines
 
 ---
+## 🎵 Music
 
+Music in this project was generated using Suno (licensed account).
+
+Audio assets are included for demonstration and gameplay purposes.
+
+---
 🌿 *MAAT-RPG is not a game about power – but about meaning.*
 
 ---
