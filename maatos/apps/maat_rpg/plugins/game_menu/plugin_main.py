@@ -349,13 +349,24 @@ def _settings_labels(language: str, settings: dict) -> tuple[str, str, str, str,
 class MenuMusic:
     def __init__(self, plugin_dir: str):
         self.plugin_dir = plugin_dir
-        self.track = os.path.join(plugin_dir, "menu_theme.mp3")
+        self.track = ""
         self._player = ManagedAudioPlayer(self.track)
+
+    def _resolve_track(self) -> str:
+        settings = _load_settings()
+        language = settings.get("language", "de")
+        if language == "en":
+            english_track = os.path.join(self.plugin_dir, "menu_theme_en.mp3")
+            if os.path.isfile(english_track):
+                return english_track
+        return os.path.join(self.plugin_dir, "menu_theme.mp3")
 
     def start(self):
         settings = _load_settings()
         if not _setting_music_enabled(settings):
             return
+        self.track = self._resolve_track()
+        self._player.set_track(self.track)
         self._player.start_loop(self.track)
 
     def stop(self):
@@ -404,10 +415,17 @@ def _localize_path_profile(profile: dict, language: str) -> dict:
     title_map = {
         "Grenzhüter der Wahrheit": "Boundary Keeper of Truth",
         "Grenzhüter der Erinnerung": "Boundary Keeper of Memory",
+        "Grenzhüter der Maat": "Boundary Keeper of Maat",
         "Klangsucher der Harmonie": "Tone Seeker of Harmony",
+        "Klangsucher der Wahrheit": "Tone Seeker of Truth",
+        "Klangsucher der Erinnerung": "Tone Seeker of Memory",
+        "Klangsucher der Maat": "Tone Seeker of Maat",
         "Formträger der Schöpfung": "Form Bearer of Creation",
+        "Formträger der Wahrheit": "Form Bearer of Truth",
         "Formträger der Erinnerung": "Form Bearer of Memory",
+        "Formträger der Maat": "Form Bearer of Maat",
         "Wegsucher": "Path Seeker",
+        "Wegsucher der Maat": "Path Seeker of Maat",
     }
     rank_map = {
         "Erwachend": "Awakening",
@@ -418,6 +436,8 @@ def _localize_path_profile(profile: dict, language: str) -> dict:
         "Wahrheit darf Grenzen nicht verletzen.": "Truth must not violate boundaries.",
         "Erinnerung darf nicht zu Besitz werden.": "Memory must not become possession.",
         "Harmonie ohne Wahrheit bleibt fragil.": "Harmony without truth remains fragile.",
+        "Maatis' Weg formt sich aus Entscheidung und Bewährung.": "Maatis' path is shaped by choice and trial.",
+        "Erinnerung klingt als Ordnung weiter.": "Memory continues to resonate as order.",
         "Moeglichkeit wird zum Echo der Welt.": "Possibility becomes the echo of the world.",
         "Möglichkeit wird zum Echo der Welt.": "Possibility becomes the echo of the world.",
     }
@@ -1064,6 +1084,9 @@ def options_menu(plugin_dir: str, menu_music: MenuMusic):
             settings = _load_settings()
             settings["language"] = choose_language()
             _save_settings(settings)
+            if _setting_music_enabled(settings):
+                menu_music.stop()
+                menu_music.start()
         elif choice == "10":
             break
         else:

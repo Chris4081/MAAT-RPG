@@ -308,10 +308,17 @@ def _localize_path_profile(profile: dict, language: str) -> dict:
     title_map = {
         "Grenzhüter der Wahrheit": "Boundary Keeper of Truth",
         "Grenzhüter der Erinnerung": "Boundary Keeper of Memory",
+        "Grenzhüter der Maat": "Boundary Keeper of Maat",
         "Klangsucher der Harmonie": "Tone Seeker of Harmony",
+        "Klangsucher der Wahrheit": "Tone Seeker of Truth",
+        "Klangsucher der Erinnerung": "Tone Seeker of Memory",
+        "Klangsucher der Maat": "Tone Seeker of Maat",
         "Formträger der Schöpfung": "Form Bearer of Creation",
+        "Formträger der Wahrheit": "Form Bearer of Truth",
         "Formträger der Erinnerung": "Form Bearer of Memory",
+        "Formträger der Maat": "Form Bearer of Maat",
         "Wegsucher": "Path Seeker",
+        "Wegsucher der Maat": "Path Seeker of Maat",
     }
     rank_map = {
         "Erwachend": "Awakening",
@@ -322,6 +329,8 @@ def _localize_path_profile(profile: dict, language: str) -> dict:
         "Wahrheit darf Grenzen nicht verletzen.": "Truth must not violate boundaries.",
         "Erinnerung darf nicht zu Besitz werden.": "Memory must not become possession.",
         "Harmonie ohne Wahrheit bleibt fragil.": "Harmony without truth remains fragile.",
+        "Maatis' Weg formt sich aus Entscheidung und Bewährung.": "Maatis' path is shaped by choice and trial.",
+        "Erinnerung klingt als Ordnung weiter.": "Memory continues to resonate as order.",
         "Moeglichkeit wird zum Echo der Welt.": "Possibility becomes the echo of the world.",
         "Möglichkeit wird zum Echo der Welt.": "Possibility becomes the echo of the world.",
     }
@@ -622,8 +631,21 @@ def start_classic():
     print(_render_title_screen())
     try:
         input(Fore.YELLOW + "\n> " + Style.RESET_ALL)
+    except KeyboardInterrupt:
+        msg = (
+            "\n🌿 Interrupted - see you later.\n"
+            if _ui_language() == "en"
+            else "\n🌿 Abbruch – bis später.\n"
+        )
+        print(msg)
+        return
     except (EOFError, StopIteration):
-        print("\n🌿 Kein interaktiver Titelbildschirm-Input verfügbar – Start läuft weiter.\n")
+        msg = (
+            "\n🌿 No interactive title-screen input available - continuing startup.\n"
+            if _ui_language() == "en"
+            else "\n🌿 Kein interaktiver Titelbildschirm-Input verfügbar – Start läuft weiter.\n"
+        )
+        print(msg)
 
     ui_text = _title_text(_ui_language())
     print(Fore.CYAN + f"\n🌿 {ui_text['active']}\n" + Style.RESET_ALL)

@@ -24,21 +24,29 @@ from shared.core.audio import music_enabled, play_audio_process, stop_audio_proc
 
 # Ziel-Gesamtdauer in Sekunden (3:47 = 3*60 + 47 = 227)
 TOTAL_INTRO_DURATION = 227.0
+STORY_STREAM_SPEED = {
+    "de": 0.03,
+    "en": 0.0325,
+}
 
 # -----------------------------------------------------------
 # ASCII-Pyramide (ohne Farben)
 # -----------------------------------------------------------
 PYRAMID_ASCII = [
-    "                   /\\",
-    "                  /  \\",
-    "                 /    \\",
-    "                /      \\",
-    "               /   /\\   \\",
-    "              /   /  \\   \\",
-    "             /   /____\\   \\",
-    "            /            \\",
-    "           /              \\",
-    "          /________________\\",
+    "                          /\\",
+    "                         /  \\",
+    "                        /    \\",
+    "                       /      \\",
+    "                      /   /\\   \\",
+    "                     /   /  \\   \\",
+    "                    /   / /\\ \\   \\",
+    "                   /   / /  \\ \\   \\",
+    "                  /   / /____\\ \\   \\",
+    "                 /   /__________\\   \\",
+    "                /                    \\",
+    "               /                      \\",
+    "              /                        \\",
+    "             /__________________________\\",
 ]
 
 INTRO_TEXT = {
@@ -139,6 +147,9 @@ class Plugin:
     def _anim_frames(self):
         return ANIM_FRAMES.get(self._lang(), ANIM_FRAMES["de"])
 
+    def _story_speed(self) -> float:
+        return STORY_STREAM_SPEED.get(self._lang(), STORY_STREAM_SPEED["de"])
+
     def _t(self, de: str, en: str) -> str:
         return en if self._lang() == "en" else de
 
@@ -205,6 +216,13 @@ class Plugin:
         proc = self._music_proc
         self._music_proc = None
         stop_audio_process(proc)
+
+    def _resolve_intro_track(self, base_dir: str) -> str:
+        if self._lang() == "en":
+            english_intro = os.path.join(base_dir, "Intro_EN.mp3")
+            if os.path.isfile(english_intro):
+                return english_intro
+        return os.path.join(base_dir, "intro.mp3")
 
     # -----------------------------------------------
     # Langsames Streaming
@@ -285,7 +303,7 @@ class Plugin:
 
         try:
             # 1) Musik starten
-            intro_mp3 = os.path.join(base_dir, "intro.mp3")
+            intro_mp3 = self._resolve_intro_track(base_dir)
             if os.path.isfile(intro_mp3):
                 started = self._play_music(intro_mp3)
                 if not started:
@@ -298,7 +316,7 @@ class Plugin:
 
             # 3) Story
             for line in self._intro_lines():
-                if not self._slow_stream(line, speed=0.03):
+                if not self._slow_stream(line, speed=self._story_speed()):
                     print(self._t("\n MAAT RPG Intro abgebrochen.\n", "\n MAAT RPG intro aborted.\n"))
                     return
 

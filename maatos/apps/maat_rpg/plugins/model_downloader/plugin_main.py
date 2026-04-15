@@ -103,6 +103,7 @@ DOWNLOADER_TEXT = {
         "incomplete": "Download unvollstaendig, wird erneut versucht.",
         "resume_rejected": "Server hat Resume nicht akzeptiert, starte neu.",
         "interrupted": "⚠ Download unterbrochen: {error}",
+        "cancelled": "⏹ Download durch Benutzer abgebrochen bei {progress}.",
         "retrying": "🔁 Wiederhole in {wait}s (Versuch {retry}/{max_retries}) – Fortschritt bleibt erhalten.",
         "aborted": "Download nach {max_retries} Wiederholungen abgebrochen. Fortschritt bleibt erhalten: {progress}",
         "model_found": "\n✔ Modell gefunden: {model}\n",
@@ -154,6 +155,7 @@ DOWNLOADER_TEXT = {
         "incomplete": "Download incomplete, retrying.",
         "resume_rejected": "Server did not accept resume, restarting.",
         "interrupted": "⚠ Download interrupted: {error}",
+        "cancelled": "⏹ Download canceled by user at {progress}.",
         "retrying": "🔁 Retrying in {wait}s (attempt {retry}/{max_retries}) – progress is preserved.",
         "aborted": "Download aborted after {max_retries} retries. Progress remains preserved: {progress}",
         "model_found": "\n✔ Model found: {model}\n",
@@ -539,6 +541,11 @@ def resumable_download(url: str, final_path: Path):
             meta_path.unlink(missing_ok=True)
             return
 
+        except KeyboardInterrupt:
+            print()
+            save_progress(meta_path, downloaded_total, total_size)
+            raise
+
         except Exception as e:
             retries += 1
             print()
@@ -640,6 +647,14 @@ def ensure_model(plugin_dir: str, force_open: bool = False) -> bool:
         print(_dt("welcome"))
         time.sleep(0.8)
         return True
+
+    except KeyboardInterrupt:
+        music.stop()
+        kept = part_path.stat().st_size if part_path.exists() else int(load_progress(meta_path).get("downloaded", 0) or 0)
+        print()
+        print(Fore.YELLOW + _dt("cancelled", progress=format_bytes(kept)) + Style.RESET_ALL)
+        print(_dt("progress_kept"))
+        return False
 
     except Exception as e:
         music.stop()
