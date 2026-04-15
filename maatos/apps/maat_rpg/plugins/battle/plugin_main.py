@@ -399,6 +399,7 @@ def _localize_path_profile(profile: dict | None) -> dict:
         "Erinnerung darf nicht zu Besitz werden.": "Memory must not become possession.",
         "Harmonie ohne Wahrheit bleibt fragil.": "Harmony without truth remains fragile.",
         "Maatis' Weg formt sich aus Entscheidung und Bewährung.": "Maatis' path is shaped by choice and trial.",
+        "Erinnerung klingt als Ordnung weiter.": "Memory continues to resonate as order.",
         "Moeglichkeit wird zum Echo der Welt.": "Possibility becomes the echo of the world.",
         "Möglichkeit wird zum Echo der Welt.": "Possibility becomes the echo of the world.",
     }
