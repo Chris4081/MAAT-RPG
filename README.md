@@ -120,7 +120,7 @@ xattr -dr com.apple.quarantine "MAAT RPG.app"
 open "MAAT RPG.app"
 ```
 
-**Option 2 — Git Clone (empfohlen für Entwickler auf Linux/macOS)**
+**Option 2 — Git Clone (empfohlen für Entwickler auf macOS und Gamer/Entwickler auf Linux)**
 
 ```bash
 git clone https://github.com/Chris4081/MAAT-RPG.git && cd MAAT-RPG/maatos && bash setup.sh
@@ -131,7 +131,7 @@ Der Installer bevorzugt automatisch:
 - dann `python3.11`
 - erst danach `python3`
 
-Wenn dein System standardmäßig Python 3.13 nutzt, installiere am besten Python 3.11 oder 3.12 und starte dann:
+**Wenn dein System standardmäßig Python 3.13 nutzt, installiere am besten Python 3.11 oder 3.12 und starte dann:**
 
 ```bash
 MAAT_SETUP_PYTHON=python3.11 bash setup.sh
@@ -290,7 +290,7 @@ xattr -dr com.apple.quarantine "MAAT RPG.app"
 open "MAAT RPG.app"
 ```
 
-**Option 2 — Git Clone (recommended for developers on Linux/macOS)**
+**Option 2 — Git Clone (recommended for Linux gamers and developers (macOS/Linux)**
 
 ```bash
 git clone https://github.com/Chris4081/MAAT-RPG.git && cd MAAT-RPG/maatos && bash setup.sh
@@ -301,7 +301,7 @@ The installer automatically prefers:
 - then `python3.11`
 - and only after that `python3`
 
-If your system default is Python 3.13, install Python 3.11 or 3.12 first and then run:
+**If your system default is Python 3.13, install Python 3.11 or 3.12 first and then run:**
 
 ```bash
 MAAT_SETUP_PYTHON=python3.11 bash setup.sh
