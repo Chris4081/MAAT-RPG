@@ -33,6 +33,8 @@ A first look at **MAAT RPG** in action: story flow, bilingual UI, combat, and at
 - Plugin API: [docs/PLUGIN_API.md](./docs/PLUGIN_API.md)
 - MAAT formulas: [docs/MAAT_FORMULAS.md](./docs/MAAT_FORMULAS.md)
 - Mod support: [docs/MOD_SUPPORT.md](./docs/MOD_SUPPORT.md)
+- Linux install: [docs/INSTALL_LINUX.md](./docs/INSTALL_LINUX.md)
+- Windows install: [docs/INSTALL_WINDOWS.md](./docs/INSTALL_WINDOWS.md)
 
 ---
 
@@ -79,6 +81,9 @@ Wenn du MAAT-RPG erweitern oder daran mitarbeiten willst, findest du hier die wi
 - [Contribution Guide](./CONTRIBUTING.md)
 - [Plugin API](./docs/PLUGIN_API.md)
 - [MAAT-Formeln](./docs/MAAT_FORMULAS.md)
+- [Mod-Support](./docs/MOD_SUPPORT.md)
+- [Linux-Installation](./docs/INSTALL_LINUX.md)
+- [Windows-Installation](./docs/INSTALL_WINDOWS.md)
 
 ---
 
@@ -136,7 +141,7 @@ open "MAAT RPG.app"
 **Option 2 — Git Clone (empfohlen für Entwickler auf Linux/macOS)**
 
 ```bash
-git clone https://github.com/Chris4081/MAAT-RPG.git && cd MAAT-RPG/maatos && bash setup.sh
+git clone https://github.com/Chris4081/MAAT-RPG.git && cd MAAT-RPG && bash setup.sh
 ```
 
 Der Installer bevorzugt automatisch:
@@ -161,7 +166,7 @@ sudo apt install -y \
     speech-dispatcher espeak-ng
 
 git clone https://github.com/Chris4081/MAAT-RPG.git
-cd MAAT-RPG/maatos
+cd MAAT-RPG
 MAAT_SETUP_PYTHON=python3.11 bash setup.sh
 ```
 
@@ -169,7 +174,7 @@ MAAT_SETUP_PYTHON=python3.11 bash setup.sh
 
 ```powershell
 git clone https://github.com/Chris4081/MAAT-RPG.git
-cd MAAT-RPG\maatos
+cd MAAT-RPG
 powershell -ExecutionPolicy Bypass -File .\setup.ps1
 ```
 
@@ -183,7 +188,7 @@ Hinweise:
 - Empfohlen: Python 3.11 oder 3.12
 - Musik funktioniert auf Windows am besten mit `ffplay` aus `ffmpeg`
 - Für `llama-cpp-python` werden in der Regel `cmake` und Visual Studio Build Tools benötigt
-- Details: [INSTALL_WINDOWS.md](./maatos/INSTALL_WINDOWS.md)
+- Details: [docs/INSTALL_WINDOWS.md](./docs/INSTALL_WINDOWS.md)
 
 **Troubleshooting**
 
@@ -202,7 +207,7 @@ Beim ersten Start kann macOS eine Warnung anzeigen,
 da MAAT-RPG lokal & unsigniert ist.
 
 Falls nötig:
-1. **Rechtsklick** auf `MAAT-RPG.app`
+1. **Rechtsklick** auf `MAAT RPG.app`
 2. „**Öffnen**" wählen
 3. Sicherheitsdialog **bestätigen**
 
@@ -283,6 +288,9 @@ If you want to extend or contribute to MAAT-RPG, start here:
 - [Contribution Guide](./CONTRIBUTING.md)
 - [Plugin API](./docs/PLUGIN_API.md)
 - [MAAT Formulas](./docs/MAAT_FORMULAS.md)
+- [Mod Support](./docs/MOD_SUPPORT.md)
+- [Linux Install](./docs/INSTALL_LINUX.md)
+- [Windows Install](./docs/INSTALL_WINDOWS.md)
 
 ---
 
@@ -328,12 +336,6 @@ If you want to extend or contribute to MAAT-RPG, start here:
 
 ---
 
-### Datenquellen
-- Wikipedia (CC BY-SA 4.0) via Wikimedia API
-- https://foundation.wikimedia.org/wiki/Policy:API_usage_guidelines
-
----
-
 ### 🚀 Installation
 
 **Option 1 — Download (recommended for MAC OS players)**
@@ -349,7 +351,7 @@ open "MAAT RPG.app"
 **Option 2 — Git Clone (recommended for developers on Linux/macOS)**
 
 ```bash
-git clone https://github.com/Chris4081/MAAT-RPG.git && cd MAAT-RPG/maatos && bash setup.sh
+git clone https://github.com/Chris4081/MAAT-RPG.git && cd MAAT-RPG && bash setup.sh
 ```
 
 The installer automatically prefers:
@@ -374,7 +376,7 @@ sudo apt install -y \
     speech-dispatcher espeak-ng
 
 git clone https://github.com/Chris4081/MAAT-RPG.git
-cd MAAT-RPG/maatos
+cd MAAT-RPG
 MAAT_SETUP_PYTHON=python3.11 bash setup.sh
 ```
 
@@ -382,7 +384,7 @@ MAAT_SETUP_PYTHON=python3.11 bash setup.sh
 
 ```powershell
 git clone https://github.com/Chris4081/MAAT-RPG.git
-cd MAAT-RPG\maatos
+cd MAAT-RPG
 powershell -ExecutionPolicy Bypass -File .\setup.ps1
 ```
 
@@ -396,7 +398,7 @@ Notes:
 - Recommended: Python 3.11 or 3.12
 - Music works best on Windows with `ffplay` from `ffmpeg`
 - `llama-cpp-python` usually needs `cmake` and Visual Studio Build Tools
-- Details: [INSTALL_WINDOWS.md](./maatos/INSTALL_WINDOWS.md)
+- Details: [docs/INSTALL_WINDOWS.md](./docs/INSTALL_WINDOWS.md)
 
 **Troubleshooting**
 
@@ -416,7 +418,7 @@ On first launch, macOS may show a security warning
 because MAAT-RPG is local & unsigned.
 
 If needed:
-1. **Right-click** on `MAAT-RPG.app`
+1. **Right-click** on `MAAT RPG.app`
 2. Select „**Open**"
 3. **Confirm** the security dialog
 
