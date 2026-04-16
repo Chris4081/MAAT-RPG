@@ -233,6 +233,24 @@ musst du den Quellcode deiner Änderungen ebenfalls offenlegen.
 
 ---
 
+### Kostenlose Audioquellen
+
+Einige Soundeffekte stammen aus kostenlosen Mediatheken:
+
+- **Level-Up-Sound:**
+- **vitory**
+
+Quelle: **Pixabay**
+
+https://pixabay.com
+
+Lizenz: *Pixabay Content License*
+
+(Kostenlose Nutzung, auch kommerziell, jedoch nicht zum Weiterverkauf als Einzelprodukte)
+
+> Diese Sounds dienen als Platzhalter und werden
+> zukünftig durch eigens produzierte Audioelemente ersetzt.
+
 ## 🎵 Musik
 
 Die in diesem Projekt verwendete Musik wurde mit Suno unter Verwendung eines lizenzierten Accounts generiert.
@@ -444,6 +462,24 @@ you must also release the source code of your changes.
 - https://foundation.wikimedia.org/wiki/Policy:API_usage_guidelines
 
 ---
+### Free Audio Sources
+
+Some sound effects are from free media libraries:
+
+**Level-Up Sound:**
+**victory**
+
+Source: **Pixabay**
+
+https://pixabay.com
+
+License: *Pixabay Content License*
+
+(Free to use, including commercial use, but not for resale as individual products)
+
+> These sounds serve as placeholders and will be replaced
+> by custom-produced audio elements in the future.
+
 
 ## 🎵 Music
 
