@@ -1296,10 +1296,13 @@ class Plugin:
             cur = int(q.get("progress", 0))
             target = int(q.get("target", 1))
             if q.get("counter_key") == "messages_total":
+                meta = self.qstate.get("meta", {}) if isinstance(self.qstate, dict) else {}
+                meta_total = int(meta.get("messages_total", cur) or cur)
+                cur = min(max(cur, meta_total), target)
                 remaining = max(0, target - cur)
                 return self._t(
-                    f"Noch {remaining}/{target} Nachrichten uebrig",
-                    f"{remaining}/{target} messages remaining",
+                    f"Fortschritt: {cur}/{target} — noch {remaining} Nachrichten uebrig",
+                    f"Progress: {cur}/{target} — {remaining} messages remaining",
                 )
             return self._t(f"Fortschritt: {cur}/{target}", f"Progress: {cur}/{target}")
 
