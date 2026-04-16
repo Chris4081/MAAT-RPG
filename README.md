@@ -33,8 +33,10 @@ A first look at **MAAT RPG** in action: story flow, bilingual UI, combat, and at
 - Plugin API: [docs/PLUGIN_API.md](./docs/PLUGIN_API.md)
 - MAAT formulas: [docs/MAAT_FORMULAS.md](./docs/MAAT_FORMULAS.md)
 - Mod support: [docs/MOD_SUPPORT.md](./docs/MOD_SUPPORT.md)
+- All docs: [docs/](./docs/)
 - Linux install: [docs/INSTALL_LINUX.md](./docs/INSTALL_LINUX.md)
 - Windows install: [docs/INSTALL_WINDOWS.md](./docs/INSTALL_WINDOWS.md)
+- 
 
 ---
 
