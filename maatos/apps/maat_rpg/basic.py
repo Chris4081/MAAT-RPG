@@ -46,11 +46,19 @@ from shared.core.maat_paths import (
     get_saves_dir,
     get_state_dir,
     get_profiles_dir,
+    get_mods_dir,
+    get_mods_plugins_dir,
+    get_mods_stories_dir,
+    get_mods_battle_profiles_dir,
 )
 
 APP_SUPPORT_DIR = get_app_support_dir()
 BASE_APP_SUPPORT_DIR = get_default_app_support_dir()
 PROFILES_DIR = get_profiles_dir()
+MODS_DIR = get_mods_dir()
+MODS_PLUGINS_DIR = get_mods_plugins_dir()
+MODS_STORIES_DIR = get_mods_stories_dir()
+MODS_BATTLE_PROFILES_DIR = get_mods_battle_profiles_dir()
 DATA_DIR = get_data_dir()
 MODELS_DIR = get_models_dir()
 LOGS_DIR = get_logs_dir()
@@ -58,7 +66,19 @@ CACHE_DIR = get_cache_dir()
 SAVES_DIR = get_saves_dir()
 STATE_DIR = get_state_dir()
 
-for p in [APP_SUPPORT_DIR, DATA_DIR, MODELS_DIR, LOGS_DIR, CACHE_DIR, SAVES_DIR, STATE_DIR]:
+for p in [
+    APP_SUPPORT_DIR,
+    MODS_DIR,
+    MODS_PLUGINS_DIR,
+    MODS_STORIES_DIR,
+    MODS_BATTLE_PROFILES_DIR,
+    DATA_DIR,
+    MODELS_DIR,
+    LOGS_DIR,
+    CACHE_DIR,
+    SAVES_DIR,
+    STATE_DIR,
+]:
     p.mkdir(parents=True, exist_ok=True)
 
 MODEL_DIR = str(MODELS_DIR)
@@ -71,6 +91,7 @@ os.environ["MAAT_LOGS_DIR"] = str(LOGS_DIR)
 os.environ["MAAT_CACHE_DIR"] = str(CACHE_DIR)
 os.environ["MAAT_SAVES_DIR"] = str(SAVES_DIR)
 os.environ["MAAT_STATE_DIR"] = str(STATE_DIR)
+os.environ["MAAT_MODS_DIR"] = str(MODS_DIR)
 
 _dbg(f"🧪 basic.py: App Support = {APP_SUPPORT_DIR}")
 _dbg(f"🧪 basic.py: Data Dir    = {DATA_DIR}")
@@ -783,7 +804,7 @@ def start_classic():
             shared_plugin_root = os.path.join(ROOT, "shared", "plugins")
             plugin_config_path = os.path.join(os.path.dirname(__file__), "plugin_config.json")
             pm = PluginManager(
-                [app_plugin_root, shared_plugin_root],
+                [app_plugin_root, shared_plugin_root, str(MODS_PLUGINS_DIR)],
                 config_path=plugin_config_path,
             )
             pm.load_plugins()

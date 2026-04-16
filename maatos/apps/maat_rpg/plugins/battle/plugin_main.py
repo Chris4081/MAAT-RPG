@@ -22,6 +22,7 @@ import contextlib
 from colorama import Fore, Style
 from shared.core.maat_paths import data_file, state_file, log_file
 from shared.core.audio import ManagedAudioPlayer, music_enabled
+from shared.core.mod_support import load_battle_profile_mods
 from shared.core.rpg_i18n import get_language
 
 
@@ -87,6 +88,12 @@ BATTLE_TEXT = {
         "shop_sigil_item": "  • Schutz-Siegel – 40 Gold (verleiht im naechsten echten Kampf ein Start-Schild)",
         "shop_buy_hint": "Kaufen mit: `/shop buy potion 1`, `/shop buy potion 3` oder `/shop buy sigil 1`",
         "shop_unknown_item": "Dieses Item gibt es hier nicht. Verfuegbar: `potion`, `sigil`.",
+        "modfight_missing": "Nutze `/fightmod <id>` oder `/fightmod list`.",
+        "modfight_list_title": "🧩 **Verfuegbare Kampf-Mods**",
+        "modfight_list_empty": "Keine externen Kampf-Mods gefunden. Lege JSON/YAML-Dateien in `mods/battle_profiles` ab.",
+        "modfight_list_hint": "Starten mit: `/fightmod <id>`",
+        "modfight_unknown": "Dieses Kampf-Mod wurde nicht gefunden: `{id}`",
+        "modfight_entry": "• `{id}` — {name} ({ftype})",
         "sigil_activate": "🛡 Ein Schutz-Siegel entfaellt und umhuellt Maatis. Start-Schild: {guard}. (Verbleibend: {sigils})",
         "summary_win": "📘 Kampfanalyse: Sieg, weil {reasons}.",
         "summary_loss": "📘 Kampfanalyse: Niederlage gegen {enemy}, weil {reasons}.",
@@ -238,6 +245,12 @@ BATTLE_TEXT = {
         "shop_sigil_item": "  • Warding Sigil – 40 gold (grants a starting shield in the next real battle)",
         "shop_buy_hint": "Buy with: `/shop buy potion 1`, `/shop buy potion 3`, or `/shop buy sigil 1`",
         "shop_unknown_item": "That item is not sold here. Available: `potion`, `sigil`.",
+        "modfight_missing": "Use `/fightmod <id>` or `/fightmod list`.",
+        "modfight_list_title": "🧩 **Available battle mods**",
+        "modfight_list_empty": "No external battle mods found. Put JSON/YAML files into `mods/battle_profiles`.",
+        "modfight_list_hint": "Start with: `/fightmod <id>`",
+        "modfight_unknown": "This battle mod was not found: `{id}`",
+        "modfight_entry": "• `{id}` — {name} ({ftype})",
         "sigil_activate": "🛡 A warding sigil unfolds around Maatis. Starting shield: {guard}. (Remaining: {sigils})",
         "summary_win": "📘 Battle analysis: victory, because {reasons}.",
         "summary_loss": "📘 Battle analysis: defeat against {enemy}, because {reasons}.",
@@ -3055,6 +3068,10 @@ class Plugin:
             "de": "Startet einen geführten Finalboss-Testkampf.",
             "en": "Starts a guided final boss test battle.",
         },
+        "/fightmod": {
+            "de": "Startet ein externes Kampf-Mod aus `mods/battle_profiles`.",
+            "en": "Starts an external battle mod from `mods/battle_profiles`.",
+        },
         "/xp": {
             "de": "Zeigt deinen aktuellen Level- und XP-Status.",
             "en": "Shows your current level and XP status.",
@@ -3103,6 +3120,30 @@ class Plugin:
         if base == "/fightfinal":
             demo_context = self._build_demo_context("final", context)
             out = self.core.run_fight("final", demo_context)
+            if isinstance(context, dict):
+                context["reset_conversation_after_battle"] = True
+            return True, out
+
+        if base == "/fightmod":
+            mod_battles = load_battle_profile_mods()
+            if len(parts) < 2:
+                return True, self._render_mod_battle_list(mod_battles, missing=True)
+
+            selector = parts[1].lower()
+            if selector == "list":
+                return True, self._render_mod_battle_list(mod_battles)
+
+            battle_mod = mod_battles.get(selector)
+            if not battle_mod:
+                return True, _battle_text("modfight_unknown", id=selector)
+
+            mod_context = dict(context or {})
+            mod_context["battle_profile"] = dict(battle_mod.get("battle_profile") or {})
+
+            if not battle_mod.get("persistent_rewards"):
+                mod_context.setdefault("guide_mode", True)
+
+            out = self.core.run_fight(battle_mod.get("fight_type", "boss"), mod_context)
             if isinstance(context, dict):
                 context["reset_conversation_after_battle"] = True
             return True, out
@@ -3225,6 +3266,30 @@ class Plugin:
             return True, "\n".join(lines)
 
         return None
+
+    def _render_mod_battle_list(self, mod_battles: dict, missing: bool = False) -> str:
+        lines = [_battle_text("modfight_list_title"), ""]
+        if not mod_battles:
+            lines.append(_battle_text("modfight_list_empty"))
+            return "\n".join(lines)
+
+        if missing:
+            lines.append(_battle_text("modfight_missing"))
+            lines.append("")
+
+        for mod_id, data in sorted(mod_battles.items()):
+            lines.append(
+                _battle_text(
+                    "modfight_entry",
+                    id=mod_id,
+                    name=data.get("name", mod_id),
+                    ftype=data.get("fight_type", "boss"),
+                )
+            )
+
+        lines.append("")
+        lines.append(_battle_text("modfight_list_hint"))
+        return "\n".join(lines)
 
     #---------------------------------
     # Tränke verwenden

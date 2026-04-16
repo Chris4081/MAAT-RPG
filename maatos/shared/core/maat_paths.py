@@ -71,6 +71,22 @@ def get_profiles_dir() -> Path:
     return _ensure_dir(get_default_app_support_dir() / "profiles")
 
 
+def get_mods_dir() -> Path:
+    return _dir_from_env("MAAT_MODS_DIR", get_default_app_support_dir() / "mods")
+
+
+def get_mods_plugins_dir() -> Path:
+    return _ensure_dir(get_mods_dir() / "plugins")
+
+
+def get_mods_stories_dir() -> Path:
+    return _ensure_dir(get_mods_dir() / "stories")
+
+
+def get_mods_battle_profiles_dir() -> Path:
+    return _ensure_dir(get_mods_dir() / "battle_profiles")
+
+
 def data_file(name: str) -> str:
     return str(get_data_dir() / name)
 

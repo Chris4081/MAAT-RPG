@@ -19,6 +19,7 @@ import sys
 import time
 from shared.core.audio import music_enabled, play_audio_process, stop_audio_process
 from shared.core.maat_paths import data_file, state_file, log_file
+from shared.core.mod_support import merge_story_config, resolve_story_asset_path, resolve_story_module_path
 
 
 SETTINGS_FILE = state_file("settings_state.json")
@@ -261,16 +262,19 @@ class Plugin:
         }
 
     def _load_config(self):
+        config = None
         if os.path.exists(self.config_path):
             try:
                 with open(self.config_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
                 if "stories" in data and isinstance(data["stories"], list):
-                    return data
+                    config = data
             except Exception as e:
                 print(f"⚠ Fehler in Story-Config: {e}")
-        print("⚠ Keine gültige config.json gefunden – nutze Default-Story-Config.")
-        return self._default_config()
+        if config is None:
+            print("⚠ Keine gültige config.json gefunden – nutze Default-Story-Config.")
+            config = self._default_config()
+        return merge_story_config(config)
 
     # -------------------------------------------------
     # STATE HANDLING
@@ -317,22 +321,22 @@ class Plugin:
     # -------------------------------------------------
     # MUSIK (EINMAL, KEIN LOOP)
     # -------------------------------------------------
-    def _start_music_once(self, filename: str):
+    def _start_music_once(self, filename: str, entry: dict | None = None):
         """
         Spielt eine MP3 EINMAL im Hintergrund (kein Loop).
         """
         if not filename or not _music_enabled():
             return
 
-        path = os.path.join(self.story_dir, filename)
-        if not os.path.isfile(path):
-            print(f"⚠ Musikdatei nicht gefunden: {path}")
+        path = resolve_story_asset_path(filename, self.story_dir, entry)
+        if path is None or not path.is_file():
+            print(f"⚠ Musikdatei nicht gefunden: {filename}")
             return
 
         # ggf. alten Prozess beenden
         self._stop_music()
 
-        self._music_proc = play_audio_process(path)
+        self._music_proc = play_audio_process(str(path))
         if self._music_proc is None:
             print("⚠ Konnte Musik nicht starten.")
 
@@ -346,18 +350,18 @@ class Plugin:
     # -------------------------------------------------
     # STORY LADEN
     # -------------------------------------------------
-    def _load_story_module(self, module_name: str):
+    def _load_story_module(self, module_name: str, entry: dict | None = None):
         """
         Lädt storyX.py aus dem stories-Ordner und gibt Story()-Instanz zurück.
         Erwartet in storyX.py eine Klasse 'Story'.
         """
-        story_path = os.path.join(self.story_dir, f"{module_name}.py")
-        if not os.path.isfile(story_path):
+        story_path = resolve_story_module_path(module_name, self.story_dir, entry)
+        if not story_path.is_file():
             print(f"⚠ Story-Modul nicht gefunden: {story_path}")
             return None
 
         try:
-            spec = importlib.util.spec_from_file_location(module_name, story_path)
+            spec = importlib.util.spec_from_file_location(module_name, str(story_path))
             mod = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(mod)
             if hasattr(mod, "Story"):
@@ -372,7 +376,7 @@ class Plugin:
     # -------------------------------------------------
     # STORY AUSFÜHREN
     # -------------------------------------------------
-    def _run_story_interactive(self, story, music_filename: str = None, extra_lines: list[str] | None = None):
+    def _run_story_interactive(self, story, music_filename: str = None, extra_lines: list[str] | None = None, entry: dict | None = None):
         """
         Führt eine Story interaktiv aus:
         - Musik optional EINMAL starten
@@ -383,7 +387,7 @@ class Plugin:
 
         # 🎵 Musik EINMAL starten (kein Loop)
         if music_filename:
-            self._start_music_once(music_filename)
+            self._start_music_once(music_filename, entry)
 
         # Story-Text holen (Story.run() soll eine Liste von Zeilen liefern)
         try:
@@ -1039,11 +1043,11 @@ class Plugin:
             self._save_state()
 
     def _play_story_entry(self, entry, context=None):
-        story_obj = self._load_story_module(entry.get("module"))
+        story_obj = self._load_story_module(entry.get("module"), entry)
         if story_obj:
             music_file = entry.get("music")
             scene_lines = self._profile_scene_lines(entry.get("module", ""))
-            self._run_story_interactive(story_obj, music_file, extra_lines=scene_lines)
+            self._run_story_interactive(story_obj, music_file, extra_lines=scene_lines, entry=entry)
 
             played = self.state.get("played", [])
             played.append(entry["id"])
