@@ -221,6 +221,19 @@ musst du den Quellcode deiner Änderungen ebenfalls offenlegen.
 > MAAT-RPG ist ein Forschungs- und Kunstprojekt.  
 > Ziel ist Bewusstsein, nicht Ausbeutung.
 
+
+### Data Sources
+- Wikipedia (CC BY-SA 4.0) via Wikimedia API
+- https://foundation.wikimedia.org/wiki/Policy:API_usage_guidelines
+
+---
+
+## 🎵 Musik
+
+Die in diesem Projekt verwendete Musik wurde mit Suno unter Verwendung eines lizenzierten Accounts generiert.
+
+Sie dient zur Unterstützung des Spielerlebnisses von MAAT RPG.
+
 ---
 
 🌿 *MAAT-RPG ist kein Spiel über Macht – sondern über Bedeutung.*
@@ -427,6 +440,14 @@ you must also release the source code of your changes.
 ### Data Sources
 - Wikipedia (CC BY-SA 4.0) via Wikimedia API
 - https://foundation.wikimedia.org/wiki/Policy:API_usage_guidelines
+
+---
+
+## 🎵 Music
+
+Some music in this project was generated using Suno with a licensed account.
+
+All tracks are used as part of the MAAT RPG experience.
 
 ---
 
