@@ -1,10 +1,10 @@
 > 🇩🇪 [Deutsch](#-deutsch) · 🇬🇧 [English](#-english)
 
 # 🌿 MAAT-RPG ALPHA  
-**macOS • Linux • Local • Offline • Ethical**
+**macOS • Linux • Windows (experimental) • Local • Offline • Ethical**
 
 **MAAT RPG** is a bilingual, local AI role-playing game in the terminal, based on story, combat, path identity, journal progression and the five principles of MAAT.
-### Platforms: 🍎 macOS · 🐧 Linux
+### Platforms: 🍎 macOS · 🐧 Linux · 🪟 Windows (experimental)
 
 ### Highlights
 
@@ -28,6 +28,10 @@ A first look at **MAAT RPG** in action: story flow, bilingual UI, combat, and at
 
 - Full feature list: [FUNKTIONEN.md](./FUNKTIONEN.md)
 - Website [MAAT-RPG](https://maat-research.com/maat-rpg.html)
+- Architecture: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
+- Contribution guide: [CONTRIBUTING.md](./CONTRIBUTING.md)
+- Plugin API: [docs/PLUGIN_API.md](./docs/PLUGIN_API.md)
+- MAAT formulas: [docs/MAAT_FORMULAS.md](./docs/MAAT_FORMULAS.md)
 
 
 ---
@@ -46,7 +50,7 @@ Im Zentrum stehen die fünf MAAT-Prinzipien:
 ```
 Kein Cloud-Zwang
 Keine Accounts
-Alles läuft lokal auf deinem Mac
+Alles läuft lokal auf deinem Rechner
 ```
 
 ---
@@ -66,6 +70,15 @@ Alles läuft lokal auf deinem Mac
 ### 📚 Funktionsübersicht
 
 Die vollständige zweisprachige Übersicht aller Systeme, Features und Kommandos findest du in [FUNKTIONEN.md](./FUNKTIONEN.md).
+
+### 🛠️ Entwickler-Dokumentation
+
+Wenn du MAAT-RPG erweitern oder daran mitarbeiten willst, findest du hier die wichtigsten technischen Dokumente:
+
+- [Architektur](./docs/ARCHITECTURE.md)
+- [Contribution Guide](./CONTRIBUTING.md)
+- [Plugin API](./docs/PLUGIN_API.md)
+- [MAAT-Formeln](./docs/MAAT_FORMULAS.md)
 
 ---
 
@@ -93,7 +106,7 @@ Die vollständige zweisprachige Übersicht aller Systeme, Features und Kommandos
 **Operating Systems**
 - ✅ macOS 12+
 - ✅ Linux (Ubuntu, Debian, Fedora)
-- ? Theoretically: Windows (WSL2 + Python)
+- 🧪 Windows 10/11 (experimental, PowerShell + Python)
 
 
 **Hardware**
@@ -120,7 +133,7 @@ xattr -dr com.apple.quarantine "MAAT RPG.app"
 open "MAAT RPG.app"
 ```
 
-**Option 2 — Git Clone (empfohlen für Entwickler auf macOS und Gamer/Entwickler auf Linux)**
+**Option 2 — Git Clone (empfohlen für Entwickler auf Linux/macOS)**
 
 ```bash
 git clone https://github.com/Chris4081/MAAT-RPG.git && cd MAAT-RPG/maatos && bash setup.sh
@@ -131,7 +144,7 @@ Der Installer bevorzugt automatisch:
 - dann `python3.11`
 - erst danach `python3`
 
-**Wenn dein System standardmäßig Python 3.13 nutzt, installiere am besten Python 3.11 oder 3.12 und starte dann:**
+Wenn dein System standardmäßig Python 3.13 nutzt, installiere am besten Python 3.11 oder 3.12 und starte dann:
 
 ```bash
 MAAT_SETUP_PYTHON=python3.11 bash setup.sh
@@ -151,6 +164,26 @@ git clone https://github.com/Chris4081/MAAT-RPG.git
 cd MAAT-RPG/maatos
 MAAT_SETUP_PYTHON=python3.11 bash setup.sh
 ```
+
+**Option 4 — Windows (experimentell, PowerShell)**
+
+```powershell
+git clone https://github.com/Chris4081/MAAT-RPG.git
+cd MAAT-RPG\maatos
+powershell -ExecutionPolicy Bypass -File .\setup.ps1
+```
+
+Danach:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\start.ps1
+```
+
+Hinweise:
+- Empfohlen: Python 3.11 oder 3.12
+- Musik funktioniert auf Windows am besten mit `ffplay` aus `ffmpeg`
+- Für `llama-cpp-python` werden in der Regel `cmake` und Visual Studio Build Tools benötigt
+- Details: [INSTALL_WINDOWS.md](./maatos/INSTALL_WINDOWS.md)
 
 **Troubleshooting**
 
@@ -208,7 +241,7 @@ At its core stand the five MAAT principles:
 ```
 No cloud required
 No accounts
-Everything runs locally on your Mac
+Everything runs locally on your machine
 ```
 
 ---
@@ -228,6 +261,15 @@ Everything runs locally on your Mac
 ### 📚 Feature Overview
 
 The full bilingual overview of all systems, features, and commands is available in [FUNKTIONEN.md](./FUNKTIONEN.md).
+
+### 🛠️ Developer Documentation
+
+If you want to extend or contribute to MAAT-RPG, start here:
+
+- [Architecture](./docs/ARCHITECTURE.md)
+- [Contribution Guide](./CONTRIBUTING.md)
+- [Plugin API](./docs/PLUGIN_API.md)
+- [MAAT Formulas](./docs/MAAT_FORMULAS.md)
 
 ---
 
@@ -252,13 +294,14 @@ The full bilingual overview of all systems, features, and commands is available 
 
 ### 🖥️ System Requirements
 
-**macOS**
+**Operating Systems**
 - macOS **12 Monterey** or newer
+- Linux (Ubuntu, Debian, Fedora)
+- 🧪 Windows 10/11 (experimental, PowerShell + Python)
+
+**macOS note**
 - Apple Silicon (M3 / M4 / M5 recommended)
 - *(Intel Mac: experimentally supported)*
-
-- Linux (Ubuntu, Debian, Fedora)
-- ? Theoretically: Windows (WSL2 + Python)
 
 **Hardware**
 - At least **16 GB RAM** (24 GB recommended)
@@ -276,13 +319,6 @@ The full bilingual overview of all systems, features, and commands is available 
 - Wikipedia (CC BY-SA 4.0) via Wikimedia API
 - https://foundation.wikimedia.org/wiki/Policy:API_usage_guidelines
 
-## 🎵 Musik
-
-Die Musik in diesem Projekt wurde mit Suno (lizenzierter Account) generiert.
-
-Die Audioinhalte sind für Demonstrations- und Gameplay-Zwecke enthalten.
-
----
 ---
 
 ### 🚀 Installation
@@ -297,7 +333,7 @@ xattr -dr com.apple.quarantine "MAAT RPG.app"
 open "MAAT RPG.app"
 ```
 
-**Option 2 — Git Clone (recommended for Linux gamers and developers (macOS/Linux)**
+**Option 2 — Git Clone (recommended for developers on Linux/macOS)**
 
 ```bash
 git clone https://github.com/Chris4081/MAAT-RPG.git && cd MAAT-RPG/maatos && bash setup.sh
@@ -308,7 +344,7 @@ The installer automatically prefers:
 - then `python3.11`
 - and only after that `python3`
 
-**If your system default is Python 3.13, install Python 3.11 or 3.12 first and then run:**
+If your system default is Python 3.13, install Python 3.11 or 3.12 first and then run:
 
 ```bash
 MAAT_SETUP_PYTHON=python3.11 bash setup.sh
@@ -328,6 +364,26 @@ git clone https://github.com/Chris4081/MAAT-RPG.git
 cd MAAT-RPG/maatos
 MAAT_SETUP_PYTHON=python3.11 bash setup.sh
 ```
+
+**Option 4 — Windows (experimental, PowerShell)**
+
+```powershell
+git clone https://github.com/Chris4081/MAAT-RPG.git
+cd MAAT-RPG\maatos
+powershell -ExecutionPolicy Bypass -File .\setup.ps1
+```
+
+After that:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\start.ps1
+```
+
+Notes:
+- Recommended: Python 3.11 or 3.12
+- Music works best on Windows with `ffplay` from `ffmpeg`
+- `llama-cpp-python` usually needs `cmake` and Visual Studio Build Tools
+- Details: [INSTALL_WINDOWS.md](./maatos/INSTALL_WINDOWS.md)
 
 **Troubleshooting**
 
@@ -373,13 +429,7 @@ you must also release the source code of your changes.
 - https://foundation.wikimedia.org/wiki/Policy:API_usage_guidelines
 
 ---
-## 🎵 Music
 
-Music in this project was generated using Suno (licensed account).
-
-Audio assets are included for demonstration and gameplay purposes.
-
----
 🌿 *MAAT-RPG is not a game about power – but about meaning.*
 
 ---
@@ -389,6 +439,7 @@ Audio assets are included for demonstration and gameplay purposes.
 **[🌐 maat-research.com](https://maat-research.com)**  
 &nbsp;·&nbsp;
 **[📄 Paper 21](https://maat-research.com)**  
-
+&nbsp;·&nbsp;
+**[⚖️ MAAT Framework](https://doi.org/10.5281/zenodo.18489336)**
 
 </div>
