@@ -1717,10 +1717,8 @@ class Plugin:
         Synchronisiert counter/battle_win-Quests mit dem echten Kampf-Zähler.
         Wird bei jedem before_chat/after_response aufgerufen.
         """
-        if self.state is None:
-            return
         try:
-            root = self.state.state if isinstance(self.state.state, dict) else {}
+            root = self.state.state if (self.state is not None and isinstance(self.state.state, dict)) else {}
             stats = root.get("stats") if isinstance(root.get("stats"), dict) else {}
             fights_won = int(stats.get("fights_won", root.get("fights", 0)) or 0)
             fights_total = int(stats.get("fights_total", fights_won) or 0)
