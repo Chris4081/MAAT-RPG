@@ -273,6 +273,46 @@ def resolve_battle_core(pm):
     return None
 
 
+def bind_runtime_core(pm, battle_core):
+    """
+    Reicht den gefundenen BattleCore nachtraeglich an Plugins weiter,
+    die beim Laden noch keinen Core/State bekommen haben.
+    """
+    if not pm or not battle_core:
+        return
+
+    battle_state = getattr(battle_core, "state", None)
+
+    for plugin in pm.iter_all_plugins():
+        try:
+            bind_fn = getattr(plugin, "bind_core", None)
+            if callable(bind_fn):
+                try:
+                    bind_fn(battle_core)
+                except TypeError:
+                    bind_fn(battle_core, {"pm": pm})
+        except Exception:
+            pass
+
+        try:
+            if getattr(plugin, "core", None) is None:
+                setattr(plugin, "core", battle_core)
+        except Exception:
+            pass
+
+        try:
+            if battle_state is not None and getattr(plugin, "state", None) is None:
+                setattr(plugin, "state", battle_state)
+                ensure_state = getattr(plugin, "_ensure_state", None)
+                if callable(ensure_state):
+                    ensure_state()
+                ensure_defaults = getattr(plugin, "_ensure_default_quests", None)
+                if callable(ensure_defaults):
+                    ensure_defaults()
+        except Exception:
+            pass
+
+
 def _load_json_file(path: Path) -> dict:
     try:
         with open(path, "r", encoding="utf-8") as f:
@@ -908,6 +948,7 @@ def start_classic():
     battle_core = resolve_battle_core(pm)
     if battle_core:
         context["rpg"]["battle_core"] = battle_core
+        bind_runtime_core(pm, battle_core)
 
     # -------------------------------------------------
     # STARTUP HOOKS
