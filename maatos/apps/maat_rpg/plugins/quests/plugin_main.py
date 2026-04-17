@@ -549,7 +549,9 @@ LOCKED_QUESTS = [
 ]
 
 # Schneller Tier-Lookup nach ID (für Migration bestehender Saves)
-_QUEST_TIER_MAP = {q["id"]: q.get("level_tier", 0) for q in PRE_INTRO_QUESTS + BASE_QUESTS + LOCKED_QUESTS}
+_ALL_QUEST_DEFINITIONS = PRE_INTRO_QUESTS + BASE_QUESTS + LOCKED_QUESTS
+_QUEST_TIER_MAP = {q["id"]: q.get("level_tier", 0) for q in _ALL_QUEST_DEFINITIONS}
+_QUEST_DEFINITION_MAP = {q["id"]: q for q in _ALL_QUEST_DEFINITIONS}
 
 QUEST_KEYWORD_ALIASES = {
     "maat_elements": [
@@ -936,6 +938,10 @@ class Plugin:
                 "de": "Zeigt Quest-Details; /quest accept ist nur fuer manuell verfuegbare Alt-Quests noetig.",
                 "en": "Shows quest details; /quest accept is only needed for manually available legacy quests.",
             },
+            "/questcheck": {
+                "de": "Prueft, welche Quest-Trigger auf einen Text matchen.",
+                "en": "Checks which quest triggers match a text.",
+            },
         }
 
         # interner Quest-State
@@ -1241,12 +1247,40 @@ class Plugin:
         qs = self.qstate
 
         if qs["available"] or qs["active"] or qs["completed"] or qs["locked"]:
-            # Migration: level_tier nachtragen falls fehlend
+            # Migration: Questdefinitionen an aktuellen Stand anpassen
+            changed = False
             for lst in (qs["available"], qs["active"], qs["completed"], qs["locked"]):
                 for q in lst:
-                    if "level_tier" not in q:
-                        q["level_tier"] = _QUEST_TIER_MAP.get(q.get("id", ""), 0)
-            if self.state is not None:
+                    quest_id = q.get("id", "")
+                    definition = _QUEST_DEFINITION_MAP.get(quest_id)
+                    if definition:
+                        for key in (
+                            "name",
+                            "desc",
+                            "type",
+                            "counter_key",
+                            "target",
+                            "reward_xp",
+                            "repeatable",
+                            "days",
+                            "required_days",
+                            "keyword",
+                            "keywords",
+                            "level_tier",
+                        ):
+                            if key in definition:
+                                value = definition[key]
+                                if isinstance(value, list):
+                                    value = list(value)
+                                elif isinstance(value, dict):
+                                    value = dict(value)
+                                if q.get(key) != value:
+                                    q[key] = value
+                                    changed = True
+                    elif "level_tier" not in q:
+                        q["level_tier"] = _QUEST_TIER_MAP.get(quest_id, 0)
+                        changed = True
+            if changed and self.state is not None:
                 self.state.save()
             return
 
@@ -1286,6 +1320,10 @@ class Plugin:
 
         if base == "/quest":
             text = self._cmd_quest(args)
+            return True, text
+
+        if base == "/questcheck":
+            text = self._cmd_questcheck(args)
             return True, text
 
         return False, None
@@ -1509,6 +1547,50 @@ class Plugin:
     # -------------------------------------------------
     # Fortschritts-Text für aktive Quests
     # -------------------------------------------------
+    def _quest_would_match(self, quest: dict, user_input: str) -> bool:
+        qtype = quest.get("type")
+        if qtype == "chat_keyword":
+            return self._matches_chat_keyword_quest(quest, user_input)
+        if qtype == "daily_streak":
+            text = str(user_input or "").lower()
+            keywords = self._daily_quest_keywords(quest)
+            return any(keyword in text for keyword in keywords)
+        return False
+
+    def _cmd_questcheck(self, args):
+        sample = " ".join(args).strip()
+        if not sample:
+            return self._t(
+                "Verwendung: /questcheck <text>\nBeispiel: /questcheck Calculate the Maat value of light",
+                "Usage: /questcheck <text>\nExample: /questcheck Calculate the Maat value of light",
+            )
+
+        normalized = self._normalize_keyword_text(sample)
+        sections = []
+        groups = [
+            (self._t("Aktiv", "Active"), self.qstate.get("active", [])),
+            (self._t("Gesperrt", "Locked"), self.qstate.get("locked", [])),
+            (self._t("Abgeschlossen", "Completed"), self.qstate.get("completed", [])),
+        ]
+        for label, quests in groups:
+            matches = []
+            for quest in quests:
+                if isinstance(quest, dict) and self._quest_would_match(quest, sample):
+                    matches.append(self._quest_name(quest))
+            if matches:
+                sections.append(f"{label}: " + ", ".join(matches))
+
+        lines = [
+            self._t("🎯 Quest-Trigger-Check", "🎯 Quest Trigger Check"),
+            f"Input: {sample}",
+            f"Normalized: {normalized}",
+        ]
+        if sections:
+            lines.extend(sections)
+        else:
+            lines.append(self._t("Keine Quest matcht aktuell auf diesen Text.", "No quest currently matches this text."))
+        return "\n".join(lines)
+
     def _quest_progress_text(self, q: dict | None) -> str:
         """
         Gibt einen kurzen Fortschritts-Text für eine aktive Quest zurück.
