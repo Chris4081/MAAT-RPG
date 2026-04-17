@@ -551,6 +551,150 @@ LOCKED_QUESTS = [
 # Schneller Tier-Lookup nach ID (für Migration bestehender Saves)
 _QUEST_TIER_MAP = {q["id"]: q.get("level_tier", 0) for q in PRE_INTRO_QUESTS + BASE_QUESTS + LOCKED_QUESTS}
 
+QUEST_KEYWORD_ALIASES = {
+    "maat_elements": [
+        "maat value of the elements",
+        "maat values of water fire earth and air",
+        "maat values of water, fire, earth and air",
+        "wasser feuer erde luft",
+    ],
+    "energy_compare": [
+        "compare solar energy and nuclear power",
+        "solar energy and nuclear power",
+        "solar vs nuclear",
+        "solar vs atomkraft",
+    ],
+    "maat_world": [
+        "explain the maat world formula",
+        "explain maat world formula",
+        "explain maat_world",
+        "maat world",
+    ],
+    "maat_plp_project": [
+        "calculate the plp of a project",
+        "plp for a project",
+        "plp project",
+    ],
+    "maat_cosmos": [
+        "maat value of the universe",
+        "maat value of the cosmos",
+        "maat value of cosmos",
+    ],
+    "maat_field_theory": [
+        "the five maat fields",
+        "the five fields",
+        "all five fields",
+        "explain h b s v r",
+    ],
+    "maat_consciousness": [
+        "ai consciousness",
+        "artificial intelligence consciousness",
+        "can ai become conscious",
+        "does ai have consciousness",
+    ],
+    "maat_network": [
+        "network consciousness",
+        "network consciousness formula",
+        "network formula",
+    ],
+    "maat_plp_self": [
+        "my plp",
+        "calculate my plp",
+        "personal plp",
+    ],
+    "maat_master_formula": [
+        "maat master formula",
+        "maat master",
+        "explain maat master",
+    ],
+    "maat_compare_beings": [
+        "maat value of human animal and plant",
+        "maat values of human animal and plant",
+        "compare human animal plant",
+    ],
+    "explain_h_field": [
+        "harmony means",
+        "h field means",
+        "coherence means",
+        "harmony is for me",
+    ],
+    "explain_b_field": [
+        "balance means",
+        "b field means",
+        "balance is for me",
+        "equilibrium means",
+    ],
+    "explain_s_field": [
+        "creative power means",
+        "s field means",
+        "creativity in maat",
+        "creation is for me",
+    ],
+    "explain_v_field": [
+        "connectedness means",
+        "v field means",
+        "connectedness is for me",
+        "i experience connectedness",
+    ],
+    "explain_r_field": [
+        "respect means",
+        "r field means",
+        "respect is for me",
+        "respect is immovable",
+    ],
+    "maat_natural_law": [
+        "maat as natural law",
+        "maat is a natural law",
+        "maat discovered not invented",
+    ],
+    "maat_physics_bridge": [
+        "maat and physics",
+        "maat field theory",
+        "maat and quantum field theory",
+    ],
+    "maat_all_formulas": [
+        "all maat formulas",
+        "explain all maat formulas",
+        "maat formula overview",
+    ],
+    "maat_stability_live": [
+        "my stability score",
+        "calculate my stability",
+        "current stability score",
+    ],
+    "maat_essay": [
+        "essay about maat",
+        "write a maat essay",
+        "essay on maat",
+    ],
+    "maat_agi_vision": [
+        "vision of agi",
+        "agi according to maat",
+        "agi living by maat",
+    ],
+    "maat_inner_truth": [
+        "my deepest maat insight",
+        "my inner truth about maat",
+        "what i truly understood about maat",
+    ],
+    "maat_teach_others": [
+        "explain maat to another person",
+        "how would i explain maat",
+        "teach maat to others",
+    ],
+    "maat_manifest": [
+        "my maat manifest",
+        "my inviolable principles",
+        "my maat principles",
+    ],
+    "maat_universe_formula": [
+        "b universe",
+        "complete the world formula",
+        "maat integral",
+        "universe integral maat",
+    ],
+}
+
 QUEST_I18N = {
     "know_maat_ki": {
         "en_name": "Get to Know MAAT-KI",
@@ -877,11 +1021,11 @@ class Plugin:
 
     def _matches_chat_keyword_quest(self, q: dict, user_input: str) -> bool:
         normalized = self._normalize_keyword_text(user_input)
-        keywords = [self._normalize_keyword_text(k) for k in q.get("keywords", [])]
+        qid = q.get("id", "")
+        keywords = [self._normalize_keyword_text(k) for k in (q.get("keywords", []) + QUEST_KEYWORD_ALIASES.get(qid, []))]
         if any(k and k in normalized for k in keywords):
             return True
 
-        qid = q.get("id", "")
         if qid == "maat_first_calc":
             calc_markers = (
                 "calculate the maat value",
