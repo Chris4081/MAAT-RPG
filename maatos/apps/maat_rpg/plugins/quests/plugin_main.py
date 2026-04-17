@@ -836,6 +836,26 @@ class Plugin:
                 return normalized[idx + len(marker):].strip()
         return ""
 
+    def _contains_all_principles(self, normalized: str) -> bool:
+        groups = [
+            ("harmonie", "harmony"),
+            ("balance",),
+            ("schopfungskraft", "schoepfungskraft", "creative power", "creativity", "creation"),
+            ("verbundenheit", "connectedness", "connection"),
+            ("respekt", "respect"),
+        ]
+        return all(any(alias in normalized for alias in group) for group in groups)
+
+    def _matches_elements_request(self, normalized: str) -> bool:
+        german = all(word in normalized for word in ("wasser", "feuer", "erde", "luft"))
+        english = all(word in normalized for word in ("water", "fire", "earth", "air"))
+        return german or english
+
+    def _matches_energy_compare_request(self, normalized: str) -> bool:
+        has_solar = "solar" in normalized or "solarenergie" in normalized
+        has_nuclear = "atomkraft" in normalized or "nuclear" in normalized
+        return has_solar and has_nuclear
+
     def _matches_person_value_request(self, normalized: str) -> bool:
         tail = self._message_tail_after_maat_value(normalized)
         if not tail:
@@ -851,7 +871,9 @@ class Plugin:
             return False
 
         words = [w for w in tail.split() if w]
-        return len(words) >= 2
+        if len(words) >= 2:
+            return True
+        return len(words) == 1 and len(words[0]) >= 8
 
     def _matches_chat_keyword_quest(self, q: dict, user_input: str) -> bool:
         normalized = self._normalize_keyword_text(user_input)
@@ -873,6 +895,15 @@ class Plugin:
 
         if qid == "maat_person":
             return self._matches_person_value_request(normalized)
+
+        if qid == "maat_elements":
+            return self._matches_elements_request(normalized)
+
+        if qid == "energy_compare":
+            return self._matches_energy_compare_request(normalized)
+
+        if qid == "maat_all_principles":
+            return self._contains_all_principles(normalized)
 
         return False
 
