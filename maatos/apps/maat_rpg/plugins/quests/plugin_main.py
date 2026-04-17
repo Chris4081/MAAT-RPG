@@ -1,4 +1,6 @@
 import os
+import re
+import unicodedata
 from datetime import datetime
 import json
 from shared.core.rpg_i18n import get_language
@@ -28,7 +30,7 @@ PRE_INTRO_QUESTS = [
         "name": "Erste Maat-Berechnung",
         "desc": "Berechne mit der MAAT-KI deine ersten Maat-Werte — siehe Einführung. Frage zum Beispiel: 'Berechne den Maat-Wert von X'.",
         "type": "chat_keyword",
-        "keywords": ["berechne maat", "maat-wert berechnen", "maat wert berechnen", "berechne den maat"],
+        "keywords": ["berechne maat", "maat-wert berechnen", "maat wert berechnen", "berechne den maat", "calculate maat", "calculate the maat value", "maat value", "maat value of"],
         "reward_xp": 15,
         "level_tier": -1,
     },
@@ -61,7 +63,7 @@ BASE_QUESTS = [
         "name": "Maat-Wert der Mona Lisa",
         "desc": "Bitte die MAAT-KI, den Maat-Wert der Mona Lisa zu berechnen.",
         "type": "chat_keyword",
-        "keywords": ["mona lisa", "maat-wert der mona lisa"],
+        "keywords": ["mona lisa", "maat-wert der mona lisa", "maat value of the mona lisa", "maat value of mona lisa"],
         "reward_xp": 35,
         "level_tier": 0,
     },
@@ -70,7 +72,7 @@ BASE_QUESTS = [
         "name": "Licht der Harmonie",
         "desc": "Bitte die MAAT-KI, den Maat-Wert von Licht zu erklären.",
         "type": "chat_keyword",
-        "keywords": ["maat-wert von licht", "licht"],
+        "keywords": ["maat-wert von licht", "licht", "maat value of light", "light"],
         "reward_xp": 35,
         "level_tier": 0,
     },
@@ -136,7 +138,7 @@ LOCKED_QUESTS = [
         "name": "Dein eigener Maat-Wert",
         "desc": "Bitte die MAAT-KI, deinen eigenen Maat-Wert zu berechnen.",
         "type": "chat_keyword",
-        "keywords": ["meinen maat-wert", "mein maat-wert"],
+        "keywords": ["meinen maat-wert", "mein maat-wert", "my maat value", "my own maat value", "calculate my maat value"],
         "reward_xp": 40,
         "level_tier": 2,
     },
@@ -145,7 +147,7 @@ LOCKED_QUESTS = [
         "name": "Die Maat-Weltformel",
         "desc": "Frage die MAAT-KI nach der Maat-Weltformel und lass sie erklären. Die Formel lautet: Maat_world = (H·B·S·V·R)/ΔE — wobei H=Harmonie, B=Balance, S=Schöpfungskraft, V=Verbundenheit, R=Respekt, ΔE=Entropie.",
         "type": "chat_keyword",
-        "keywords": ["maat-weltformel"],
+        "keywords": ["maat-weltformel", "maat world formula"],
         "reward_xp": 45,
         "level_tier": 2,
     },
@@ -154,7 +156,7 @@ LOCKED_QUESTS = [
         "name": "PLP eines Projekts",
         "desc": "Bitte die MAAT-KI, das PLP eines Projekts oder einer Idee zu berechnen. PLP = (H·B·S·V·R·K)/(Hindernisse+ΔE) — K=Kompetenz, ΔE=Energieaufwand. Stability = min(R, ⁴√(H·B·S·V)) zeigt die innere Stabilität.",
         "type": "chat_keyword",
-        "keywords": ["PLP eines projekts", "plp berechnen"],
+        "keywords": ["PLP eines projekts", "plp berechnen", "plp of a project", "calculate plp"],
         "reward_xp": 55,
         "level_tier": 3,
     },
@@ -163,7 +165,7 @@ LOCKED_QUESTS = [
         "name": "Elemente im Gleichgewicht",
         "desc": "Bitte die MAAT-KI, die Maat-Werte von Wasser, Feuer, Erde und Luft zu vergleichen.",
         "type": "chat_keyword",
-        "keywords": ["maat-werte von wasser, feuer, erde und luft"],
+        "keywords": ["maat-werte von wasser, feuer, erde und luft", "maat values of water fire earth and air", "maat values of water, fire, earth and air"],
         "reward_xp": 65,
         "level_tier": 3,
     },
@@ -172,7 +174,7 @@ LOCKED_QUESTS = [
         "name": "Äon der Maat",
         "desc": "Frage die MAAT-KI nach einer Erklärung des Äons der Maat. Der Äon beschreibt einen kosmischen Zeitalter-Zyklus, in dem C(x) = φH·φB·φS·φV·φR/(ΔE+ε) als kollektive Kohärenzordnung wirkt.",
         "type": "chat_keyword",
-        "keywords": ["äon der maat"],
+        "keywords": ["äon der maat", "aeon of maat"],
         "reward_xp": 70,
         "level_tier": 3,
     },
@@ -815,6 +817,64 @@ class Plugin:
 
     def _quest_name(self, quest: dict) -> str:
         return self._quest_display(quest).get("name", quest.get("id", "Quest"))
+
+
+    def _normalize_keyword_text(self, text: str) -> str:
+        raw = str(text or "").lower()
+        raw = unicodedata.normalize("NFKD", raw)
+        raw = "".join(ch for ch in raw if not unicodedata.combining(ch))
+        raw = raw.replace("ß", "ss")
+        raw = re.sub(r"[_\-]+", " ", raw)
+        raw = re.sub(r"[^a-z0-9\s]", " ", raw)
+        raw = re.sub(r"\s+", " ", raw).strip()
+        return raw
+
+    def _message_tail_after_maat_value(self, normalized: str) -> str:
+        for marker in ("maat value of ", "maat wert von ", "maat wert der ", "maat value for "):
+            idx = normalized.find(marker)
+            if idx != -1:
+                return normalized[idx + len(marker):].strip()
+        return ""
+
+    def _matches_person_value_request(self, normalized: str) -> bool:
+        tail = self._message_tail_after_maat_value(normalized)
+        if not tail:
+            return False
+
+        excluded = {
+            "mona lisa", "light", "licht", "water", "fire", "earth", "air",
+            "wasser", "feuer", "erde", "luft", "solar", "atomkraft", "nuclear",
+            "universe", "kosmos", "cosmos", "world formula", "weltformel",
+            "project", "projekt", "plp", "aeon", "aon",
+        }
+        if any(item in normalized for item in excluded):
+            return False
+
+        words = [w for w in tail.split() if w]
+        return len(words) >= 2
+
+    def _matches_chat_keyword_quest(self, q: dict, user_input: str) -> bool:
+        normalized = self._normalize_keyword_text(user_input)
+        keywords = [self._normalize_keyword_text(k) for k in q.get("keywords", [])]
+        if any(k and k in normalized for k in keywords):
+            return True
+
+        qid = q.get("id", "")
+        if qid == "maat_first_calc":
+            calc_markers = (
+                "calculate the maat value",
+                "calculate maat value",
+                "maat value of",
+                "berechne den maat wert",
+                "berechne maat",
+                "maat wert von",
+            )
+            return any(marker in normalized for marker in calc_markers)
+
+        if qid == "maat_person":
+            return self._matches_person_value_request(normalized)
+
+        return False
 
     def _find_quest_in_list(self, quests: list, qid: str):
         if not isinstance(quests, list):
@@ -1704,12 +1764,10 @@ class Plugin:
                 self._complete_quest(q, completed_msgs)
 
     def _check_keyword_quests(self, user_input: str, completed_msgs: list):
-        text = user_input.lower()
         for q in list(self.qstate["active"]):
             if q.get("type") != "chat_keyword":
                 continue
-            kws = [k.lower() for k in q.get("keywords", [])]
-            if any(k in text for k in kws):
+            if self._matches_chat_keyword_quest(q, user_input):
                 self._complete_quest(q, completed_msgs)
 
     def _check_battle_quests(self, completed_msgs: list):
