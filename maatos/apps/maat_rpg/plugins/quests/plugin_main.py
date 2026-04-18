@@ -1552,9 +1552,7 @@ class Plugin:
         if qtype == "chat_keyword":
             return self._matches_chat_keyword_quest(quest, user_input)
         if qtype == "daily_streak":
-            text = str(user_input or "").lower()
-            keywords = self._daily_quest_keywords(quest)
-            return any(keyword in text for keyword in keywords)
+            return self._matches_daily_quest(quest, user_input)
         return False
 
     def _cmd_questcheck(self, args):
@@ -1963,10 +1961,32 @@ class Plugin:
             keywords.append(raw_keyword.strip().lower())
 
         aliases = {
-            "daily_hello": ["hallo", "hello", "hi", "hey"],
-            "daily_reflect": ["reflexion", "reflection", "selbstreflexion", "self-reflection"],
-            "daily_gratitude": ["dankbar", "gratitude", "grateful"],
-            "daily_learning": ["heute gelernt", "learned today", "today i learned", "i learned"],
+            "daily_hello": [
+                "hallo", "hello", "hi", "hey",
+                "good morning", "good evening", "guten morgen", "guten abend",
+                "moin", "servus",
+            ],
+            "daily_reflect": [
+                "reflexion", "reflection", "selbstreflexion", "self-reflection",
+                "who am i", "who am i really", "what do i feel", "how do i feel",
+                "why am i", "why do i", "what do i want", "what is my path",
+                "wer bin ich", "wer bin ich wirklich", "was fuehle ich",
+                "wie fuehle ich mich", "warum bin ich", "warum tue ich",
+                "was will ich", "was ist mein weg",
+            ],
+            "daily_gratitude": [
+                "dankbar", "gratitude", "grateful", "thankful",
+                "thank you for", "thanks for", "i appreciate",
+                "danke fuer", "danke fur", "ich schaetze",
+            ],
+            "daily_learning": [
+                "heute gelernt", "learned today", "today i learned", "i learned",
+                "i learned that", "i learned something", "today i realized",
+                "today i understood", "heute habe ich gelernt",
+                "ich habe heute gelernt", "ich habe gelernt",
+                "heute habe ich verstanden", "ich habe verstanden",
+                "mir ist heute klar geworden",
+            ],
             "daily_wisdom": ["weisheit", "wisdom", "zitat", "quote"],
             "daily_creation": ["erschaffen", "geschaffen", "create", "created", "etwas neues", "something new"],
             "daily_field_reflection": ["feld", "maat-feld", "field reflection", "maat field"],
@@ -1998,18 +2018,69 @@ class Plugin:
         quest["last_progress_day"] = today
         return progress
 
+    def _matches_daily_reflection(self, normalized: str, raw_text: str) -> bool:
+        explicit = (
+            "who am i", "who am i really", "what do i feel", "how do i feel",
+            "why am i", "why do i", "what do i want", "what is my path",
+            "wer bin ich", "wer bin ich wirklich", "was fuehle ich",
+            "wie fuehle ich mich", "warum bin ich", "warum tue ich",
+            "was will ich", "was ist mein weg",
+        )
+        if any(phrase in normalized for phrase in explicit):
+            return True
+
+        if "?" not in raw_text:
+            return False
+
+        tokens = set(normalized.split())
+        question_words = {"who", "what", "why", "how", "where", "wer", "was", "warum", "wie", "wo", "wohin"}
+        self_words = {"i", "me", "my", "myself", "ich", "mich", "mir", "mein", "meine", "selbst"}
+        return bool(tokens & question_words) and bool(tokens & self_words)
+
+    def _matches_daily_gratitude(self, normalized: str) -> bool:
+        strong_markers = (
+            "grateful", "gratitude", "thankful", "dankbar",
+            "i appreciate", "ich schaetze",
+        )
+        if any(marker in normalized for marker in strong_markers):
+            return True
+
+        softer_markers = ("thank you for", "thanks for", "danke fuer", "danke fur")
+        return any(marker in normalized for marker in softer_markers)
+
+    def _matches_daily_learning(self, normalized: str) -> bool:
+        markers = (
+            "today i learned", "learned today", "i learned that", "i learned something",
+            "today i realized", "today i understood",
+            "heute gelernt", "heute habe ich gelernt", "ich habe heute gelernt",
+            "ich habe gelernt", "heute habe ich verstanden",
+            "ich habe verstanden", "mir ist heute klar geworden",
+        )
+        return any(marker in normalized for marker in markers)
+
+    def _matches_daily_quest(self, quest: dict, user_input: str) -> bool:
+        normalized = self._normalize_keyword_text(user_input)
+        keywords = [self._normalize_keyword_text(k) for k in self._daily_quest_keywords(quest)]
+        if any(keyword and keyword in normalized for keyword in keywords):
+            return True
+
+        qid = quest.get("id", "")
+        if qid == "daily_reflect":
+            return self._matches_daily_reflection(normalized, str(user_input or ""))
+        if qid == "daily_gratitude":
+            return self._matches_daily_gratitude(normalized)
+        if qid == "daily_learning":
+            return self._matches_daily_learning(normalized)
+        return False
+
     def _check_daily_quests(self, user_input: str, completed_msgs: list):
-        text = user_input.lower()
         today = datetime.now().date().isoformat()
 
         for q in list(self.qstate["active"]):
             if q.get("type") != "daily_streak":
                 continue
 
-            keywords = self._daily_quest_keywords(q)
-            if not keywords:
-                continue
-            if not any(keyword in text for keyword in keywords):
+            if not self._matches_daily_quest(q, user_input):
                 continue
 
             progress = self._advance_daily_quest(q, today)

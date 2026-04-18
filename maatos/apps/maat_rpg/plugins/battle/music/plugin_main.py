@@ -48,6 +48,11 @@ def _load_settings() -> dict:
         return {}
 
 
+def _lang() -> str:
+    language = str(_load_settings().get("language", "de")).lower()
+    return "en" if language == "en" else "de"
+
+
 class TitleDemoAbort(Exception):
     pass
 
@@ -803,8 +808,11 @@ class Plugin:
             self.core.state.save()
             print(
                 Fore.CYAN
-                + "\n⚔️ Kampfmodus freigeschaltet! "
-                "Gegner können dich jetzt zufällig zwischen Nachrichten angreifen.\n"
+                + (
+                    "\n⚔️ Combat mode unlocked! Enemies can now attack you randomly between messages.\n"
+                    if _lang() == "en"
+                    else "\n⚔️ Kampfmodus freigeschaltet! Gegner können dich jetzt zufällig zwischen Nachrichten angreifen.\n"
+                )
                 + Style.RESET_ALL
             )
             return False, user_input

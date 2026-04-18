@@ -3448,7 +3448,11 @@ class Plugin:
             self.state.save()
             print(
                 Fore.CYAN
-                + "\n⚔️ Kampfmodus freigeschaltet! Die Einfuehrung ist abgeschlossen. Gegner koennen dich jetzt zufaellig angreifen.\n"
+                + (
+                    "\n⚔️ Combat mode unlocked! The introduction is complete. Enemies can now attack you randomly.\n"
+                    if _battle_ui_language() == "en"
+                    else "\n⚔️ Kampfmodus freigeschaltet! Die Einfuehrung ist abgeschlossen. Gegner koennen dich jetzt zufaellig angreifen.\n"
+                )
                 + Style.RESET_ALL
             )
             return False, user_input
