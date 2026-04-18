@@ -2073,6 +2073,13 @@ class Plugin:
             return self._matches_daily_learning(normalized)
         return False
 
+    def _daily_progress_message(self, quest: dict, progress: int, target: int) -> str:
+        name = self._quest_name(quest)
+        return self._t(
+            f"🌅 Daily-Fortschritt: {name} — {progress}/{target} Tage",
+            f"🌅 Daily progress: {name} — {progress}/{target} days",
+        )
+
     def _check_daily_quests(self, user_input: str, completed_msgs: list):
         today = datetime.now().date().isoformat()
 
@@ -2090,6 +2097,8 @@ class Plugin:
             target = int(q.get("required_days") or q.get("days") or 1)
             if progress >= target:
                 self._complete_quest(q, completed_msgs)
+            else:
+                completed_msgs.append(self._daily_progress_message(q, progress, target))
 
     def _check_keyword_quests(self, user_input: str, completed_msgs: list):
         for q in list(self.qstate["active"]):

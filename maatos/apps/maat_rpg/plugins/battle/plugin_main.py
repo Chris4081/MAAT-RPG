@@ -3673,7 +3673,7 @@ class Plugin:
                 # Header „Verlauf des Kampfes“ vor die eigentlichen Zeilen
                 header = [
                     "",  # kleine Leerzeile
-                    "📜 Verlauf des Kampfes:",
+                    "📜 Battle History:" if _battle_ui_language() == "en" else "📜 Verlauf des Kampfes:",
                     ""
                 ]
                 try:
