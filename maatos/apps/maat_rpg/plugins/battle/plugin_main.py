@@ -32,11 +32,20 @@ class TitleDemoAbort(Exception):
 
 BATTLE_TEXT = {
     "de": {
-        "guide_hint_final_1": "📘 Guide: Beginne ruhig mit Fokus. So lernst du Resonanz und Schild ohne Druck kennen.",
+        "guide_hint_final_1": "📘 Guide: Beginne ruhig mit Angriff. So siehst du Schaden, Resonanz und den Boss-Rhythmus direkt im Ablauf.",
         "guide_hint_final_2": "📘 Guide: Beobachte jetzt Aura, Charge-Balken und Spezialname. Der Finalboss kündigt Gefahr klar an.",
         "guide_hint_final_3": "📘 Guide: Wenn Resonanz 100/100 erreicht, kannst du den MAAT-Impuls bewusst timen.",
-        "guide_hint_normal_1": "📘 Guide: Angriff zeigt dir die fünf Prinzipien. Fokus ist die sichere Lernaktion fuer Schild und Heilung.",
-        "guide_hint_normal_2": "📘 Guide: Achte auf Schwachstelle und Resonanz. So lernst du den Rhythmus des Systems.",
+        "guide_hint_normal_1": "📘 Guide: Beginne mit Angriff. So siehst du Prinzipwahl, Schaden, Schwachstelle und Resonanz Schritt fuer Schritt.",
+        "guide_hint_normal_2": "📘 Guide: Vergleiche danach Fokus, Skill oder Trank. So lernst du Heilung, Schild und Tempo im direkten Unterschied.",
+        "guide_hint_normal_3": "📘 Guide: Bei 100/100 Resonanz ist der MAAT-Impuls bereit. Das ist dein starker Finisher mit Heilung.",
+        "guide_step_attack_1": "📘 Schritt 1: Du waehlst {attack}. Jeder Angriff nutzt eines der fuenf MAAT-Prinzipien.",
+        "guide_step_attack_2": "📘 Schritt 2: Der Treffer verursacht {damage} Schaden{weakness}",
+        "guide_step_attack_3": "📘 Schritt 3: Gleichzeitig laedt sich deine Resonanz auf {resonance}/100 auf.",
+        "guide_step_attack_4": "📘 Schritt 4: Wenn die Resonanz 100 erreicht, kannst du mit MAAT-Impuls grossen Schaden und Heilung ausloesen.",
+        "guide_step_focus_1": "📘 Guide: Fokus heilt dich, baut Schild auf und gibt sichere Resonanz ohne Risiko.",
+        "guide_step_skill_1": "📘 Guide: Skills verursachen meist mehr Druck als ein normaler Angriff und laden Resonanz gut auf.",
+        "guide_step_potion_1": "📘 Guide: Der Heiltrank heilt sofort, verbraucht aber ein Item aus deinem Inventar.",
+        "guide_step_ult_1": "📘 Guide: MAAT-Impuls verbraucht deine volle Resonanz und verbindet starken Schaden mit Heilung.",
         "guide_bonus_potion": "🧪 Guide-Bonus: Du findest einen Heiltrank. (Traenke: {potions})",
         "guide_complete": "📘 Guide-Kampf abgeschlossen.",
         "guide_reward_note": "Kein XP, kein Gold und keine dauerhaften Kampfverluste wurden angerechnet.",
@@ -189,11 +198,20 @@ BATTLE_TEXT = {
         "log_ult": "MAAT-Impuls: {damage} Schaden, {heal} Heilung",
     },
     "en": {
-        "guide_hint_final_1": "📘 Guide: Start calmly with Focus. This lets you learn resonance and shielding without pressure.",
+        "guide_hint_final_1": "📘 Guide: Start with Attack. This lets you see damage, resonance, and the boss rhythm directly in motion.",
         "guide_hint_final_2": "📘 Guide: Watch the aura, charge bar, and special name. The final boss signals danger clearly.",
         "guide_hint_final_3": "📘 Guide: When resonance reaches 100/100, you can time the MAAT impulse on purpose.",
-        "guide_hint_normal_1": "📘 Guide: Attack shows the five principles. Focus is the safe learning action for shield and healing.",
-        "guide_hint_normal_2": "📘 Guide: Watch the weakness and resonance. That is how you learn the system's rhythm.",
+        "guide_hint_normal_1": "📘 Guide: Start with Attack. That shows principle choice, damage, weakness, and resonance step by step.",
+        "guide_hint_normal_2": "📘 Guide: Then compare Focus, Skill, or Potion. That teaches healing, shielding, and tempo side by side.",
+        "guide_hint_normal_3": "📘 Guide: At 100/100 resonance, the MAAT impulse is ready. That is your strong finisher with healing.",
+        "guide_step_attack_1": "📘 Step 1: You choose {attack}. Every attack uses one of the five MAAT principles.",
+        "guide_step_attack_2": "📘 Step 2: The hit deals {damage} damage{weakness}",
+        "guide_step_attack_3": "📘 Step 3: At the same time, your resonance rises to {resonance}/100.",
+        "guide_step_attack_4": "📘 Step 4: When resonance reaches 100, you can unleash the MAAT impulse for heavy damage and healing.",
+        "guide_step_focus_1": "📘 Guide: Focus heals you, builds shield, and gives safe resonance without much risk.",
+        "guide_step_skill_1": "📘 Guide: Skills usually create more pressure than a normal attack and charge resonance well.",
+        "guide_step_potion_1": "📘 Guide: The healing potion restores HP instantly, but it consumes one item from your inventory.",
+        "guide_step_ult_1": "📘 Guide: The MAAT impulse spends your full resonance and combines strong damage with healing.",
         "guide_bonus_potion": "🧪 Guide bonus: You find a healing potion. (Potions: {potions})",
         "guide_complete": "📘 Guide battle completed.",
         "guide_reward_note": "No XP, no gold, and no permanent combat losses were applied.",
@@ -1630,8 +1648,61 @@ class BattleCore:
         hints = {
             1: _battle_text("guide_hint_normal_1"),
             2: _battle_text("guide_hint_normal_2"),
+            3: _battle_text("guide_hint_normal_3"),
         }
         return hints.get(turn_counter, "")
+
+    def _guide_default_action(self, ftype: str, turn_counter: int, turn_state: dict, player_hp: int, max_hp: int, player: dict) -> str:
+        explained = set(turn_state.get("guide_explained_actions", []))
+        resonance = int(turn_state.get("resonance", 0) or 0)
+        potions = int(player.get("potions", 0) or 0)
+
+        if resonance >= 100 and "ult" not in explained:
+            return "5"
+        if "attack" not in explained:
+            return "1"
+        if "skill" not in explained and player.get("skills"):
+            return "2"
+        if player_hp < max_hp and potions > 0 and "potion" not in explained:
+            return "4"
+        if "focus" not in explained:
+            return "3"
+        if ftype == "final" and resonance < 100:
+            return "3"
+        return "1"
+
+    def _guide_default_principle_choice(self, turn_state: dict, principles: dict) -> str:
+        weakness = str(turn_state.get("weakness") or "").strip()
+        for key, value in principles.items():
+            if value == weakness:
+                return key
+        return "1"
+
+    def _guide_action_breakdown(self, action_key: str, turn_state: dict, **kwargs) -> list[str]:
+        explained = list(turn_state.get("guide_explained_actions", []))
+        if action_key in explained:
+            return []
+        explained.append(action_key)
+        turn_state["guide_explained_actions"] = explained
+
+        if action_key == "attack":
+            weakness = str(kwargs.get("weakness_text", "") or "").strip()
+            weakness_suffix = f" — {weakness}" if weakness else ""
+            return [
+                _battle_text("guide_step_attack_1", attack=kwargs.get("attack", "?")),
+                _battle_text("guide_step_attack_2", damage=kwargs.get("damage", 0), weakness=weakness_suffix),
+                _battle_text("guide_step_attack_3", resonance=kwargs.get("resonance", 0)),
+                _battle_text("guide_step_attack_4"),
+            ]
+        if action_key == "focus":
+            return [_battle_text("guide_step_focus_1")]
+        if action_key == "skill":
+            return [_battle_text("guide_step_skill_1")]
+        if action_key == "potion":
+            return [_battle_text("guide_step_potion_1")]
+        if action_key == "ult":
+            return [_battle_text("guide_step_ult_1")]
+        return []
 
     def _restore_guide_state(self, original_player_hp: int, stats_snapshot: dict | None):
         self.state.state["player"]["hp"] = original_player_hp
@@ -2753,7 +2824,10 @@ class BattleCore:
                 print(_battle_text("action_potion"))
                 print(_battle_text("action_ult"))
                 print(_battle_text("action_flee"))
-                choice = self._prompt(_battle_text("action_prompt"), context=context, default="3")
+                action_default = "3"
+                if guide_mode:
+                    action_default = self._guide_default_action(ftype, turn_counter, turn_state, player_hp, p["max_hp"], p)
+                choice = self._prompt(_battle_text("action_prompt"), context=context, default=action_default)
 
                 if choice == "1":
                     # ANGRIFF → Prinzip wählen
@@ -2765,7 +2839,10 @@ class BattleCore:
                         print(f"4) {principle_names['Verbundenheit']}")
                         print(f"5) {principle_names['Respekt']}")
                         print(_battle_text("attack_back"))
-                        sub = self._prompt(_battle_text("attack_choose"), context=context, default="6")
+                        attack_default = "6"
+                        if guide_mode:
+                            attack_default = self._guide_default_principle_choice(turn_state, principles)
+                        sub = self._prompt(_battle_text("attack_choose"), context=context, default=attack_default)
                         if sub == "6":
                             break
                         if sub not in principles:
@@ -2804,6 +2881,17 @@ class BattleCore:
                         )
                         self._slow_line(line)
                         log_lines.append(_battle_text("log_player_attack", attack=_principle_label(atk_type), damage=final_dmg))
+                        if guide_mode:
+                            for guide_line in self._guide_action_breakdown(
+                                "attack",
+                                turn_state,
+                                attack=_principle_label(atk_type),
+                                damage=final_dmg,
+                                weakness_text=weakness_txt,
+                                resonance=resonance,
+                            ):
+                                self._slow_line(guide_line, delay_char=0.008, delay_line=0.22)
+                                log_lines.append(guide_line)
 
                         break  # danach zurück ins Hauptmenü
 
@@ -2841,6 +2929,10 @@ class BattleCore:
                                 )
                                 self._slow_line(line)
                                 log_lines.append(_battle_text("log_skill_hit", skill=sk, damage=final_dmg))
+                                if guide_mode:
+                                    for guide_line in self._guide_action_breakdown("skill", turn_state):
+                                        self._slow_line(guide_line, delay_char=0.008, delay_line=0.22)
+                                        log_lines.append(guide_line)
                         except ValueError:
                             print(_battle_text("invalid_input"))
 
@@ -2851,6 +2943,10 @@ class BattleCore:
                         line += extra_txt
                     self._slow_line(line)
                     log_lines.append(_battle_text("log_player_focus"))
+                    if guide_mode:
+                        for guide_line in self._guide_action_breakdown("focus", turn_state):
+                            self._slow_line(guide_line, delay_char=0.008, delay_line=0.22)
+                            log_lines.append(guide_line)
 
                 elif choice == "4":
                     potion_msg, did_heal = self._use_potion_in_fight(turn_state)
@@ -2865,6 +2961,10 @@ class BattleCore:
                         if did_heal
                         else _battle_text("log_player_potion_skip")
                     )
+                    if guide_mode and did_heal:
+                        for guide_line in self._guide_action_breakdown("potion", turn_state):
+                            self._slow_line(guide_line, delay_char=0.008, delay_line=0.22)
+                            log_lines.append(guide_line)
                     player_hp = p["hp"]
 
                 elif choice == "5":
@@ -2877,6 +2977,10 @@ class BattleCore:
                         if enemy_hp <= 0:
                             turn_state["ult_finisher"] = True
                         log_lines.append(_battle_text("log_ult", damage=final_dmg, heal=heal))
+                        if guide_mode:
+                            for guide_line in self._guide_action_breakdown("ult", turn_state):
+                                self._slow_line(guide_line, delay_char=0.008, delay_line=0.22)
+                                log_lines.append(guide_line)
 
                 elif choice == "6":
                     # FLUCHT
