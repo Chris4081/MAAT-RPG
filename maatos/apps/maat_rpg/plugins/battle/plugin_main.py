@@ -2337,17 +2337,37 @@ class BattleCore:
 
         if ftype == "normal":
             stats = self.state.state["stats"]
+            world = self.state.state.get("world", {})
             boss_wins = stats.get("boss_wins", 0)
-            idx = max(0, min(4, boss_wins))
 
-            if idx == 0:
-                cand = os.path.join(music_dir, "battle_normal.mp3")
+            # Nach dem vollständigen Finale (5 Prinzipien) rotiert die normale Kampfmusik zufällig.
+            if int(world.get("principles_restored", 0) or 0) >= 5:
+                endgame_candidates = [
+                    os.path.join(music_dir, "battle_normal.mp3"),
+                    os.path.join(music_dir, "battle_normal2.mp3"),
+                    os.path.join(music_dir, "battle_normal3.mp3"),
+                    os.path.join(music_dir, "battle_normal4.mp3"),
+                    os.path.join(music_dir, "battle_normal5.mp3"),
+                ]
+                available = [cand for cand in endgame_candidates if os.path.isfile(cand)]
+                if available:
+                    path = random.choice(available)
             else:
-                cand = os.path.join(music_dir, f"battle_normal{idx+1}.mp3")
+                idx = max(0, min(4, boss_wins))
 
-            if os.path.isfile(cand):
-                path = cand
-            else:
+                if idx == 0:
+                    cand = os.path.join(music_dir, "battle_normal.mp3")
+                else:
+                    cand = os.path.join(music_dir, f"battle_normal{idx+1}.mp3")
+
+                if os.path.isfile(cand):
+                    path = cand
+                else:
+                    fallback = os.path.join(music_dir, "battle_normal.mp3")
+                    if os.path.isfile(fallback):
+                        path = fallback
+
+            if path is None:
                 fallback = os.path.join(music_dir, "battle_normal.mp3")
                 if os.path.isfile(fallback):
                     path = fallback
