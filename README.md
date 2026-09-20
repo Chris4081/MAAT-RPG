@@ -2,32 +2,7 @@
 
 **English** · [Deutsch](README.de.md)
 
-**Public Beta · Source Edition · 20 September 2026** — Run the game from source with your
-own GGUF model. [Setup and launch](GUI-START.md#english).
-
-## Download and play
-
-Choose the edition that suits you:
-
-| Edition | Download | What's included? |
-| --- | --- | --- |
-| **🎵 Official version with music** | [Download MAAT RPG with music (.zip)](https://maat-research.com/data/downloads/maat-rpg.zip) | The regular game version with its soundtrack and original sound effects, hosted on the project owner's server. |
-| **💻 Repository version without music** | On this GitHub page, select **Code → Download ZIP**, or clone the repository. | Game source code, artwork and original sound effects. Background music and embedded Suno covers are not included; music is off by default. |
-
-**With music:** download and extract the ZIP, then follow the
-[step-by-step ZIP guide](docs/ZIP_INSTALL.en.md). It covers macOS Intel/Apple
-Silicon, Linux and experimental Windows setup, model selection, music and later starts.
-
-**From the repository:** extract the ZIP or clone the repository, open a terminal
-in the folder containing `start_gui.py`, and follow the
-[GUI setup guide](GUI-START.md#english). This edition is also the starting point
-for modifying the game or making your own fork.
-
-[More about music and sound effects →](docs/MUSIC.md#english)
-
-MAAT RPG is in active development. During the beta, you may encounter bugs,
-unfinished translations and changes to game balance. Your playtesting and feedback
-help shape the next version.
+**Public Beta · Source Edition · 20 September 2026**
 
 ### A conversation. A whole world.
 
@@ -35,7 +10,7 @@ Talk to your AI. Follow Maatis through Terra. Conversations become encounters, c
 
 **Local AI · Two perspectives · Five classes · 23 minigames · English & German**
 
-[🌐 Discover the game](https://maat-research.com/maat-rpg/index-en.html) · [✨ Explore all features](https://maat-research.com/maat-rpg/features-en.html) · [▶ Installation](GUI-START.md#english)
+[🌐 Discover the game](https://maat-research.com/maat-rpg/index-en.html) · [✨ Explore all features](https://maat-research.com/maat-rpg/features-en.html) · [⬇ Downloads](#download-and-play)
 
 ![Maatis discovers a glowing artifact as a holographic AI awakens in an abandoned library.](maatos/gui/assets/intro-awakening.png)
 
@@ -193,6 +168,21 @@ Denominators must be positive. These are subjective assessments within a reflect
 [Try the interactive MAAT calculator](https://maat-research.com/maat-rpg/index-en.html#formeln) · [More formula explanations](https://maat-research.com/maat-rpg/features-en.html#formeln)
 
 </details>
+
+**🎵 Music note:** The repository edition includes original sound effects and starts
+without background music. The official ZIP version includes the soundtrack.
+[Music details](docs/MUSIC.md#english).
+
+## Download and play
+
+| Version | Download | Setup guide |
+| --- | --- | --- |
+| **With music** | [Download the official game ZIP](https://maat-research.com/data/downloads/maat-rpg.zip) | [Step-by-step ZIP guide](docs/ZIP_INSTALL.en.md) |
+| **Without music · repository** | **Code → Download ZIP** on this GitHub page, or clone the repository. | [Set up from source](GUI-START.md#english) |
+
+MAAT RPG is in active development. During the beta, you may encounter bugs,
+unfinished translations and changes to game balance. Your playtesting and feedback
+help shape the next version.
 
 ## Your first journey
 
