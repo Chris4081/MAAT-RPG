@@ -1,0 +1,124 @@
+{
+  "kind": "synthetic Qt development captures",
+  "seed": 7,
+  "profile_data": false,
+  "date": "2026-09-20",
+  "images": [
+    {
+      "file": "breakout.png",
+      "sha256": "c654de71fdede624f3f9abbedb381d25a030f53db20fafd232fe895095a024ff"
+    },
+    {
+      "file": "four.png",
+      "sha256": "7678afac7980cd4b6008109513f127e6f67f5416f75cd9d11283ed92d5789437"
+    },
+    {
+      "file": "lights.png",
+      "sha256": "39926e2176282468645cd178e8414779fddd242b9d58cfe4e002a56b3bc9b0c8"
+    },
+    {
+      "file": "maat-coil-de.png",
+      "sha256": "ce4cb5aff45b87da11e4799e2ba6bfbd16871941ffb55b609dcfae334aa5fa55"
+    },
+    {
+      "file": "maat-coil-en.png",
+      "sha256": "58dfe559d979c715456dd5609e9b310687b569cf54180674b94c3595134f8dd4"
+    },
+    {
+      "file": "maat_balance.png",
+      "sha256": "9d0c2bd2f6d090cb2432071899341eec28d01169b80f07310a5da4b5ad4e4de3"
+    },
+    {
+      "file": "maat_coil.png",
+      "sha256": "ce4cb5aff45b87da11e4799e2ba6bfbd16871941ffb55b609dcfae334aa5fa55"
+    },
+    {
+      "file": "maat_connection.png",
+      "sha256": "56dd08e23bbffb107ff89752d6404f5861758a76e19545e71b3da21f9b0ec078"
+    },
+    {
+      "file": "maat_creation.png",
+      "sha256": "fc9aeec09ac1948baba11210ed53a57d9d5be02966e405d2d6c0f5bf895ad9a2"
+    },
+    {
+      "file": "maat_echo.png",
+      "sha256": "c45d716140a236987bdcbdf1cb1f64723ee2342f2f2fd0c2c8dc5ab6208243b4"
+    },
+    {
+      "file": "maat_numbers.png",
+      "sha256": "0c58eebc041a4dadd2401802da2de6773e11d8e29737681f08c8849477015b11"
+    },
+    {
+      "file": "maat_respect.png",
+      "sha256": "3be06c902d0e58de7617fe263f59d7aad3d4109851967f73a8df7359b9de4140"
+    },
+    {
+      "file": "maat_rings.png",
+      "sha256": "3502846bfc52de3f7c798819f17d561f935a8c17ef3519bcacff5f80b2b01bf9"
+    },
+    {
+      "file": "maat_snake.png",
+      "sha256": "edec0a2a28a4f61ac477b77282da8d72ab4c6f9fced07bdea4aed6ac288c96e8"
+    },
+    {
+      "file": "maat_towers.png",
+      "sha256": "58b96e03271b2300ce080f8784a7cba6f3a4c2897fd2ff4eef9870980ebdab0d"
+    },
+    {
+      "file": "maze.png",
+      "sha256": "7257e9d81e43ec15571f7dc8014ed9ab1ceca5ed490735a6550ee925ba2a067d"
+    },
+    {
+      "file": "memory.png",
+      "sha256": "224e3c381147adfbaa67a2453ecea59d262f4589e63600fcde418af1a784210e"
+    },
+    {
+      "file": "mines.png",
+      "sha256": "08287b67f16c91042e58ae4194d5d04ad2933d28a8f271b5a9c93c9bf20b72ad"
+    },
+    {
+      "file": "overview-1.png",
+      "sha256": "91be39a57b2e7b6292c4840b4408690f082b87ac35b2858fd74d02215a1ca983"
+    },
+    {
+      "file": "overview-2.png",
+      "sha256": "d4bbca7db2b28270f74d930fb02b215395b67536bec0414c68c9a899d4dfa7d9"
+    },
+    {
+      "file": "overview-3.png",
+      "sha256": "c462f183db824fc9cc3e10fd4b92bfc4b71faed5d0919fb249e95a469664aa1e"
+    },
+    {
+      "file": "overview-4.png",
+      "sha256": "a0466e7645ac9d17ad9ce01ed79ee4d134913c6018b18d65221c8ec78e2eb3c8"
+    },
+    {
+      "file": "reflex.png",
+      "sha256": "2a19f97c4c76d1e88ae54390c07bf8c329cd5ce9a4a23face954e6aea56260f5"
+    },
+    {
+      "file": "slide.png",
+      "sha256": "9b40d3f48a793a112ea698f6e9b17684f0e78e19d532b188055cadb382c81452"
+    },
+    {
+      "file": "snake_walls.png",
+      "sha256": "d01232b99af8a51e0544fe5fed79a78b874f9db7366b5bfb3588f84817461373"
+    },
+    {
+      "file": "sokoban.png",
+      "sha256": "311a22218f318f788cc9158b915f4c445e78905d2c8d98b373c5a22734241aa8"
+    },
+    {
+      "file": "tetris.png",
+      "sha256": "0ee5fe3e7f25222a40b648c84b005caffc527e5a618649998c2ed09abb0a7d1b"
+    },
+    {
+      "file": "three.png",
+      "sha256": "faa0e89f7f1a74023903096821be8dc15cc804045d18a265a87b1c9503c18ef9"
+    },
+    {
+      "file": "wheel.png",
+      "sha256": "5d950842dd042048af78f82a39288d545d3c7f9d85155fc3955b3967b1c8754a"
+    }
+  ]
+}

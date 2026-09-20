@@ -1,0 +1,79 @@
+{
+  "method": "Local connected-background extraction with edge matting",
+  "source_set": "Approved class-concepts-v2; originals preserved",
+  "generated_variants_used": false,
+  "assets": [
+    {
+      "name": "normal",
+      "source": "../maatis-normal.png",
+      "source_sha256": "8c21d3d7c80bf72488aacef65725c21437d448ae6bb7d5665ddf3c768528e9f5",
+      "file": "maatis-normal.png",
+      "sha256": "9915628b1b344a54450832c99072fb05d7b9eba00bdde405db10218f97acdb9b",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "transparent_pixels": 1230308,
+      "partial_alpha_pixels": 9005
+    },
+    {
+      "name": "robo",
+      "source": "../maatis-robo.png",
+      "source_sha256": "46340a3ce6e4747da2da7beb9bb3497092dbc9d61900e9651fc936bbaa8f5fdc",
+      "file": "maatis-robo.png",
+      "sha256": "33e560019f133b445bd7bfdeec16ecd2676af7ee892c86355751c6cca1ac2f78",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "transparent_pixels": 1187983,
+      "partial_alpha_pixels": 8805
+    },
+    {
+      "name": "engelchen",
+      "source": "../maatis-engelchen.png",
+      "source_sha256": "3f540e389f7eef17ce40db36d286217d81a83a465ca1673abe1bd6b02a5de1f1",
+      "file": "maatis-engelchen.png",
+      "sha256": "0db6935b181822d545f35dd4153f3b73588fe3ab1f8a26ca25e7ae66928e9320",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "transparent_pixels": 1152658,
+      "partial_alpha_pixels": 11490
+    },
+    {
+      "name": "magier",
+      "source": "../maatis-magier.png",
+      "source_sha256": "46269fa10b0263892d4db9e47914e12d0d42419c7c1a0d5dfc77dc8b81354eeb",
+      "file": "maatis-magier.png",
+      "sha256": "59d86526702bab9a6c419383361d89997bc7bb69c9c0f424beb2355533b560ab",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "transparent_pixels": 1175406,
+      "partial_alpha_pixels": 14523
+    },
+    {
+      "name": "priester",
+      "source": "../maatis-priester.png",
+      "source_sha256": "d881ffb7227c928d9b5e3f3b846d1441b6a4b6cd8b1d70736c7870ab2d430210",
+      "file": "maatis-priester.png",
+      "sha256": "dd4eff8d09190d347af6aa66d0c3c524f3bd8c26f04b6b88663bd0b4f862ba4a",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "transparent_pixels": 1240297,
+      "partial_alpha_pixels": 12084
+    },
+    {
+      "name": "puppy",
+      "source": "../maatis-puppy.png",
+      "source_sha256": "85117de3eb5bc5da946cf6ce9bdaa423633bb93fff9222327b86de6494bf4e13",
+      "file": "maatis-puppy.png",
+      "sha256": "29d71f2ba1464a448a73825fef804ab3f4d83e1d088b12f1b28f694d04fac2a0",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "transparent_pixels": 1127757,
+      "partial_alpha_pixels": 8653
+    }
+  ]
+}

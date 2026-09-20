@@ -1,0 +1,27 @@
+{
+  "plugins": {
+    "chat_memory": false,
+    "memory_orchestrator": false,
+    "memory_v5": false,
+    "memory_v6": false,
+    "maat_time_kernel": false,
+    "maat_usercontext_memory": false,
+    "super_memory": true,
+    "maat_thinking": true,
+    "maat_emotion": true,
+    "maat_plp_anti_hallu": true,
+    "maat_style": true,
+    "maat_reply_style": true,
+    "maat_identity": true,
+    "maat_reality_layer": true,
+    "maat_formatting": true,
+    "uncertainty_guard": false,
+    "model_downloader": true,
+    "game_menu": true,
+    "rpg_intro": true,
+    "story_loader": true,
+    "battle": true,
+    "Wiki_Fetcher": false,
+    "offline_wiki": true
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "mode": "built-in image_gen",
+  "deliverable": "Six class model sheets, 20 labeled poses each",
+  "common": "Use case: stylized-concept.\nDeliverable: ONE complete class action / expression MODEL SHEET for MAAT RPG, a coherent illustrated set comparable to the robot action sheet reference. This is a labeled class pose board, not an isolated single character.\nReference image 1 is the APPROVED class character design: preserve its exact face, hair silhouette, proportions, clothing, headgear, class accessories, palette, gold outlines, and simple charming flat geometric cartoon style throughout EVERY pose. Reference image 2 is the existing robot action sheet: use ONLY for the concept of clearly separated labeled poses with colorful effects. Do NOT turn the class into a robot unless reference 1 itself is the robot.\nCreate a high-resolution portrait board, 2048 x 2560 or larger matching 4:5 proportions. Title at top in pale gold. Below it, EXACTLY FOUR COLUMNS and FIVE ROWS of equally sized panels, exactly 20 full-body figures. Uniform dark navy background #071024, panels slightly lighter navy #101d37 separated by generous gutters. Clean simple pale-gold sans-serif labels centered beneath each figure. No text on the characters, no HP numbers, no interface controls. Same character scale and baseline within each panel, including effects with comfortable margins, no cropped feet, wings, hats or staff.\nVisual style: simple flat teal-blue #254c65 shapes, clean even pale gold #dec787 outline, gold diamond #e8c576, pale cyan details, warm tan simple human face when applicable. Never add realism, dimensional shading, textures, ornate clothing, complex anatomy or painterly rendering. Preserve the friendly approved design. Slight rotations, expressive eyes, arms and legs make each pose noticeably DIFFERENT, still the SAME character.\nOrder is strict left to right, top to bottom. The exact panel labels and pose contents:\nROW 1:\n1 \"Standard\" — neutral standing, relaxed arms, approved face.\n2 \"Bereit\" — attentive combat stance, elbows slightly bent, determined expression.\n3 \"Blinzeln\" — relaxed standing with both eyes visibly closed.\n4 \"Erschöpft\" — slumped shoulders, lowered head, tired eyes, a small amber droplet.\nROW 2:\n5 \"Harmonie\" — one arm extended toward viewer-right, three mint-green curved wave lines emerging from hand.\n6 \"Balance\" — arms spread evenly, a pale-blue balanced scale symbol floating beside hand.\n7 \"Schöpfung\" — one hand raised, a distinct four-point gold star inside violet magic lines beside the hand.\n8 \"Verbindung\" — arms outward, three warm-gold and cyan dots connected as a triangular constellation.\nROW 3:\n9 \"Respekt\" — braced stance behind a large blue energy shield with a gold check symbol.\n10 \"Schlag\" — dynamic swing, one clean broad gold crescent slash toward viewer-right.\n11 \"Klaue\" — forward swipe with THREE parallel curved strike trails.\n12 \"Sand\" — sweeping gesture, a curl of golden sand grains moving to viewer-right.\nROW 4:\n13 \"Funke\" — hand raised with a small pale cyan lightning bolt.\n14 \"MAAT-Impuls\" — both arms raised, a golden sunlike energy ring with short radial rays beside character.\n15 \"Fokus\" — calm closed eyes, hands near chest diamond, thin cyan circular aura.\n16 \"Heiltrank\" — happy eyes, holding a clearly visible small mint-green potion bottle near face, a few green plus signs.\nROW 5:\n17 \"Treffer\" — recoils sideways, pained squeezed eyes, three short red impact rays; no gore, no damage text.\n18 \"Abwehr\" — arms braced, physical navy shield with gold diamond, small cyan impact ticks.\n19 \"Sieg\" — arms raised joyfully, happy curved eyes and tiny gold celebratory sparkles.\n20 \"Resonanz 100%\" — proud planted stance, gold chest diamond surrounded by concentric gold energy rings, charged aura kept as simple outlined shapes.\nKeep all 20 labels exactly once and in that order. Do not omit panels, replace panels with text, merge panels or repeat the same pose without the required action. No other captions or subtitles.\nClass-specific title and invariant design notes:\n",
+  "classes": [
+    [
+      "normal",
+      "MAATIS · NORMAL",
+      "Human Maatis BEFORE class selection: keep dark tousled hair, navy scarf, teal tunic and pants, warm tan face, simple mitt-like hands and boots. Effects are clean geometric MAAT energy, without class gear. Use the approved normal design from reference 1."
+    ],
+    [
+      "robo",
+      "MAATIS · ROBO",
+      "The existing friendly ROBOT: rounded square head, T antenna, dark rounded visor with pale cyan line eyes, flat teal body, gold chest diamond, angular hands and feet. NO human face, hair, nose or mouth. Express emotion only with visor eyes and pose. Every panel preserves original robot silhouette, antenna and visor."
+    ],
+    [
+      "engelchen",
+      "MAATIS · ENGELCHEN",
+      "Human angel Maatis: keep the exact dark hair, TWO gold curved horns, two ivory wings, teal outfit and warm tan human face of reference 1 in EVERY panel. Wings move with the action; keep both recognizable. Add at most two little feather symbols to attack trails, do not obscure MAAT symbols. No halo replacing horns, no demon transformation."
+    ],
+    [
+      "magier",
+      "MAATIS · MAGIER",
+      "Human wizard Maatis: keep the exact tall pointed teal/navy hat with gold band and diamond, navy/teal open robe, short boots and warm tan face in EVERY panel. Cast actions with a hand; subtle lavender rings can accompany the specific MAAT symbols. Keep hat on even when hurt or tired. No staff, book or realistic face added."
+    ],
+    [
+      "priester",
+      "MAATIS · PRIESTER",
+      "Human priest Maatis: keep the exact ivory robe with central teal panel and gold diamond, warm tan face, distinctive dark teal angular hair and tall plain golden staff with diamond inside a ring. Staff stays visible in EVERY pose, held in either hand or planted beside him when both hands are needed. Effects emerge from staff or free hand as appropriate; one small ivory ray may accompany the specific effect. No religious cross, no hat, no complex ornaments."
+    ],
+    [
+      "puppy",
+      "MAATIS · PUPPY",
+      "Human Maatis dressed in the EXACT blue dog costume: TWO long floppy dark ears, cream dog-muzzle decoration on HOOD above exposed HUMAN face, cream belly with gold diamond, mitten paws, paw boots and small tail. Preserve visible human face and costume in EVERY pose. Animate ears and tail gently; add one or two tiny gold paw-print accents to slash/claw/sand effects. No transformation into an actual dog, no face hidden behind muzzle."
+    ]
+  ],
+  "references": {
+    "classDirectory": "gui-preview/class-concepts-v2",
+    "actionSheet": "gui-preview/maatis-presence.png"
+  }
+}

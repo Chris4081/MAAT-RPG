@@ -1,0 +1,83 @@
+{
+  "description": "Images used in the German and English GitHub READMEs. Existing project artwork and development views; no private player saves or chats. Captions identify test views. This manifest does not grant new media rights.",
+  "prepared": "2026-09-20",
+  "images": [
+    {
+      "file": "docs/images/classes-overview.png",
+      "source": "MAAT-RPG/gui-preview/maat-rpg-website/assets/classes-overview.png",
+      "kind": "project artwork overview",
+      "sha256": "3f9d1b1e009607d45e109e538f0dd17db7b991f6061d189e235d8a743e5da1a5",
+      "pixel_changes": false
+    },
+    {
+      "file": "docs/images/terra-journey.png",
+      "source": "MAAT-RPG/gui-preview/maat-rpg-website/assets/terra-journey.png",
+      "kind": "development UI capture with test data",
+      "sha256": "475bf8078ed3d0aca9de0db5af773ff4036e910de6161dd590d455bab431fab9",
+      "pixel_changes": false
+    },
+    {
+      "file": "docs/images/maat-snake.png",
+      "source": "MAAT-RPG/gui-preview/maat-rpg-website/assets/maat-snake.png",
+      "kind": "development UI capture with test data",
+      "sha256": "bff81feb4a5d81640be99e610f4efd2e206f3372c8ff6ea8c7d56ef387ec4b2c",
+      "pixel_changes": false
+    },
+    {
+      "file": "docs/images/memories-en-current.png",
+      "source": "MAAT-RPG/gui-preview/maat-rpg-website/assets/memories-en-current.png",
+      "kind": "development UI capture with test data",
+      "sha256": "88d5a4983a0ff5c208a3a646faee013d22323ba607250557157c9972a6236045",
+      "pixel_changes": false
+    },
+    {
+      "file": "docs/images/talents-robo.png",
+      "source": "MAAT-RPG/gui-preview/maat-rpg-website/assets/talents-robo.png",
+      "kind": "development UI capture with test data",
+      "sha256": "c1dc9d4f9656bcabf1bfe790a3c446f7aaf8d315a17e33d8fc711635e15a405c",
+      "pixel_changes": false
+    },
+    {
+      "file": "maatos/gui/assets/intro-awakening.png",
+      "source": "existing repository asset",
+      "kind": "project story illustration",
+      "sha256": "5ae11105008857678571412e23823e73e862714345de877ca9de8713b1b4ddfe",
+      "pixel_changes": false
+    },
+    {
+      "file": "gui-preview/egyptian-bosses-v1/battle-08.png",
+      "source": "existing repository asset",
+      "kind": "synthetic combat preview",
+      "sha256": "c377800aae2bc07a7914783e6e2a20520963b578cbf84c1c400ea6ec061a2a88",
+      "pixel_changes": false
+    },
+    {
+      "file": "gui-preview/minigame-review-v1/maat-coil-de.png",
+      "source": "tools/render_minigame_review.py (seed 7, no profile data)",
+      "kind": "linked synthetic Qt minigame preview",
+      "sha256": "ce4cb5aff45b87da11e4799e2ba6bfbd16871941ffb55b609dcfae334aa5fa55",
+      "pixel_changes": false
+    },
+    {
+      "file": "gui-preview/minigame-review-v1/maat-coil-en.png",
+      "source": "tools/render_minigame_review.py (seed 7, no profile data)",
+      "kind": "linked synthetic Qt minigame preview",
+      "sha256": "58dfe559d979c715456dd5609e9b310687b569cf54180674b94c3595134f8dd4",
+      "pixel_changes": false
+    },
+    {
+      "file": "gui-preview/minigame-review-v2/temple-circles-de.png",
+      "source": "tools/render_minigame_review.py (seed 7, no profile data)",
+      "kind": "linked synthetic Qt minigame preview",
+      "sha256": "c37d88fb3714841bf921f8cfa9a6764afdb5fc96e6c7efd896a9274d37a8fd15",
+      "pixel_changes": false
+    },
+    {
+      "file": "gui-preview/minigame-review-v2/temple-circles-en.png",
+      "source": "tools/render_minigame_review.py (seed 7, no profile data)",
+      "kind": "linked synthetic Qt minigame preview",
+      "sha256": "e6399e6ab1f82205c89c514ba371241a42bdfac56a2c0c2c3be04dde6b952d6b",
+      "pixel_changes": false
+    }
+  ]
+}

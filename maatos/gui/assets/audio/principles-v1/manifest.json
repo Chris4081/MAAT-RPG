@@ -1,0 +1,46 @@
+{
+  "format": "PCM signed 16-bit stereo / 48000 Hz",
+  "origin": "Original procedural synthesis, no external samples.",
+  "sounds": {
+    "h_harmony": {
+      "title": "H · Harmonie",
+      "description": "Warmer Akkord mit einer weichen Lichtwelle.",
+      "duration": 1.35,
+      "peak_db": -6.42,
+      "rms_db": -21.0,
+      "sha256": "1f5e9ec1a430a107bb5fc6302b50418e94dcd98acbe8747f7b3b0753bc6df9fb"
+    },
+    "b_balance": {
+      "title": "B · Balance",
+      "description": "Zwei gleich starke, räumlich versetzte Impulse.",
+      "duration": 1.35,
+      "peak_db": -5.75,
+      "rms_db": -21.0,
+      "sha256": "874a98319369a5d3d5e940d6314ed3744a556f3fbaca0842e918a7ea8db823ff"
+    },
+    "s_creation": {
+      "title": "S · Schöpfungskraft",
+      "description": "Aufsteigende Energie mit funkelnden Obertönen.",
+      "duration": 1.35,
+      "peak_db": -5.84,
+      "rms_db": -21.0,
+      "sha256": "ffdc911f04ee5babb81aae41f32ccf2713735c762f0bbf91da2c30b571af5932"
+    },
+    "v_connection": {
+      "title": "V · Verbundenheit",
+      "description": "Verwobene Klangwellen mit antwortenden Echos.",
+      "duration": 1.35,
+      "peak_db": -7.19,
+      "rms_db": -21.0,
+      "sha256": "3ec98c71d6cc32f153b35140c8ede0f82d5471b78f4554b0b6bb4489a9b3ae01"
+    },
+    "r_respect": {
+      "title": "R · Respekt",
+      "description": "Tiefer Schutzimpuls mit warmem, metallischem Nachklang.",
+      "duration": 1.35,
+      "peak_db": -5.46,
+      "rms_db": -21.0,
+      "sha256": "ae865fe3671a5d3630625c6bcfe20516b1e48add4aef9556d9bfb3a872b05023"
+    }
+  }
+}

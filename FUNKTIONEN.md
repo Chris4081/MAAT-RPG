@@ -1,0 +1,400 @@
+> Historischer Terminal-Überblick / Historical terminal overview.
+> Aktuelle GUI-Funktionen / Current GUI features: [Deutsch](README.de.md) · [English](README.md).
+
+# MAAT-RPG / MAAT-OS Funktionen
+
+Stand: 10.04.2026
+
+Diese Datei beschreibt die sichtbaren Funktionen, Systeme und Kommandos des aktuellen MAAT-RPG- und MAAT-OS-Repos in Deutsch und Englisch.
+
+## Auf einen Blick
+
+- Zweisprachiges KI-RPG mit lokalem Modellbetrieb
+- Story, Kämpfe, Journal, Quests und Boss-Codex in einem zusammenhängenden System
+- MAAT-OS als modularer Unterbau für Loader, Plugins, Analyse und Spielwelt
+- Reaktive Progression: Entscheidungen verändern Profil, Kämpfe, Rewards und Weltreaktionen
+- Guide-Modi für sicheres Lernen ohne spielerischen Vorteil
+
+## Deutsch
+
+### Kernfunktionen
+
+- Zweisprachiger Start von MAAT-OS Loader und MAAT-RPG
+- Sprachwahl beim Start und im Menü
+- Sprachumschaltung auch für Loader, Modellwahl, Intro, HUD und Systemmeldungen
+- Titelbildschirm `Version 0.2` mit Enter-Schritt
+- Persistenter Spielstand in `Application Support`
+- Lokales Modell-Setup mit Modell-Auswahl und Downloader
+- Modell-Downloader mit Resume-/Prüf-Logik
+- Architekturgetrennte Setup-Pfade für Intel und Apple Silicon
+- Say-TTS mit Sprach-Standardstimmen `Anna` und `Samantha`
+- Musiksystem für Menü, Intro und Kämpfe
+- Plugin-Architektur mit Command Router
+- DE/EN-Hilfetexte und lokalisierte Plugin-Befehle
+- Mac-Setup für Intel und Apple Silicon
+
+### Gameplay
+
+- Geführte Demo-Kämpfe ohne spielerischen Vorteil
+- Guide-Kämpfe mit Erklärung für `/fight`, `/fightboss` und `/fightfinal`
+- Zufallskämpfe nach der Einführung
+- Boss- und Finalbosskämpfe mit Auren, Charge und Spezialangriffen
+- Boss-HUD mit Aura, Phase, Spezialname und Charge-Anzeige
+- Phase-2-System für späte Bosse
+- Resonanz-System mit `MAAT Impuls`
+- Fokus-System mit Heilung und Schild
+- Schwachstellen-System pro Runde
+- Shop mit Heiltränken und Schutz-Siegeln
+- Schutz-Siegel aktivieren Startschild in echten Kämpfen
+- Kampf-Erfolge und Kampfanalyse
+- Pfadabhängige Kampfmodifikatoren und Belohnungen
+- Pfadprofil, Rang und Motiv für Maatis
+- Story-Entscheidungen mit späteren Konsequenzen
+- Journal und Boss-Codex
+- Quests mit pfadabhängigen Bonusbelohnungen
+- Dungeon-Systeme `60`, `500` und `1000`
+
+### Story und Welt
+
+- Cinematic Intro für MAAT-RPG
+- Hauptstory mit Zwischenakten und inneren Reflexionen
+- Entscheidungsszenen mit mehreren Antwortpfaden
+- Mehrsprachige Story-Szenen und Journal-Einträge
+- Reaktive Welt auf Basis des Pfadprofils
+- Boss-Reaktionen auf Maatis’ Weg
+- Beziehungsanzeige zwischen Maatis und MAAT-KI
+- Pfadprofil entwickelt Titel, Rang und Motiv aus Entscheidungen
+- Konsequenznetz zwischen Story, Kampf, Journal und Rewards
+- Lore-, Origin- und Identitätsansichten
+
+### MAAT-OS und Systemfluss
+
+- App-Loader mit Sprachwahl vor dem eigentlichen Spiel
+- MAAT-RPG-Menü mit Musik, Titelbildschirm und Progress-Anzeige
+- Startdiagnose für Python, Backends und Modellordner
+- Soft-Reset des Gesprächskontexts nach Demo- und Testkämpfen
+- Saubere Trennung zwischen Chat-Kontext und Kampf-Kontext
+- Lokalisierte Ladebalken und Startmeldungen
+
+### Wichtige Kommandos
+
+#### Basis und Navigation
+
+- `/help`, `/h`, `/hilfe` → Zeigt alle Kommandos
+- `/clear`, `/cls` → Leert den Bildschirm
+- `/exit`, `/quit` → Beendet das Programm
+- `/menu` → Zeigt das MAAT-RPG-Startmenü
+- `/motivate` → Gibt eine motivierende Zeile aus
+- `/evo` → Zeigt den Status der Self-Evolution-Engine
+
+#### Story, Journal und Identität
+
+- `/storyreset` → Setzt den Story-Fortschritt zurück
+- `/journal` → Zeigt Maatis bisherigen Weg und seine Entscheidungen
+- `/whoismaat` → Zeigt, wer MAAT bzw. Maatis ist
+- `/origin` → Zeigt die Ursprungsgeschichte
+- `/lore` → Zeigt Lore und Hintergrundwelt
+- `/maatbond` → Zeigt die aktuelle Beziehung zu MAAT-KI
+- `/rpgdemo` → Startet das Cinematic-Intro
+
+#### Kampf, Fortschritt und Shop
+
+- `/fight` → Startet einen geführten MAAT-Testkampf
+- `/fightboss` → Startet einen geführten Boss-Testkampf
+- `/fightfinal` → Startet einen geführten Finalboss-Testkampf
+- `/xp` → Zeigt Level- und XP-Status
+- `/shop` → Öffnet den Shop
+- `/shop buy potion <n>` → Kauft Heiltränke
+- `/shop buy sigil <n>` → Kauft Schutz-Siegel
+- `/usepotion` → Benutzt einen Heiltrank
+- `/battletest` → Führt einen Battle-Core-Selbsttest aus
+
+#### Quests und Erfolge
+
+- `/quests` → Zeigt verfügbare, aktive und abgeschlossene Quests
+- `/quest accept <id>` → Nimmt eine Quest an
+- `/quest info <id>` → Zeigt Quest-Details und Pfadbonus
+- `/erfolge` → Zeigt freigeschaltete Erfolge
+- `/ach` → Zeigt emotionale oder narrative Achievements
+
+#### Dungeons und Felder
+
+- `/dungeon60` → Betritt Dungeon 60
+- `/d500` → Betritt Dungeon 500
+- `/d1000` → Betritt Dungeon 1000
+- `/test_fields` → Testet oder zeigt die MAAT-Felder
+
+#### Modelle, Profil und System
+
+- `/model` → Modellverwaltung und Modell-Auswahl
+- `/restart` → Startet die Software neu
+- `/safe-restart` → Speichert und startet neu
+- `/profile` → Profil-Befehle
+- `/plugins` → Plugin-Management
+- `/sysinfo` → Systemdiagnose
+- `/meminfo` → RAM-/VRAM-Verbrauch
+- `/update` → Führt `git pull` mit Neustart aus
+
+#### Sprache, Audio und TTS
+
+- `/say` → Zeigt die Say-TTS-Hilfe
+- `/say on` → Aktiviert Say-TTS
+- `/say off` → Deaktiviert Say-TTS
+- `/say voice <name>` → Ändert die TTS-Stimme
+
+#### Zeit, Analyse und MAAT-Metriken
+
+- `/time`, `/zeit` → Zeigt die aktuelle Zeit
+- `/runtime`, `/laufzeit` → Zeit seit der letzten Antwort
+- `/timeinfo`, `/zeitkontext` → Vollständiger Zeitkontext
+- `/timelog` → Zeigt die letzten Time-Memory-Einträge
+- `/time topic <thema>` → Zeit seit der letzten Erwähnung eines Themas
+- `/time stats`, `/timestats` → Statistiken über das Time-Memory
+- `/maat` → Zeigt den aktuellen MAAT-Score der letzten Antwort
+- `/bias` → Zeigt den letzten Bias-Score
+- `/uncertainty` → Zeigt den letzten Unsicherheitswert
+- `/prethought` → Zeigt die letzte Vor-Analyse
+- `/emotion` → Zeigt die letzte erkannte Emotions-Resonanz
+- `/userstyle` → Zeigt den anonymen User-Stil-Snapshot
+
+#### Wissen, Denken und Bewusstseinsanalyse
+
+- `/wiki <begriff>` → Holt und cached einen Wikipedia-Artikel
+- `/wiki cache` → Zeigt Cache-Einträge
+- `/wiki debug on/off/once` → Steuert Wiki-Debug
+- `/think` und Unterbefehle → Auto-Think Hilfe, Status und Debug
+- `/bki` und Unterbefehle → Bewusstseinsindex Psi, Status und Verlauf
+
+#### Memory und Erinnerungen
+
+- `/mem` und Unterbefehle → Memory-v5-Übersicht, Suche und Debug
+- `/mem6` und Unterbefehle → Memory-v6-Übersicht, Hybrid-Suche und Debug
+- `/memauto` und Unterbefehle → Triggerbasierte Erinnerungen
+- `/antirepeat` und Unterbefehle → Anti-Repeat-Filter
+
+### Automatische Systeme
+
+- Passive HP-Regeneration nach Chat-Nachrichten
+- Battle-Core-Selbsttest für Stabilität
+- Sprachabhängige TTS-Stimme
+- Plugin-Startdiagnose und Modellprüfung
+- Lokalisierte Start-, Lade- und Diagnosemeldungen
+- Automatische Kampfauslösung nach der Einführung
+- Profilabhängige Boss-Reaktionen
+- Journal-Einträge aus Story-, Boss- und Quest-Ereignissen
+- Auto-Think, BKI und MAAT-Analyse-Plugins
+- Automatische Battle-Kontext-Bereinigung nach Guide-Kämpfen
+- Sprach-Fallback über gespeicherte Sprache oder Systemsprache
+- Schutz gegen unnötige Plugin-Loader-Warnungen beim Start
+
+### Zusätzliche Nutzerfunktionen
+
+- Zweisprachige Questnamen und Questbeschreibungen
+- Zweisprachige Achievements und Battle-Logs
+- Zweisprachiger Shop, HUD, Titelbildschirm und Intro
+- Zweisprachige Modellwahl und Downloader-Dialogs
+- Zweisprachige MAAT-OS-Infoseiten im Menü
+- Boss-Codex-Einträge beim ersten Treffen
+- Journal dokumentiert Storyweg, Konsequenzen und Boss-Begegnungen
+
+### Hinweise
+
+- Demo-Kämpfe `/fight`, `/fightboss` und `/fightfinal` geben keinen XP-, Gold- oder Item-Vorteil.
+- Einige Kommandos haben Unterbefehle mit Parametern, zum Beispiel `/quest accept`, `/shop buy`, `/wiki <begriff>`, `/mem search`, `/mem6 search`.
+
+---
+
+## English
+
+## At a Glance
+
+- Bilingual AI-RPG with local model execution
+- Story, combat, journal, quests, and boss codex inside one connected system
+- MAAT-OS as the modular foundation for loader, plugins, analysis, and world logic
+- Reactive progression: decisions reshape profile, battles, rewards, and world reactions
+- Guide modes for safe learning without gameplay advantage
+
+### Core Features
+
+- Bilingual startup for the MAAT-OS loader and MAAT-RPG
+- Language selection at startup and in the menu
+- Language switching also covers loader, model selection, intro, HUD, and system messages
+- `Version 0.2` title screen with Enter step
+- Persistent save state in `Application Support`
+- Local model setup with model selection and downloader
+- Model downloader with resume and verification logic
+- Architecture-specific setup paths for Intel and Apple Silicon
+- Say-TTS with language-specific default voices `Anna` and `Samantha`
+- Music system for menu, intro, and battles
+- Plugin architecture with command router
+- DE/EN help texts and localized plugin commands
+- Mac setup for Intel and Apple Silicon
+
+### Gameplay
+
+- Guided demo battles with no gameplay advantage
+- Guide battles with explanations for `/fight`, `/fightboss`, and `/fightfinal`
+- Random battles after the introduction
+- Boss and final boss fights with auras, charge, and special attacks
+- Boss HUD with aura, phase, special name, and charge display
+- Phase-2 system for later bosses
+- Resonance system with `MAAT Impulse`
+- Focus system with healing and shield
+- Per-turn weakness system
+- Shop with healing potions and warding sigils
+- Warding sigils grant a starting shield in real battles
+- Combat achievements and battle analysis
+- Path-dependent combat modifiers and rewards
+- Path profile, rank, and motive for Maatis
+- Story choices with later consequences
+- Journal and boss codex
+- Quests with path-dependent bonus rewards
+- Dungeon systems `60`, `500`, and `1000`
+
+### Story and World
+
+- Cinematic intro for MAAT-RPG
+- Main story with interludes and inner reflections
+- Choice scenes with multiple answer paths
+- Multilingual story scenes and journal entries
+- Reactive world based on the path profile
+- Boss reactions to Maatis' path
+- Relationship display between Maatis and MAAT-KI
+- Path profile develops title, rank, and motive from decisions
+- Consequence network linking story, battle, journal, and rewards
+- Lore, origin, and identity views
+
+### MAAT-OS and System Flow
+
+- App loader with language selection before the actual game
+- MAAT-RPG menu with music, title screen, and progress display
+- Startup diagnostics for Python, backends, and model folders
+- Soft reset of conversation context after demo and test battles
+- Clean separation between chat context and battle context
+- Localized loading bars and startup messages
+
+### Key Commands
+
+#### Base and Navigation
+
+- `/help`, `/h`, `/hilfe` → Shows all commands
+- `/clear`, `/cls` → Clears the screen
+- `/exit`, `/quit` → Exits the program
+- `/menu` → Shows the MAAT-RPG start menu
+- `/motivate` → Gives you a motivational line
+- `/evo` → Shows the self-evolution engine status
+
+#### Story, Journal, and Identity
+
+- `/storyreset` → Resets story progress
+- `/journal` → Shows Maatis' path and decisions
+- `/whoismaat` → Shows who MAAT / Maatis is
+- `/origin` → Shows the origin story
+- `/lore` → Shows lore and background worldbuilding
+- `/maatbond` → Shows the current bond with MAAT-KI
+- `/rpgdemo` → Starts the cinematic intro
+
+#### Battle, Progress, and Shop
+
+- `/fight` → Starts a guided MAAT test battle
+- `/fightboss` → Starts a guided boss test battle
+- `/fightfinal` → Starts a guided final boss test battle
+- `/xp` → Shows level and XP status
+- `/shop` → Opens the shop
+- `/shop buy potion <n>` → Buys healing potions
+- `/shop buy sigil <n>` → Buys warding sigils
+- `/usepotion` → Uses a healing potion
+- `/battletest` → Runs a battle-core self-test
+
+#### Quests and Achievements
+
+- `/quests` → Shows available, active, and completed quests
+- `/quest accept <id>` → Accepts a quest
+- `/quest info <id>` → Shows quest details and path bonus
+- `/erfolge` → Shows unlocked achievements
+- `/ach` → Shows emotional or narrative achievements
+
+#### Dungeons and Fields
+
+- `/dungeon60` → Enters Dungeon 60
+- `/d500` → Enters Dungeon 500
+- `/d1000` → Enters Dungeon 1000
+- `/test_fields` → Tests or shows the MAAT fields
+
+#### Models, Profile, and System
+
+- `/model` → Model management and model selection
+- `/restart` → Restarts the software
+- `/safe-restart` → Saves and restarts
+- `/profile` → Profile commands
+- `/plugins` → Plugin management
+- `/sysinfo` → System diagnostics
+- `/meminfo` → RAM/VRAM usage
+- `/update` → Runs `git pull` and restarts
+
+#### Language, Audio, and TTS
+
+- `/say` → Shows Say-TTS help
+- `/say on` → Enables Say-TTS
+- `/say off` → Disables Say-TTS
+- `/say voice <name>` → Changes the TTS voice
+
+#### Time, Analysis, and MAAT Metrics
+
+- `/time`, `/zeit` → Shows the current time
+- `/runtime`, `/laufzeit` → Time since the last response
+- `/timeinfo`, `/zeitkontext` → Full time context
+- `/timelog` → Shows the latest time-memory entries
+- `/time topic <topic>` → Time since a topic was last mentioned
+- `/time stats`, `/timestats` → Statistics about time memory
+- `/maat` → Shows the current MAAT score of the last response
+- `/bias` → Shows the last bias score
+- `/uncertainty` → Shows the latest uncertainty score
+- `/prethought` → Shows the last pre-analysis
+- `/emotion` → Shows the last detected emotional resonance
+- `/userstyle` → Shows the anonymous user-style snapshot
+
+#### Knowledge, Thinking, and Consciousness Analysis
+
+- `/wiki <term>` → Fetches and caches a Wikipedia article
+- `/wiki cache` → Shows cache entries
+- `/wiki debug on/off/once` → Controls wiki debug
+- `/think` and subcommands → Auto-Think help, status, and debug
+- `/bki` and subcommands → Consciousness index Psi, status, and history
+
+#### Memory and Recall
+
+- `/mem` and subcommands → Memory v5 overview, search, and debug
+- `/mem6` and subcommands → Memory v6 overview, hybrid search, and debug
+- `/memauto` and subcommands → Trigger-based memory storage
+- `/antirepeat` and subcommands → Anti-repeat filter
+
+### Automatic Systems
+
+- Passive HP regeneration after chat messages
+- Battle-core self-test for stability
+- Language-dependent TTS voice
+- Plugin startup diagnostics and model checks
+- Localized startup, loading, and diagnostic messages
+- Automatic battle triggering after the introduction
+- Profile-dependent boss reactions
+- Journal entries from story, boss, and quest events
+- Auto-Think, BKI, and MAAT analysis plugins
+- Automatic battle-context cleanup after guide battles
+- Language fallback via saved language or system language
+- Protection against unnecessary plugin-loader warnings at startup
+
+### Additional Player-Facing Features
+
+- Bilingual quest names and quest descriptions
+- Bilingual achievements and battle logs
+- Bilingual shop, HUD, title screen, and intro
+- Bilingual model selection and downloader dialogs
+- Bilingual MAAT-OS info pages in the menu
+- Boss codex entries on first encounter
+- Journal records story path, consequences, and boss encounters
+
+### Notes
+
+- Demo battles `/fight`, `/fightboss`, and `/fightfinal` do not grant XP, gold, or item advantages.
+- Some commands use subcommands with parameters, such as `/quest accept`, `/shop buy`, `/wiki <term>`, `/mem search`, and `/mem6 search`.

@@ -1,0 +1,92 @@
+[
+  {
+    "file": "assets/title.png",
+    "source": "gui-preview/maat-rpg-website/assets/title-screen-current.png",
+    "sha256": "5c5f56804e17fff2caedb758ee2f7c257b62846530afa3ee5e2fa2b18d273912"
+  },
+  {
+    "file": "assets/intro.png",
+    "source": "gui-preview/maat-rpg-website/assets/intro-awakening.png",
+    "sha256": "5ae11105008857678571412e23823e73e862714345de877ca9de8713b1b4ddfe"
+  },
+  {
+    "file": "assets/classes.png",
+    "source": "gui-preview/maat-rpg-website/assets/classes-overview.png",
+    "sha256": "3f9d1b1e009607d45e109e538f0dd17db7b991f6061d189e235d8a743e5da1a5"
+  },
+  {
+    "file": "assets/battle.png",
+    "source": "gui-preview/maat-rpg-website/assets/battle-magier.png",
+    "sha256": "70de5c62c3c55f45df62c4ffd637ce4b7a394a11de8f5d48c41ec4b185f01bc0"
+  },
+  {
+    "file": "assets/talents.png",
+    "source": "gui-preview/maat-rpg-website/assets/talents-magier.png",
+    "sha256": "f5d698577487a464ec0da0a1892ae4df2a9722a314b669cef3f0830c55b5387a"
+  },
+  {
+    "file": "assets/terra.png",
+    "source": "gui-preview/maat-rpg-website/assets/terra-journey.png",
+    "sha256": "475bf8078ed3d0aca9de0db5af773ff4036e910de6161dd590d455bab431fab9"
+  },
+  {
+    "file": "assets/dungeons.png",
+    "source": "gui-preview/maat-rpg-website/assets/dungeons.png",
+    "sha256": "c90bf5836405c0c6a52b85a9ff118113a7400b76ffa9dec4749d4c58d8f49c6e"
+  },
+  {
+    "file": "assets/quests.png",
+    "source": "gui-preview/maat-rpg-website/assets/quest-log.png",
+    "sha256": "3879984c50806087e9469ba633ba07a912ed74e509d0f21a2299ffc69cbb4827"
+  },
+  {
+    "file": "assets/memory.png",
+    "source": "gui-preview/maat-rpg-website/assets/super-memory.png",
+    "sha256": "f1fad5b52bbc6b557468d8a672442202b4ef4190b3cf3af9d2bc563e46971fc0"
+  },
+  {
+    "file": "assets/snake.png",
+    "source": "gui-preview/maat-rpg-website/assets/maat-snake.png",
+    "sha256": "bff81feb4a5d81640be99e610f4efd2e206f3372c8ff6ea8c7d56ef387ec4b2c"
+  },
+  {
+    "file": "assets/tetris.png",
+    "source": "gui-preview/maat-rpg-website/assets/tetris.png",
+    "sha256": "8bb3f58ac9a260facadba3aa0601422174d952af2deacb09608f66dee08b01a5"
+  },
+  {
+    "file": "assets/breakout.png",
+    "source": "gui-preview/maat-rpg-website/assets/breakout.png",
+    "sha256": "c93727ef624769125f27ca8f914632a5bf64e7382882d586ef56d73c37659134"
+  },
+  {
+    "file": "assets/navigation.png",
+    "source": "gui-preview/maat-rpg-website/assets/navigation-unread.png",
+    "sha256": "43d8acd5b55dffe6de27a87a0fbd1484c8759628476dcc905368f5a3d142d4d9"
+  },
+  {
+    "file": "assets/language.png",
+    "source": "gui-preview/language-v1/language-choice.png",
+    "sha256": "23189dcb70e96dd7976ef732102413505960999a77a73b24598983611b3c8c48"
+  },
+  {
+    "file": "assets/perspective.png",
+    "source": "gui-preview/language-v1/perspective-en.png",
+    "sha256": "3300eac68e0bcbc9baccc406c2079ec266546d7b24e23742f492fbb3bbd2697c"
+  },
+  {
+    "file": "assets/story.png",
+    "source": "gui-preview/language-v2/dungeon-story-en.png",
+    "sha256": "85cf1e86428565d8a524b80732b53919fcfa73af10be5bd8d4c2f49ebcf0e1d5"
+  },
+  {
+    "file": "assets/combat-en.png",
+    "source": "gui-preview/language-v2/battle-en.png",
+    "sha256": "e01fc03901c652029d727d792180a8c7b2f4999318c1a3d2d352e4faff44baee"
+  },
+  {
+    "file": "assets/models.png",
+    "source": "gui-preview/model-settings-manual-en.png",
+    "sha256": "74f1edfe841b42b63b6653f5a0b70222bd03816f08c12e85ee40bd23758a1545"
+  }
+]

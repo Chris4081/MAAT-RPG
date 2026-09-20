@@ -1,0 +1,5 @@
+{
+  "name": "Say-TTS",
+  "version": "1.0",
+  "entry": "shared.plugins.tts_say.main"
+}

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
+exec bash "$BASE_DIR/maatos/start_gui.sh" "$@"

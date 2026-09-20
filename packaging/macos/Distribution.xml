@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="2">
+  <title>MAAT RPG · Intel &amp; Apple Silicon</title>
+  <organization>com.maat.rpg</organization>
+  <options customize="never" require-scripts="false" hostArchitectures="x86_64,arm64"/>
+  <domains enable_anywhere="false" enable_currentUserHome="false" enable_localSystem="true"/>
+  <volume-check><allowed-os-versions><os-version min="13.3"/></allowed-os-versions></volume-check>
+  <welcome file="Welcome.html" mime-type="text/html"/>
+  <conclusion file="Conclusion.html" mime-type="text/html"/>
+  <choices-outline><line choice="game"/></choices-outline>
+  <choice id="game" title="MAAT RPG" visible="false">
+    <pkg-ref id="com.maat.rpg.installer"/>
+  </choice>
+  <pkg-ref id="com.maat.rpg.installer" version="0.4.11" auth="Root">MAAT-RPG-component.pkg</pkg-ref>
+</installer-gui-script>

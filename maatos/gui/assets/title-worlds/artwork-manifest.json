@@ -1,0 +1,43 @@
+{
+  "date": "2026-09-12",
+  "tool": "Built-in image_gen",
+  "purpose": "MAAT RPG title and main menu artwork; one landscape per Terra region; original native pyramid retained for introduction",
+  "palette": [
+    "#080f23",
+    "#10284b",
+    "#193654",
+    "#ceb57c"
+  ],
+  "files": [
+    {
+      "file": "desert.png",
+      "source": "exec-b159718c-806a-4535-807b-9da321be2d16.png",
+      "prompt": "Use case: stylized-concept. Asset type: full-width title-screen landscape for MAAT RPG, a dark-blue fantasy RPG. Create ONE finished panoramic illustration, landscape 2048x1152, no text. Subject: 'The Scales of the Desert', an ancient monumental golden balance scale built into a weathered sandstone sanctuary in an immense nocturnal desert, approached by a winding trail of tiny warm golden save-point lights. The two balanced shallow pans hover above midnight-blue sand; elegant Egyptian-inspired architecture, sparse ruined pillars and dunes receding into haze. Beautiful polished 2D painted game background with crisp readable silhouettes, subtle geometric shapes and fine restrained texture. Palette overwhelmingly deep navy #080f23, muted midnight blues #10284b and #193654; antique gold #ceb57c highlights with soft warm glow, no orange sky. Atmospheric starry night, quiet wonder and resonance. Wide cinematic framing with the full central landmark kept inside the middle 55% horizontally and middle 55% vertically so it remains visible when the game crops to ultrawide screens. Soft dark navy peripheral edges and bottom fading seamlessly into #080f23, luminous focal point without bleaching out. No people, characters, logos, lettering, UI, frames, borders or watermark. This is the second map after the original pyramid, so focus on the BALANCE SCALE sanctuary, not a giant pyramid.",
+      "style_reference": null
+    },
+    {
+      "file": "gardens.png",
+      "source": "exec-88e414d4-45a5-4f45-a7d1-4a4157ee76c1.png",
+      "prompt": "Use case: stylized-concept. Asset type: MAAT RPG title-screen scenic illustration. Use the supplied reference ONLY for the painted fantasy game-art style, finish, deep navy palette and golden lighting, not its desert subject. Create ONE new finished image, landscape 2048x1152. 'Gardens of Creation': an ancient terraced sanctuary reclaimed by lush, enchanted gardens, a graceful luminous tree growing from a circular pool, interlacing branches and hanging plants framing weathered golden stone arches. Blue-green leaves and faint cyan fireflies, golden sap-light in the tree. Pools reflect the night sky; a path of small golden save-point lanterns leads to the tree. The motif must be organic and alive, no desert, no balance scales. Polished, atmospheric 2D painted game background with crisp silhouettes, restrained fine texture and beautiful spatial depth. Palette overwhelmingly #080f23 navy, #10284b midnight blue and muted #193654; antique gold #ceb57c focal accents. Cinematic wide composition with the entire central landmark well inside the middle of the canvas, generous sky and foreground breathing space. Dark navy peripheral edges and bottom fade naturally into #080f23 for seamless integration in a dark-blue UI. No text, lettering, logo, UI, border, characters or watermark. Maintain the elegant visual family of the reference while clearly depicting this different region.",
+      "style_reference": "desert.png"
+    },
+    {
+      "file": "coast.png",
+      "source": "exec-0a4ae723-3674-4b4d-ba85-8ba49b6099d6.png",
+      "prompt": "Use case: stylized-concept. Asset type: MAAT RPG title-screen scenic illustration. Use the supplied reference ONLY for the painted fantasy game-art style, finish, deep navy palette and golden lighting, not its desert subject. Create ONE new finished image, landscape 2048x1152. 'Crystal Coast of Resonance': an immense quiet midnight-blue sea, translucent cyan crystal spires emerging from dark coastal rock and water, a distant island sanctuary beneath stars. In the center several elegant tall faceted crystals surround an ancient circular golden resonance gate on a rocky headland. Soft concentric ripples radiate on the water. A path with tiny golden save-point lanterns follows the shore. Restrained cyan light, moonlit mist and antique gold details, no lush trees, no desert, no balance scales. Polished, atmospheric 2D painted game background with crisp silhouettes, restrained fine texture and beautiful spatial depth. Palette overwhelmingly #080f23 navy, #10284b midnight blue and muted #193654; antique gold #ceb57c focal accents. Cinematic wide composition with the entire central landmark well inside the middle of the canvas, generous sky and foreground breathing space. Dark navy peripheral edges and bottom fade naturally into #080f23 for seamless integration in a dark-blue UI. No text, lettering, logo, UI, border, characters or watermark. Maintain the elegant visual family of the reference while clearly depicting this different region.",
+      "style_reference": "desert.png"
+    },
+    {
+      "file": "mountains.png",
+      "source": "exec-6ee997cf-78d1-42b0-9631-0d88dd53fc08.png",
+      "prompt": "Use case: stylized-concept. Asset type: MAAT RPG title-screen scenic illustration. Use the supplied reference ONLY for the painted fantasy game-art style, finish, deep navy palette and golden lighting, not its desert subject. Create ONE new finished image, landscape 2048x1152. 'Aeon's Star Mountains': soaring layered midnight-blue and blue-violet mountains beneath a magnificent night sky. An ancient stone observatory with a fine golden armillary sphere sits on a central high summit; a winding stairway and arched stone bridge with tiny golden save-point lanterns lead there. Delicate golden constellations shimmer high in the sky, very restrained violet in the distant peaks. Tall clear readable mountains, quiet cosmic wonder, no ocean, no balance scales. Polished, atmospheric 2D painted game background with crisp silhouettes, restrained fine texture and beautiful spatial depth. Palette overwhelmingly #080f23 navy, #10284b midnight blue and muted #193654; antique gold #ceb57c focal accents. Cinematic wide composition with the entire central landmark well inside the middle of the canvas, generous sky and foreground breathing space. Dark navy peripheral edges and bottom fade naturally into #080f23 for seamless integration in a dark-blue UI. No text, lettering, logo, UI, border, characters or watermark. Maintain the elegant visual family of the reference while clearly depicting this different region.",
+      "style_reference": "desert.png"
+    },
+    {
+      "file": "terra.png",
+      "source": "exec-f4372994-7d89-44d6-8508-b5e057d4ae15.png",
+      "prompt": "Use case: stylized-concept. Asset type: MAAT RPG title-screen scenic illustration. Use the supplied reference ONLY for the painted fantasy game-art style, finish, deep navy palette and golden lighting, not its desert subject. Create ONE new finished image, landscape 2048x1152. 'The Light of Terra': a restored ancient sanctuary at the heart of Terra, five graceful gilded arches gathered around a single luminous golden-white orb above a circular reflecting pool. Navy-blue mountains, softly restored blue-green gardens and elegant intact stone architecture unite all regions, tiny golden save-point lanterns on the approach. Golden strands of light rise from the five arches and converge around the orb, a sense of harmony and a homecoming. Keep it nocturnal and dark blue, the central warm light luminous but small, no daylight or orange sky, no balance scales. Polished, atmospheric 2D painted game background with crisp silhouettes, restrained fine texture and beautiful spatial depth. Palette overwhelmingly #080f23 navy, #10284b midnight blue and muted #193654; antique gold #ceb57c focal accents. Cinematic wide composition with the entire central landmark well inside the middle of the canvas, generous sky and foreground breathing space. Dark navy peripheral edges and bottom fade naturally into #080f23 for seamless integration in a dark-blue UI. No text, lettering, logo, UI, border, characters or watermark. Maintain the elegant visual family of the reference while clearly depicting this different region.",
+      "style_reference": "desert.png"
+    }
+  ]
+}

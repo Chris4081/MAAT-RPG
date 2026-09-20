@@ -1,0 +1,262 @@
+[
+  {
+    "number": 1,
+    "name": "Pharao der Dissonanz #1",
+    "asset": "gui/assets/combat/pharaoh.svg",
+    "motif": null,
+    "effect": null,
+    "preserved": true
+  },
+  {
+    "number": 2,
+    "name": "Wächter der Gebrochenen Harmonie #2",
+    "asset": "gui/assets/combat/broken_harmony.svg",
+    "motif": null,
+    "effect": null,
+    "preserved": true
+  },
+  {
+    "number": 3,
+    "name": "Archon des Abgrunds #3",
+    "asset": "gui/assets/combat/archon.svg",
+    "motif": null,
+    "effect": null,
+    "preserved": true
+  },
+  {
+    "number": 4,
+    "name": "Fürst der Zersplitterten Zeit #4",
+    "asset": "gui/assets/combat/time.svg",
+    "motif": null,
+    "effect": null,
+    "preserved": true
+  },
+  {
+    "number": 5,
+    "name": "Hüter der Leeren Sonne #5",
+    "asset": "gui/assets/combat/sun.svg",
+    "motif": null,
+    "effect": null,
+    "preserved": true
+  },
+  {
+    "number": 6,
+    "name": "Pharao der Dissonanz #6",
+    "asset": "gui/assets/combat/boss06_scarab_regent.svg",
+    "motif": [
+      "Skarabäus-Regent",
+      "Scarab Regent"
+    ],
+    "effect": "sand",
+    "preserved": false
+  },
+  {
+    "number": 7,
+    "name": "Wächter der Gebrochenen Harmonie #7",
+    "asset": "gui/assets/combat/boss07_lotus_keeper.svg",
+    "motif": [
+      "Hüterin des Lotus",
+      "Lotus Keeper"
+    ],
+    "effect": "wave",
+    "preserved": false
+  },
+  {
+    "number": 8,
+    "name": "Archon des Abgrunds #8",
+    "asset": "gui/assets/combat/boss08_anubis.svg",
+    "motif": [
+      "Wächter des Anubis",
+      "Guardian of Anubis"
+    ],
+    "effect": "wave",
+    "preserved": false
+  },
+  {
+    "number": 9,
+    "name": "Fürst der Zersplitterten Zeit #9",
+    "asset": "gui/assets/combat/boss09_thoth.svg",
+    "motif": [
+      "Schreiber des Thot",
+      "Scribe of Thoth"
+    ],
+    "effect": "connection",
+    "preserved": false
+  },
+  {
+    "number": 10,
+    "name": "Hüter der Leeren Sonne #10",
+    "asset": "gui/assets/combat/boss10_horus.svg",
+    "motif": [
+      "Schwingen des Horus",
+      "Wings of Horus"
+    ],
+    "effect": "impulse",
+    "preserved": false
+  },
+  {
+    "number": 11,
+    "name": "Pharao der Dissonanz #11",
+    "asset": "gui/assets/combat/boss11_sobek.svg",
+    "motif": [
+      "Koloss des Sobek",
+      "Colossus of Sobek"
+    ],
+    "effect": "claw",
+    "preserved": false
+  },
+  {
+    "number": 12,
+    "name": "Wächter der Gebrochenen Harmonie #12",
+    "asset": "gui/assets/combat/boss12_hathor.svg",
+    "motif": [
+      "Sistrum der Hathor",
+      "Sistrum of Hathor"
+    ],
+    "effect": "wave",
+    "preserved": false
+  },
+  {
+    "number": 13,
+    "name": "Archon des Abgrunds #13",
+    "asset": "gui/assets/combat/boss13_sekhmet.svg",
+    "motif": [
+      "Zorn der Sachmet",
+      "Wrath of Sekhmet"
+    ],
+    "effect": "creation",
+    "preserved": false
+  },
+  {
+    "number": 14,
+    "name": "Fürst der Zersplitterten Zeit #14",
+    "asset": "gui/assets/combat/boss14_osiris.svg",
+    "motif": [
+      "Djed-Hüter des Osiris",
+      "Djed Keeper of Osiris"
+    ],
+    "effect": "connection",
+    "preserved": false
+  },
+  {
+    "number": 15,
+    "name": "Hüter der Leeren Sonne #15",
+    "asset": "gui/assets/combat/boss15_khepri.svg",
+    "motif": [
+      "Sonnenkäfer des Chepri",
+      "Sun Scarab of Khepri"
+    ],
+    "effect": "spark",
+    "preserved": false
+  },
+  {
+    "number": 16,
+    "name": "Pharao der Dissonanz #16",
+    "asset": "gui/assets/combat/boss16_uraeus.svg",
+    "motif": [
+      "Uräus der Schattenkrone",
+      "Uraeus of the Shadow Crown"
+    ],
+    "effect": "sand",
+    "preserved": false
+  },
+  {
+    "number": 17,
+    "name": "Wächter der Gebrochenen Harmonie #17",
+    "asset": "gui/assets/combat/boss17_bennu.svg",
+    "motif": [
+      "Bennu der Morgenröte",
+      "Bennu of the Dawn"
+    ],
+    "effect": "wave",
+    "preserved": false
+  },
+  {
+    "number": 18,
+    "name": "Archon des Abgrunds #18",
+    "asset": "gui/assets/combat/boss18_ammit.svg",
+    "motif": [
+      "Ammit an der Seelenwaage",
+      "Ammit at the Soul Scales"
+    ],
+    "effect": "claw",
+    "preserved": false
+  },
+  {
+    "number": 19,
+    "name": "Fürst der Zersplitterten Zeit #19",
+    "asset": "gui/assets/combat/boss19_khonsu.svg",
+    "motif": [
+      "Mondwanderer des Chons",
+      "Moon Walker of Khonsu"
+    ],
+    "effect": "connection",
+    "preserved": false
+  },
+  {
+    "number": 20,
+    "name": "Hüter der Leeren Sonne #20",
+    "asset": "gui/assets/combat/boss20_apep.svg",
+    "motif": [
+      "Apophis der Sonnenfinsternis",
+      "Apep of the Eclipse"
+    ],
+    "effect": "impulse",
+    "preserved": false
+  },
+  {
+    "number": 21,
+    "name": "Pharao der Dissonanz #21",
+    "asset": "gui/assets/combat/boss21_golden_pharaoh.svg",
+    "motif": [
+      "Pharao der Goldenen Maske",
+      "Pharaoh of the Golden Mask"
+    ],
+    "effect": "sand",
+    "preserved": false
+  },
+  {
+    "number": 22,
+    "name": "Wächter der Gebrochenen Harmonie #22",
+    "asset": "gui/assets/combat/boss22_maat_wings.svg",
+    "motif": [
+      "Gefieder der MAAT",
+      "Wings of MAAT"
+    ],
+    "effect": "balance",
+    "preserved": false
+  },
+  {
+    "number": 23,
+    "name": "Archon des Abgrunds #23",
+    "asset": "gui/assets/combat/boss23_seth.svg",
+    "motif": [
+      "Sturmherr des Seth",
+      "Storm Lord of Set"
+    ],
+    "effect": "spark",
+    "preserved": false
+  },
+  {
+    "number": 24,
+    "name": "Fürst der Zersplitterten Zeit #24",
+    "asset": "gui/assets/combat/boss24_duat_obelisk.svg",
+    "motif": [
+      "Zeitobelisk der Duat",
+      "Time Obelisk of the Duat"
+    ],
+    "effect": "connection",
+    "preserved": false
+  },
+  {
+    "number": 25,
+    "name": "Hüter der Leeren Sonne #25",
+    "asset": "gui/assets/combat/boss25_ra.svg",
+    "motif": [
+      "Sonnenrichter des Re",
+      "Sun Judge of Ra"
+    ],
+    "effect": "impulse",
+    "preserved": false
+  }
+]

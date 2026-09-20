@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "created": "2026-09-20",
+  "origin": "Original procedural synthesis and project note sequences; no external samples.",
+  "authoring": "MAAT RPG project; AI-assisted procedural sound design under Christof Krieg’s direction.",
+  "source": "tools/build_celebration_sounds.py (project root)",
+  "licensing": "Project-created media; no Pixabay/Suno or other sample-library content. This manifest does not grant a new separate media license.",
+  "format": "MP3 192 kbps / 48000 Hz stereo; lossless 16-bit WAV previews",
+  "sounds": {
+    "levelup": {
+      "title": "MAAT - Aufstieg des Lichts",
+      "file": "apps/maat_rpg/plugins/battle/sounds/levelup.mp3",
+      "preview": "gui-preview/celebration-sounds-v1/levelup.wav",
+      "duration_pcm_seconds": 8.0,
+      "peak_dbfs": -9.01,
+      "rms_dbfs": -22.0,
+      "sha256": "139cff65823fc47953098ecc601403e7325b4e3c47829958b52f39436c644c36",
+      "wav_sha256": "bb703018f7353903f0e50480f740015ee891453111a637cfff705da844fe1097"
+    },
+    "victory": {
+      "title": "MAAT - Sieg der Resonanz",
+      "file": "apps/maat_rpg/plugins/battle/music/victory.mp3",
+      "preview": "gui-preview/celebration-sounds-v1/victory.wav",
+      "duration_pcm_seconds": 6.0,
+      "peak_dbfs": -9.37,
+      "rms_dbfs": -22.0,
+      "sha256": "edc269f61548b390063f1b72fa9d5e88478c9b7642209803c3694488aad539ed",
+      "wav_sha256": "bca4f3fd6abe1b7a1fe778437929fe7c1abcf1d316cb831413e5e4bb86df32e6"
+    }
+  }
+}

@@ -1,0 +1,2 @@
+# Optional local Wikipedia reader; never downloads a ZIM archive.
+libzim>=3.8,<4

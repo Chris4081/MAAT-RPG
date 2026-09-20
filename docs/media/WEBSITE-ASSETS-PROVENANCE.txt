@@ -1,0 +1,24 @@
+MAAT RPG website — asset notes, September 15, 2026
+
+Existing artwork and UI images
+The prior website's assets were retained. Artwork includes AI-assisted project
+illustrations and class art. UI captures are development and test views.
+The simple pages reuse story-temple.png, intro-awakening.png, terra-journey.png,
+battle-engelchen.png, maat-snake.png and the five class portraits.
+No new character art was generated or edited for this website update.
+
+Added English UI captures (copied without pixel changes)
+assets/achievements-en-current.png <- build/macos/test-results/language-0.4.6/achievements-en.png
+assets/world-end-en-current.png    <- build/macos/test-results/language-0.4.6/world-end-en.png
+assets/shop-en-current.png         <- build/macos/test-results/language-0.4.6/shop-en.png
+assets/contracts-en-current.png    <- build/macos/test-results/language-0.4.6/contracts-en.png
+assets/memories-en-current.png     <- build/macos/test-results/language-0.4.6/memories-en.png
+Captured on September 15, 2026 with synthetic test profiles.
+
+Formula explanation sources
+Current local game profiles maat_rpg.yaml and maat_rpg_en.yaml under
+maatos/profiles define the arithmetic MAAT average and additional formulas.
+The ordinary assessment arithmetic is also implemented in
+maatos/shared/core/maat_assessment.py.
+Website examples use explicit illustrative inputs, not observations.
+The calculator uses no game state, user profile or external service.

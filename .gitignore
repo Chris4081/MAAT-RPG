@@ -1,0 +1,75 @@
+# Environments, Python caches and editor files
+.venv/
+venv/
+mos-env/
+linux-env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.DS_Store
+._*
+Thumbs.db
+.idea/
+.vscode/
+*.bak
+*.swp
+*~
+
+# Personal configuration, saves, memories and logs (never commit these)
+.env
+.env.*
+!.env.example
+**/data/
+**/logs/
+**/cache/
+**/state/
+**/saves/
+**/models/
+**/profile_[0-9]*/
+*.log
+*.sqlite*
+*.db
+*.jsonl
+**/model_override.txt
+**/perf_override.json
+**/offline_wiki_settings.json
+**/SUNO_NACHWEISE.csv
+**/RUNTIME_AUDIT.json
+docs/PREPARATION_REPORT.md
+docs/licensing/STATUS.md
+docs/licensing/LIBZIM_VERSIONS.json
+docs/licensing/MINISPIELE_GESTALTUNG.md
+private/
+
+# Large local models, archives, dependencies and generated installers
+*.gguf
+*.zim
+*.safetensors
+*.pt
+*.pth
+*.dylib
+*.so
+*.dll
+*.whl
+*.pkg
+*.dmg
+*.zip
+*.tar.gz
+build/
+dist/
+output/
+tmp/
+# Shipped maatos/profiles contains system prompts, not personal save slots.
+
+# Internal historical progression review
+PROGRESSION-AUDIT.md
+
+# Optional background music is supplied separately; keep original project cues.
+*.mp3
+*.m4a
+!maatos/apps/maat_rpg/plugins/battle/sounds/levelup.mp3
+!maatos/apps/maat_rpg/plugins/battle/music/victory.mp3

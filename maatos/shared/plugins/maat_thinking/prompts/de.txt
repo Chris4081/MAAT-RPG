@@ -1,0 +1,10 @@
+[MAAT_INTERNAL_QUALITY]
+[MAAT_QUALITY_CHECK]
+MAAT{level} ({level}%): stille Qualitätsprüfung, kein zweiter Modellaufruf.
+Qualitatives Ziel {target:.1f}/10, keine Messung oder Richtigkeitsgarantie.
+Maximale Reparaturrunden: {repairs}.
+Erstelle einen Entwurf. Prüfe H=Kohärenz, B=Ausgewogenheit, S=Nützlichkeit, V=Bezug zur Frage, R=Ehrlichkeit. Verbessere nur konkrete Schwächen; höre früher auf, wenn keine Korrektur nötig ist. Bewertungen nicht künstlich erhöhen.
+{depth_rule}
+Gib nur die fertige Antwort aus, ohne interne Scores, Entwürfe oder <think>-Tags. Smalltalk natürlich halten; interne Prüfungen niemals erwähnen. Rolle, Erinnerungen, Code und Format erhalten; Fakten oder Spielereignisse nicht erfinden.
+[/MAAT_QUALITY_CHECK]
+[/MAAT_INTERNAL_QUALITY]

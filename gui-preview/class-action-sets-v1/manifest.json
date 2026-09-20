@@ -1,0 +1,217 @@
+{
+  "version": 1,
+  "artifact_type": "labeled_character_model_sheets",
+  "generator": "built-in image_gen",
+  "class_count": 6,
+  "poses_per_sheet": 20,
+  "total_pose_illustrations": 120,
+  "grid": {
+    "columns": 4,
+    "rows": 5
+  },
+  "individual_sprites_extracted": true,
+  "integrated_in_game": true,
+  "runtime_assets": "gui/assets/classes/actions-v1",
+  "poses": [
+    {
+      "id": "standard",
+      "label": "Standard",
+      "row": 1,
+      "column": 1
+    },
+    {
+      "id": "ready",
+      "label": "Bereit",
+      "row": 1,
+      "column": 2
+    },
+    {
+      "id": "blink",
+      "label": "Blinzeln",
+      "row": 1,
+      "column": 3
+    },
+    {
+      "id": "tired",
+      "label": "Erschöpft",
+      "row": 1,
+      "column": 4
+    },
+    {
+      "id": "wave",
+      "label": "Harmonie",
+      "row": 2,
+      "column": 1
+    },
+    {
+      "id": "balance",
+      "label": "Balance",
+      "row": 2,
+      "column": 2
+    },
+    {
+      "id": "creation",
+      "label": "Schöpfung",
+      "row": 2,
+      "column": 3
+    },
+    {
+      "id": "connection",
+      "label": "Verbindung",
+      "row": 2,
+      "column": 4
+    },
+    {
+      "id": "respect",
+      "label": "Respekt",
+      "row": 3,
+      "column": 1
+    },
+    {
+      "id": "slash",
+      "label": "Schlag",
+      "row": 3,
+      "column": 2
+    },
+    {
+      "id": "claw",
+      "label": "Klaue",
+      "row": 3,
+      "column": 3
+    },
+    {
+      "id": "sand",
+      "label": "Sand",
+      "row": 3,
+      "column": 4
+    },
+    {
+      "id": "spark",
+      "label": "Funke",
+      "row": 4,
+      "column": 1
+    },
+    {
+      "id": "impulse",
+      "label": "MAAT-Impuls",
+      "row": 4,
+      "column": 2
+    },
+    {
+      "id": "focus",
+      "label": "Fokus",
+      "row": 4,
+      "column": 3
+    },
+    {
+      "id": "heal",
+      "label": "Heiltrank",
+      "row": 4,
+      "column": 4
+    },
+    {
+      "id": "hurt",
+      "label": "Treffer",
+      "row": 5,
+      "column": 1
+    },
+    {
+      "id": "guard",
+      "label": "Abwehr",
+      "row": 5,
+      "column": 2
+    },
+    {
+      "id": "victory",
+      "label": "Sieg",
+      "row": 5,
+      "column": 3
+    },
+    {
+      "id": "charged",
+      "label": "Resonanz 100%",
+      "row": 5,
+      "column": 4
+    }
+  ],
+  "files": [
+    {
+      "class": "normal",
+      "title": "MAATIS · NORMAL",
+      "file": "maatis-normal-set.png",
+      "source": "external-generation/exec-fa37987b-8323-402c-8576-c68b08004160.png",
+      "visually_checked": true,
+      "pose_count": 20,
+      "width": 1122,
+      "height": 1402,
+      "color_mode": "RGB",
+      "bytes": 1677458,
+      "sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3"
+    },
+    {
+      "class": "robo",
+      "title": "MAATIS · ROBO",
+      "file": "maatis-robo-set.png",
+      "source": "external-generation/exec-c005ba21-0959-4b82-befd-e21e4f733dd6.png",
+      "visually_checked": true,
+      "pose_count": 20,
+      "width": 1122,
+      "height": 1402,
+      "color_mode": "RGB",
+      "bytes": 1584648,
+      "sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871"
+    },
+    {
+      "class": "engelchen",
+      "title": "MAATIS · ENGELCHEN",
+      "file": "maatis-engelchen-set.png",
+      "source": "external-generation/exec-27ab1b19-b583-4df8-a5b2-8bda014c2d1f.png",
+      "visually_checked": true,
+      "pose_count": 20,
+      "width": 1122,
+      "height": 1402,
+      "color_mode": "RGB",
+      "bytes": 1743557,
+      "sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e"
+    },
+    {
+      "class": "magier",
+      "title": "MAATIS · MAGIER",
+      "file": "maatis-magier-set.png",
+      "source": "external-generation/exec-03244189-8103-4df3-8182-813d02aa21ea.png",
+      "visually_checked": true,
+      "pose_count": 20,
+      "width": 1131,
+      "height": 1391,
+      "color_mode": "RGB",
+      "bytes": 1726295,
+      "sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53"
+    },
+    {
+      "class": "priester",
+      "title": "MAATIS · PRIESTER",
+      "file": "maatis-priester-set.png",
+      "source": "external-generation/exec-5a467f8e-6d0f-4e84-a1a3-db1a72cedc9e.png",
+      "visually_checked": true,
+      "pose_count": 20,
+      "width": 1122,
+      "height": 1402,
+      "color_mode": "RGB",
+      "bytes": 1708139,
+      "sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b"
+    },
+    {
+      "class": "puppy",
+      "title": "MAATIS · PUPPY",
+      "file": "maatis-puppy-set.png",
+      "source": "external-generation/exec-c73ac1bf-ee81-4702-b0d1-0c86a2f5993f.png",
+      "visually_checked": true,
+      "pose_count": 20,
+      "width": 1122,
+      "height": 1402,
+      "color_mode": "RGB",
+      "bytes": 1843186,
+      "sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac"
+    }
+  ]
+}

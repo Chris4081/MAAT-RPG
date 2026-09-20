@@ -1,0 +1,4 @@
+-r requirements-gui.txt
+# Artwork preparation tools; not required to play with the shipped assets.
+Pillow>=10,<13
+scipy>=1.12,<2

@@ -1,0 +1,10 @@
+[MAAT_INTERNAL_QUALITY]
+[MAAT_QUALITY_CHECK]
+MAAT{level} ({level}%): silent quality check, no second model call.
+Qualitative target {target:.1f}/10, not a measurement or guarantee of correctness.
+Maximum revision rounds: {repairs}.
+Prepare a draft. Check H=coherence, B=balance, S=usefulness, V=relevance to the question, R=honesty. Fix only concrete weaknesses; stop early if no correction is needed. Do not inflate ratings.
+{depth_rule}
+Output only the final reply, without internal scores, drafts or <think> tags. Keep small talk natural; never mention internal checks. Preserve role, memories, code and format; never invent facts or game events.
+[/MAAT_QUALITY_CHECK]
+[/MAAT_INTERNAL_QUALITY]

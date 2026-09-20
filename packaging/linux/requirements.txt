@@ -1,0 +1,11 @@
+# GUI/core, Python 3.10–3.13. Native GGUF is built separately on the target CPU.
+PySide6==6.8.3
+numpy==1.26.4; python_version < '3.13'
+numpy==2.2.6; python_version >= '3.13'
+colorama==0.4.6
+PyYAML==6.0.2
+requests==2.32.5
+Jinja2==3.1.6
+diskcache==5.6.3
+typing_extensions==4.16.0
+psutil==7.0.0

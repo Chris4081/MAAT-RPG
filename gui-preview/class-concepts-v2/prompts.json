@@ -1,0 +1,66 @@
+{
+  "mode": "built-in image_gen",
+  "common": "Use case: stylized-concept.\nCreate ONE individual MAAT RPG class avatar in exactly the extremely simple FLAT geometric illustration style of the two reference images. Reference 1 is the style/color/shape reference; reference 2 shows the existing friendly blue/gold Maatis robot in multiple poses. Do NOT reproduce the sheets, labels, other monsters, panels, or UI.\nThis is a small game icon, not detailed fantasy concept art. Match the thin even pale-gold outline #dec787, solid muted teal-blue #254c65 body shapes, navy #101d37 details, pale cyan accents #bdeefa and gold diamond #e8c576. Character constructed from a few flat shapes, like an SVG made from 15–25 simple paths. Rounded square head, compact torso, short angular legs, simple arms. Strict 2D front view, centered full body, friendly neutral standing pose. No perspective, no detailed anatomy, no fabric folds, no realistic materials, no rendering, no shadows, no gradients, no highlights, no texture, no ornate patterns. Crisp clean outlines and few large flat color areas. Constant outline thickness, akin to the existing top-left robot.\nCanvas square 1024x1024, uniform very dark navy #071024 background. Character including accessories completely visible with generous empty margin, fills about 72 percent of canvas height, feet near y=850. No platform, no ground shadow, no text, no letters, no watermark. SINGLE CHARACTER ONLY.\nFor a HUMAN variant: simplify Maatis to a small rounded-square warm tan face, ONE single flat dark hair silhouette with three angular curls, two tiny dark simple eyes and small friendly mouth. No nose modeling or beard texture. Keep the compact, short-limbed proportions and 2D outline language of the reference robot. Navy outfit with one gold chest diamond. All human class versions should share this same face and proportions.\nSpecific variant: ",
+  "variants": [
+    [
+      "maatis-normal",
+      "MAATIS NORMAL, the human before choosing a class. Small simple warm-tan face, short single-shape dark tousled hair. Basic teal-blue tunic with gold diamond emblem, tiny navy scarf as one shape, simple pants and short angular boots, hands at his sides. No class accessories, no weapons, no hat. Approximately same overall silhouette and simplicity as the reference robot, translated into a HUMAN traveler."
+    ],
+    [
+      "maatis-robo",
+      "MAATIS ROBO. Faithfully replicate the EXISTING ROBOT from reference 1 top-left, reference 2 first panel. Teal-blue rounded rectangular torso and rounded square head; T-shaped antenna on top; dark navy rounded-rectangle visor with exactly two small pale cyan horizontal line eyes; simple flat gold diamond chest; angular trapezoid arms and separated angular feet. Match its shapes and proportions very closely. Entirely flat; do not add metal highlights, panels, screws, joints, complex fingers, 3D forms, or human features."
+    ],
+    [
+      "maatis-engelchen",
+      "MAATIS ENGELCHEN. The simplified HUMAN Maatis described above, in his simple teal-blue tunic with gold diamond. Add two small golden curved horns at the sides of his dark hair and two medium ivory wings with pale gold outline, each made of a SINGLE simple stepped/scalloped shape, spread gently behind shoulders. Friendly playful expression. Arms relaxed at sides. Wings and horns clearly readable even at thumbnail size. Keep the rest very simple; no individual feather rendering."
+    ],
+    [
+      "maatis-magier",
+      "MAATIS MAGIER. The simplified HUMAN Maatis described above. Add a large simple pointed navy/teal wizard hat with gold outline, a single gold band and gold diamond emblem. Simple long navy-blue robe over short boots, gold diamond on chest. One hand holds a simple lavender magic circle with three small gold sparkle lines, other hand relaxed. Hat and robe each just a few flat shapes. No ornate details, no scrollwork, no folds."
+    ],
+    [
+      "maatis-priester",
+      "MAATIS PRIESTER. The simplified HUMAN Maatis described above. A simple ivory robe with a broad flat teal-blue central stole/panel and single gold chest diamond. Holds one tall thin gold outlined staff beside his body, topped with a small plain golden diamond inside a simple circle. No cross, no complex filigree, no realistic folds. Calm friendly standing pose, other arm relaxed. Very simple clean silhouette, clearly distinct from the wizard."
+    ],
+    [
+      "maatis-puppy",
+      "MAATIS PUPPY. The simplified HUMAN Maatis described above, face clearly visible inside the opening of a playful teal-blue dog-costume hood with two floppy navy dog ears. A small ivory muzzle patch and dark dot nose drawn on top of the hood; small friendly human face remains visible BELOW this decoration. Simple one-piece teal-blue costume with ivory belly patch and gold diamond badge, mitten paws, short paw boots, one small curved tail to the side. A human wearing a dog costume, not a realistic animal. Keep all features extremely simple and geometric with gold outlines."
+    ]
+  ],
+  "refs": [
+    "gui-preview/characters-standard.png",
+    "gui-preview/maatis-presence.png"
+  ],
+  "files": [
+    {
+      "name": "maatis-normal",
+      "source": "external-generation/exec-7f0b6dfb-327d-413c-a69d-6b469e4c0bb2.png",
+      "destination": "gui-preview/class-concepts-v2/maatis-normal.png"
+    },
+    {
+      "name": "maatis-robo",
+      "source": "external-generation/exec-f5990667-923d-4251-b123-94b80585cc71.png",
+      "destination": "gui-preview/class-concepts-v2/maatis-robo.png"
+    },
+    {
+      "name": "maatis-engelchen",
+      "source": "external-generation/exec-1dd04062-0aec-44fa-9dee-730395acda06.png",
+      "destination": "gui-preview/class-concepts-v2/maatis-engelchen.png"
+    },
+    {
+      "name": "maatis-magier",
+      "source": "external-generation/exec-47ef2f67-05da-44ff-ab94-2bafd5f34dd3.png",
+      "destination": "gui-preview/class-concepts-v2/maatis-magier.png"
+    },
+    {
+      "name": "maatis-priester",
+      "source": "external-generation/exec-8b68c511-dc21-4154-90a3-d4dc04e8ad5d.png",
+      "destination": "gui-preview/class-concepts-v2/maatis-priester.png"
+    },
+    {
+      "name": "maatis-puppy",
+      "source": "external-generation/exec-7421a0c7-baaf-4226-b236-556db4937660.png",
+      "destination": "gui-preview/class-concepts-v2/maatis-puppy.png"
+    }
+  ]
+}

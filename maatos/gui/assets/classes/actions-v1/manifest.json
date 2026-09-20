@@ -1,0 +1,2167 @@
+{
+  "version": 1,
+  "source_set": "gui-preview/class-action-sets-v1",
+  "method": "Local extraction of existing illustrations; no redraw",
+  "assets": [
+    {
+      "class_id": "normal",
+      "pose": "standard",
+      "file": "normal/standard.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        19,
+        74,
+        277,
+        296
+      ],
+      "anchor": [
+        144,
+        282
+      ],
+      "sha256": "99986daa4fdebf144b6cc554880d95712777245b16b6f1e0d360fcc376ced118"
+    },
+    {
+      "class_id": "normal",
+      "pose": "ready",
+      "file": "normal/ready.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        295,
+        74,
+        553,
+        296
+      ],
+      "anchor": [
+        420,
+        282
+      ],
+      "sha256": "689c2de96e1d8a47c2b89fbbd4b04161a48fc93e49017b690217407b85844bda"
+    },
+    {
+      "class_id": "normal",
+      "pose": "blink",
+      "file": "normal/blink.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        571,
+        74,
+        829,
+        296
+      ],
+      "anchor": [
+        696,
+        282
+      ],
+      "sha256": "597151c2819c1c37c098d63ba7ba5fdb62c8fea9a2dda49299c202656c1d7f48"
+    },
+    {
+      "class_id": "normal",
+      "pose": "tired",
+      "file": "normal/tired.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        848,
+        74,
+        1106,
+        296
+      ],
+      "anchor": [
+        983,
+        282
+      ],
+      "sha256": "4586dd37ccbe19d27f0ffcf107108bceee388b479f065ea8a170f2543aae1c4d"
+    },
+    {
+      "class_id": "normal",
+      "pose": "wave",
+      "file": "normal/wave.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        19,
+        341,
+        277,
+        561
+      ],
+      "anchor": [
+        125,
+        547
+      ],
+      "sha256": "40f302f1e180dc061226af70cc11f4041d3a7c99f01003c2ee15a450941cc5f9"
+    },
+    {
+      "class_id": "normal",
+      "pose": "balance",
+      "file": "normal/balance.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        295,
+        341,
+        553,
+        561
+      ],
+      "anchor": [
+        416,
+        547
+      ],
+      "sha256": "b4e7e1c67c452d97f3856d39e79ec2076b609f933297b9cf50f99cee6b176124"
+    },
+    {
+      "class_id": "normal",
+      "pose": "creation",
+      "file": "normal/creation.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        571,
+        341,
+        829,
+        561
+      ],
+      "anchor": [
+        676,
+        547
+      ],
+      "sha256": "27be7385bb339c353ad9f1575f29a96e92c3a426f77d917e1762c2d8b94e794d"
+    },
+    {
+      "class_id": "normal",
+      "pose": "connection",
+      "file": "normal/connection.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        848,
+        341,
+        1106,
+        561
+      ],
+      "anchor": [
+        965,
+        547
+      ],
+      "sha256": "19c06984c8c63139f7371f0d26839cdfe15d05fbb8ec609ce47571fb62cb66e5"
+    },
+    {
+      "class_id": "normal",
+      "pose": "respect",
+      "file": "normal/respect.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        19,
+        605,
+        277,
+        819
+      ],
+      "anchor": [
+        129,
+        805
+      ],
+      "sha256": "76b2c7f3578758f6b5b22e5629b370798667eb5fffd23ea341a4672bba220b32"
+    },
+    {
+      "class_id": "normal",
+      "pose": "slash",
+      "file": "normal/slash.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        295,
+        605,
+        553,
+        819
+      ],
+      "anchor": [
+        392,
+        805
+      ],
+      "sha256": "65a30988ecbe4e79fcc071c3942571637d78bc2c975ed6619a2ae7706f793404"
+    },
+    {
+      "class_id": "normal",
+      "pose": "claw",
+      "file": "normal/claw.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        571,
+        605,
+        829,
+        819
+      ],
+      "anchor": [
+        672,
+        805
+      ],
+      "sha256": "7616342ea20e9acaa01f997cc81b5471e90b25d72eaba42f1586cee4035d9ca7"
+    },
+    {
+      "class_id": "normal",
+      "pose": "sand",
+      "file": "normal/sand.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        848,
+        605,
+        1106,
+        819
+      ],
+      "anchor": [
+        955,
+        805
+      ],
+      "sha256": "72d94e7179c0b9a0a8712d6a943618d4764e54ba4617bb55a1c468e7d9badcb1"
+    },
+    {
+      "class_id": "normal",
+      "pose": "spark",
+      "file": "normal/spark.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        19,
+        866,
+        277,
+        1082
+      ],
+      "anchor": [
+        132,
+        1068
+      ],
+      "sha256": "ffba77740266a2298f723d3f0085f82c8559920afc47c6c561382b0143c95609"
+    },
+    {
+      "class_id": "normal",
+      "pose": "impulse",
+      "file": "normal/impulse.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        295,
+        866,
+        553,
+        1082
+      ],
+      "anchor": [
+        399,
+        1068
+      ],
+      "sha256": "b949f307681c5805026627afa8bbe707f7e5cb1ee0f350e21aabe15d64f50cf8"
+    },
+    {
+      "class_id": "normal",
+      "pose": "focus",
+      "file": "normal/focus.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        571,
+        866,
+        829,
+        1082
+      ],
+      "anchor": [
+        700,
+        1068
+      ],
+      "sha256": "2689925de78cb843a9f9dcfae44b9269e6d1457ee90fc6076798162291df005d"
+    },
+    {
+      "class_id": "normal",
+      "pose": "heal",
+      "file": "normal/heal.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        848,
+        866,
+        1106,
+        1082
+      ],
+      "anchor": [
+        978,
+        1068
+      ],
+      "sha256": "b7ebe331c8211d0cfa0a8dd7fcd194542d4026f3ecc706380ab41aff211fa169"
+    },
+    {
+      "class_id": "normal",
+      "pose": "hurt",
+      "file": "normal/hurt.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        19,
+        1124,
+        277,
+        1334
+      ],
+      "anchor": [
+        136,
+        1320
+      ],
+      "sha256": "8a965cbc26ad03f828ba67f8d5951b76d2e2fbc4c5d1865bcc58fa1866402598"
+    },
+    {
+      "class_id": "normal",
+      "pose": "guard",
+      "file": "normal/guard.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        295,
+        1124,
+        553,
+        1334
+      ],
+      "anchor": [
+        406,
+        1320
+      ],
+      "sha256": "66d0f1360329f3b5310765c90ddd89a84a19cf4028edb67cfbdf1611ace00853"
+    },
+    {
+      "class_id": "normal",
+      "pose": "victory",
+      "file": "normal/victory.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        571,
+        1124,
+        829,
+        1334
+      ],
+      "anchor": [
+        700,
+        1320
+      ],
+      "sha256": "186a745a01e886dee466da7b18f1b68456a2e388852bca4e2444accc098031cb"
+    },
+    {
+      "class_id": "normal",
+      "pose": "charged",
+      "file": "normal/charged.png",
+      "source": "maatis-normal-set.png",
+      "source_sha256": "a53b14be46c67e7ef6e1fcc6f6ecd8d2bc77290611da96204c53e58ff15139f3",
+      "crop": [
+        848,
+        1124,
+        1106,
+        1334
+      ],
+      "anchor": [
+        978,
+        1320
+      ],
+      "sha256": "0f83b921e65b19b06ded5741a95d1aaa6c76b8c285d954618ca14e59704f0bf7"
+    },
+    {
+      "class_id": "robo",
+      "pose": "standard",
+      "file": "robo/standard.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        17,
+        79,
+        275,
+        291
+      ],
+      "anchor": [
+        142,
+        277
+      ],
+      "sha256": "03b419b1cc4710aba6098da3558b53f19c5d19decf197499d6da4030ce276cda"
+    },
+    {
+      "class_id": "robo",
+      "pose": "ready",
+      "file": "robo/ready.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        295,
+        79,
+        553,
+        291
+      ],
+      "anchor": [
+        424,
+        277
+      ],
+      "sha256": "a02a8389ecac1ec9858a53306a5d7b19e426228029ffacbf694f66919f42fda1"
+    },
+    {
+      "class_id": "robo",
+      "pose": "blink",
+      "file": "robo/blink.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        571,
+        79,
+        829,
+        291
+      ],
+      "anchor": [
+        696,
+        277
+      ],
+      "sha256": "6338aaae05a40f3f35e0e58ba1c9c52b6c6bfc7c485f93d2309746ba794dfbc9"
+    },
+    {
+      "class_id": "robo",
+      "pose": "tired",
+      "file": "robo/tired.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        848,
+        79,
+        1106,
+        291
+      ],
+      "anchor": [
+        977,
+        277
+      ],
+      "sha256": "c1c53e80484ebe966cfd98829c46a4479e216f7a8c66453f93fc292b6126e56a"
+    },
+    {
+      "class_id": "robo",
+      "pose": "wave",
+      "file": "robo/wave.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        17,
+        337,
+        275,
+        543
+      ],
+      "anchor": [
+        122,
+        529
+      ],
+      "sha256": "b726e9e23c92073c33838f433d63c84d9e9db88ce9ad26afe565964a6a1462b9"
+    },
+    {
+      "class_id": "robo",
+      "pose": "balance",
+      "file": "robo/balance.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        295,
+        337,
+        553,
+        543
+      ],
+      "anchor": [
+        402,
+        529
+      ],
+      "sha256": "5ceb578ef30657367560fe853057ad58665c15db14c61101e60474e2d4f50fbc"
+    },
+    {
+      "class_id": "robo",
+      "pose": "creation",
+      "file": "robo/creation.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        571,
+        337,
+        829,
+        543
+      ],
+      "anchor": [
+        680,
+        529
+      ],
+      "sha256": "b11b519ea9f6d34fddc12b51f016f09792292a2e3ad69ace068d67bd6468b3b3"
+    },
+    {
+      "class_id": "robo",
+      "pose": "connection",
+      "file": "robo/connection.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        848,
+        337,
+        1106,
+        543
+      ],
+      "anchor": [
+        957,
+        529
+      ],
+      "sha256": "c9c9ce48f56742b373232429fdc8caf2c9ae58b08e0c2a7b7833df08b177e08e"
+    },
+    {
+      "class_id": "robo",
+      "pose": "respect",
+      "file": "robo/respect.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        17,
+        583,
+        275,
+        788
+      ],
+      "anchor": [
+        131,
+        774
+      ],
+      "sha256": "87505227d2a1cadc8832c6fc5e0e8400c6ebd218d2cc3f1b132bcb13ae888aea"
+    },
+    {
+      "class_id": "robo",
+      "pose": "slash",
+      "file": "robo/slash.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        295,
+        583,
+        553,
+        788
+      ],
+      "anchor": [
+        390,
+        774
+      ],
+      "sha256": "210265a80872b829fb44cfd423818a92b8c5705fe0c1e55e513b92c588750b1f"
+    },
+    {
+      "class_id": "robo",
+      "pose": "claw",
+      "file": "robo/claw.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        571,
+        583,
+        829,
+        788
+      ],
+      "anchor": [
+        680,
+        774
+      ],
+      "sha256": "08584b2ca46931e78adeaf2d322bab456b9350c58141a2a13335309e67e9e63f"
+    },
+    {
+      "class_id": "robo",
+      "pose": "sand",
+      "file": "robo/sand.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        848,
+        583,
+        1106,
+        788
+      ],
+      "anchor": [
+        957,
+        774
+      ],
+      "sha256": "442571522b735b7a80f510e1716cfc12515ad306e4da9721e71c4f425ecd4bf5"
+    },
+    {
+      "class_id": "robo",
+      "pose": "spark",
+      "file": "robo/spark.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        17,
+        834,
+        275,
+        1042
+      ],
+      "anchor": [
+        130,
+        1028
+      ],
+      "sha256": "7c9d045d6b81e51fd320bd06ce13968f3305bd66f3f536770c55ab82b033e675"
+    },
+    {
+      "class_id": "robo",
+      "pose": "impulse",
+      "file": "robo/impulse.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        295,
+        834,
+        553,
+        1042
+      ],
+      "anchor": [
+        394,
+        1028
+      ],
+      "sha256": "6863b5742bbff8f28fa407a935faef4481fdbb261a4ca4471c205121ae9d5cd4"
+    },
+    {
+      "class_id": "robo",
+      "pose": "focus",
+      "file": "robo/focus.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        571,
+        834,
+        829,
+        1042
+      ],
+      "anchor": [
+        697,
+        1028
+      ],
+      "sha256": "eca6aaaa45f36e8f81813c496378fff9c9d252b019169153e411ba0043f6b120"
+    },
+    {
+      "class_id": "robo",
+      "pose": "heal",
+      "file": "robo/heal.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        848,
+        834,
+        1106,
+        1042
+      ],
+      "anchor": [
+        973,
+        1028
+      ],
+      "sha256": "9a6885809467567e7886974637b7d0849b0b311219115394b28176f0f4134946"
+    },
+    {
+      "class_id": "robo",
+      "pose": "hurt",
+      "file": "robo/hurt.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        17,
+        1089,
+        275,
+        1300
+      ],
+      "anchor": [
+        131,
+        1286
+      ],
+      "sha256": "730d3a7ebad6b548e776bb5a84b5a3f55f0865bcfdbecf1e1b5b545532a46bc4"
+    },
+    {
+      "class_id": "robo",
+      "pose": "guard",
+      "file": "robo/guard.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        295,
+        1089,
+        553,
+        1300
+      ],
+      "anchor": [
+        401,
+        1286
+      ],
+      "sha256": "913ee0a1f2d4086f729cbf554a69b7693738b14af1a7e8d460c12a889bca1859"
+    },
+    {
+      "class_id": "robo",
+      "pose": "victory",
+      "file": "robo/victory.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        571,
+        1089,
+        829,
+        1300
+      ],
+      "anchor": [
+        690,
+        1286
+      ],
+      "sha256": "f9682cf8bbbb3c778958d2fcbbe95a8161c7a9f637d4b5f5b01614e4c6453d97"
+    },
+    {
+      "class_id": "robo",
+      "pose": "charged",
+      "file": "robo/charged.png",
+      "source": "maatis-robo-set.png",
+      "source_sha256": "e2dfa0b9f59d87b7946a332e52eec4f3272614174118578cd0ec53b9a5552871",
+      "crop": [
+        848,
+        1089,
+        1106,
+        1300
+      ],
+      "anchor": [
+        978,
+        1286
+      ],
+      "sha256": "5f0e2029710ae42258cb79183f2b941bb330d8a57cad5e72533f5ee735f27fe4"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "standard",
+      "file": "engelchen/standard.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        17,
+        68,
+        275,
+        282
+      ],
+      "anchor": [
+        141,
+        268
+      ],
+      "sha256": "59a1752575afceb4f2ba48b2222ab5954efff3bff9ee39bfdfddf7122fa7992b"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "ready",
+      "file": "engelchen/ready.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        295,
+        68,
+        553,
+        282
+      ],
+      "anchor": [
+        427,
+        268
+      ],
+      "sha256": "12fbc1a6a7900da5e0fd7eff6bf07c44a8a081662aeacb583846c004e1a83030"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "blink",
+      "file": "engelchen/blink.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        572,
+        68,
+        830,
+        282
+      ],
+      "anchor": [
+        696,
+        268
+      ],
+      "sha256": "bdd9565b0112c843bef3f296d6925a9c97ae70d005b591bd14ac875f88ba74a1"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "tired",
+      "file": "engelchen/tired.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        849,
+        68,
+        1107,
+        282
+      ],
+      "anchor": [
+        986,
+        268
+      ],
+      "sha256": "44eb4f23074c43fe14623692d1a77edcb7cc46bad4e7150cc67b0eb931c8fd69"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "wave",
+      "file": "engelchen/wave.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        17,
+        327,
+        275,
+        537
+      ],
+      "anchor": [
+        124,
+        523
+      ],
+      "sha256": "291d78015c41e2a5f04bf043f8653dc111525ae106818a19e41f563c3a0f8577"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "balance",
+      "file": "engelchen/balance.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        295,
+        327,
+        553,
+        537
+      ],
+      "anchor": [
+        408,
+        523
+      ],
+      "sha256": "be51c1604954f312e3a3c864e0ccecd2027f4c37bc2fad2cb57db0cda834efce"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "creation",
+      "file": "engelchen/creation.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        572,
+        327,
+        830,
+        537
+      ],
+      "anchor": [
+        681,
+        523
+      ],
+      "sha256": "409d8231f5306a8838f19c4671e9942d20d14f6df3e2a71b60374fd7350d1aa7"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "connection",
+      "file": "engelchen/connection.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        849,
+        327,
+        1107,
+        537
+      ],
+      "anchor": [
+        966,
+        523
+      ],
+      "sha256": "f86a8639c18864ae51fca1e5c658156c2a867313ecdce463b8b4f2f974d7f58f"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "respect",
+      "file": "engelchen/respect.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        17,
+        583,
+        275,
+        787
+      ],
+      "anchor": [
+        126,
+        773
+      ],
+      "sha256": "0e6cf2e62c8a717c746546d589060c7c65e9bd356987e3b2fcb445bb144f8cda"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "slash",
+      "file": "engelchen/slash.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        295,
+        583,
+        553,
+        787
+      ],
+      "anchor": [
+        397,
+        773
+      ],
+      "sha256": "f9230fbc393ba5880e5826619728977026bff667204ae7c21f37a5d424ef5ce4"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "claw",
+      "file": "engelchen/claw.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        572,
+        583,
+        830,
+        787
+      ],
+      "anchor": [
+        675,
+        773
+      ],
+      "sha256": "76d1a8906feedd18b3e9225622be6ec9d4e648e5e8cdf0fcb66bfc9d88d718b4"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "sand",
+      "file": "engelchen/sand.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        849,
+        583,
+        1107,
+        787
+      ],
+      "anchor": [
+        965,
+        773
+      ],
+      "sha256": "0215a993f635b42de25805949a692e795c7a1cc3074393a3189afec2d972124d"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "spark",
+      "file": "engelchen/spark.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        17,
+        837,
+        275,
+        1045
+      ],
+      "anchor": [
+        127,
+        1031
+      ],
+      "sha256": "8617468aa5215e40bf4105515aef6cdcc4a5e5ffc9f68cebaa8ad66e5b7aa025"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "impulse",
+      "file": "engelchen/impulse.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        295,
+        837,
+        553,
+        1045
+      ],
+      "anchor": [
+        405,
+        1031
+      ],
+      "sha256": "a233c767bedffd44dfe10bd1ecaf1af0c326cd102adf18258234f2c871498861"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "focus",
+      "file": "engelchen/focus.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        572,
+        837,
+        830,
+        1045
+      ],
+      "anchor": [
+        697,
+        1031
+      ],
+      "sha256": "f3a53682bd2c4976a09fe513d3733f45865fd08f1a197cb40a61edbfd64085d8"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "heal",
+      "file": "engelchen/heal.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        849,
+        837,
+        1107,
+        1045
+      ],
+      "anchor": [
+        978,
+        1031
+      ],
+      "sha256": "d1087e90205bdd3310ad7590c56cf1e84c1be8c6e2f5daf717084a612c3eb199"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "hurt",
+      "file": "engelchen/hurt.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        17,
+        1094,
+        275,
+        1302
+      ],
+      "anchor": [
+        148,
+        1288
+      ],
+      "sha256": "5b0c2241cf43b762bf4115ee341fdb15f96eb761718113c09be94d5554e02f43"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "guard",
+      "file": "engelchen/guard.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        295,
+        1094,
+        553,
+        1302
+      ],
+      "anchor": [
+        405,
+        1288
+      ],
+      "sha256": "89bc748cbb2667dbb822abab7f831e20184ca11817f912b56559313e712bab7e"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "victory",
+      "file": "engelchen/victory.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        572,
+        1094,
+        830,
+        1302
+      ],
+      "anchor": [
+        694,
+        1288
+      ],
+      "sha256": "432e23610f8a4611e3d13a699a5e9f7b448870cd986eaf28f4393024caa6f0a7"
+    },
+    {
+      "class_id": "engelchen",
+      "pose": "charged",
+      "file": "engelchen/charged.png",
+      "source": "maatis-engelchen-set.png",
+      "source_sha256": "b047f9331b9430038d4d0c5360b1419d3b37db7adf4b57ffd92e9390a3e0675e",
+      "crop": [
+        849,
+        1094,
+        1107,
+        1302
+      ],
+      "anchor": [
+        979,
+        1288
+      ],
+      "sha256": "9b7fcc2bcb3f984e32a1fa0606f790a03f016587df2dcefb4b23a76e8fe75062"
+    },
+    {
+      "class_id": "magier",
+      "pose": "standard",
+      "file": "magier/standard.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        21,
+        64,
+        279,
+        290
+      ],
+      "anchor": [
+        151,
+        276
+      ],
+      "sha256": "52517a5c53f83dbfe4da3a3056e28a13aeb0618c472a1c057f6b4087792308c1"
+    },
+    {
+      "class_id": "magier",
+      "pose": "ready",
+      "file": "magier/ready.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        298,
+        64,
+        556,
+        290
+      ],
+      "anchor": [
+        428,
+        276
+      ],
+      "sha256": "a1249c2037e42a026c3e97acfa7ada117c38df7ada6feacd6091006f879f459c"
+    },
+    {
+      "class_id": "magier",
+      "pose": "blink",
+      "file": "magier/blink.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        574,
+        64,
+        832,
+        290
+      ],
+      "anchor": [
+        704,
+        276
+      ],
+      "sha256": "9ed8b3839b3078e10628977482ccb9b403bbcaec27a9e09e64939dbe5f603e35"
+    },
+    {
+      "class_id": "magier",
+      "pose": "tired",
+      "file": "magier/tired.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        852,
+        64,
+        1110,
+        290
+      ],
+      "anchor": [
+        982,
+        276
+      ],
+      "sha256": "d54edf873197ac13f1cbb77d48892f001108139c0bf07d5c05eeb390ad5da488"
+    },
+    {
+      "class_id": "magier",
+      "pose": "wave",
+      "file": "magier/wave.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        21,
+        323,
+        279,
+        545
+      ],
+      "anchor": [
+        136,
+        531
+      ],
+      "sha256": "3046efe4a5774fe0c03975892cee8ecd02b0ed9a67777827b3266b70257ee42b"
+    },
+    {
+      "class_id": "magier",
+      "pose": "balance",
+      "file": "magier/balance.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        298,
+        323,
+        556,
+        545
+      ],
+      "anchor": [
+        419,
+        531
+      ],
+      "sha256": "9990797c539f02b92d297dcd0a2565865665ac489373f4c7526fa8c5c2c3c3f1"
+    },
+    {
+      "class_id": "magier",
+      "pose": "creation",
+      "file": "magier/creation.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        574,
+        323,
+        832,
+        545
+      ],
+      "anchor": [
+        693,
+        531
+      ],
+      "sha256": "3173f5116302732d1ce7ab11a50eb9c53554b53354bd82646b4b8dd47e844ec5"
+    },
+    {
+      "class_id": "magier",
+      "pose": "connection",
+      "file": "magier/connection.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        852,
+        323,
+        1110,
+        545
+      ],
+      "anchor": [
+        980,
+        531
+      ],
+      "sha256": "b44527a84363fc513b6cc6b37ebcc509af0ef879affe923eee2e12366fb949fc"
+    },
+    {
+      "class_id": "magier",
+      "pose": "respect",
+      "file": "magier/respect.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        21,
+        582,
+        279,
+        795
+      ],
+      "anchor": [
+        134,
+        781
+      ],
+      "sha256": "ee29fc74c6ab9829de23fde18daac5bfe009b53d60277dd42be34e83c2ff0e17"
+    },
+    {
+      "class_id": "magier",
+      "pose": "slash",
+      "file": "magier/slash.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        298,
+        582,
+        556,
+        795
+      ],
+      "anchor": [
+        400,
+        781
+      ],
+      "sha256": "e27c8c609972109ee85717cb3eb10bb2f250c4d3048799fb9ae8c70f9c8f4bfe"
+    },
+    {
+      "class_id": "magier",
+      "pose": "claw",
+      "file": "magier/claw.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        574,
+        582,
+        832,
+        795
+      ],
+      "anchor": [
+        683,
+        781
+      ],
+      "sha256": "25e1ea78046d945d7d1db632a90247223776ad7717dc89176d8fddc30ab7a34c"
+    },
+    {
+      "class_id": "magier",
+      "pose": "sand",
+      "file": "magier/sand.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        852,
+        582,
+        1110,
+        795
+      ],
+      "anchor": [
+        972,
+        781
+      ],
+      "sha256": "c7a93ed8ead1f6a2c10f9472dbd1032e57c8b0816d33b86fd152a54d77c3db29"
+    },
+    {
+      "class_id": "magier",
+      "pose": "spark",
+      "file": "magier/spark.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        21,
+        835,
+        279,
+        1055
+      ],
+      "anchor": [
+        136,
+        1041
+      ],
+      "sha256": "cdbd111930e85cb05df1abd0f9844c6e11ccbc355bcf89c282ed3b5dbf25a9e9"
+    },
+    {
+      "class_id": "magier",
+      "pose": "impulse",
+      "file": "magier/impulse.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        298,
+        835,
+        556,
+        1055
+      ],
+      "anchor": [
+        415,
+        1041
+      ],
+      "sha256": "21b653a2708d0a117383755da39c04b6ea0e6d7b1e64b3f8a0c4da7211c794bc"
+    },
+    {
+      "class_id": "magier",
+      "pose": "focus",
+      "file": "magier/focus.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        574,
+        835,
+        832,
+        1055
+      ],
+      "anchor": [
+        705,
+        1041
+      ],
+      "sha256": "5154cd87b1740ce99e190a68a85e3d7680fabeef1f25e83fbe015117e29254d1"
+    },
+    {
+      "class_id": "magier",
+      "pose": "heal",
+      "file": "magier/heal.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        852,
+        835,
+        1110,
+        1055
+      ],
+      "anchor": [
+        987,
+        1041
+      ],
+      "sha256": "cd7d77e3b4fc4f0e1dbf32c4137fa381a414ad96991b8a5668cc624120335d1e"
+    },
+    {
+      "class_id": "magier",
+      "pose": "hurt",
+      "file": "magier/hurt.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        21,
+        1091,
+        279,
+        1314
+      ],
+      "anchor": [
+        138,
+        1300
+      ],
+      "sha256": "b955b9177f5d7dfb7bda269b0e5380466c8a8fdd2065252de40add328607da0c"
+    },
+    {
+      "class_id": "magier",
+      "pose": "guard",
+      "file": "magier/guard.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        298,
+        1091,
+        556,
+        1314
+      ],
+      "anchor": [
+        415,
+        1300
+      ],
+      "sha256": "8699ee4c46d072341692a34c2218da96f3719f521800e3889faf9d7b4175a5f9"
+    },
+    {
+      "class_id": "magier",
+      "pose": "victory",
+      "file": "magier/victory.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        574,
+        1091,
+        832,
+        1314
+      ],
+      "anchor": [
+        704,
+        1300
+      ],
+      "sha256": "c48e531421a7a99ab9f28f2770ba25863d41e57af418663b1e32ba4d2eb932b1"
+    },
+    {
+      "class_id": "magier",
+      "pose": "charged",
+      "file": "magier/charged.png",
+      "source": "maatis-magier-set.png",
+      "source_sha256": "b909dda84ddf9de3a32cfd14ad8ed4bb7b9c17b1a69e9c8c2d02c1df94956f53",
+      "crop": [
+        852,
+        1091,
+        1110,
+        1314
+      ],
+      "anchor": [
+        984,
+        1300
+      ],
+      "sha256": "e03b3f6ccd41fb65955ada54978ba5cf5f7c72108732ffff649215737afa288b"
+    },
+    {
+      "class_id": "priester",
+      "pose": "standard",
+      "file": "priester/standard.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        18,
+        71,
+        276,
+        289
+      ],
+      "anchor": [
+        149,
+        275
+      ],
+      "sha256": "b65d21897388427dc26096cecd4449bbf4528ddc94ed9831b4db17c91f7216c8"
+    },
+    {
+      "class_id": "priester",
+      "pose": "ready",
+      "file": "priester/ready.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        296,
+        71,
+        554,
+        289
+      ],
+      "anchor": [
+        427,
+        275
+      ],
+      "sha256": "04087194ce8e6bf9be4cad418d6244e0d6f780398333ec41a1fbb41f8f450ae3"
+    },
+    {
+      "class_id": "priester",
+      "pose": "blink",
+      "file": "priester/blink.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        573,
+        71,
+        831,
+        289
+      ],
+      "anchor": [
+        704,
+        275
+      ],
+      "sha256": "e8e3ac70febba2ce77b65eb89cdbb839e6f99b5449bd998de738ddc0565425d2"
+    },
+    {
+      "class_id": "priester",
+      "pose": "tired",
+      "file": "priester/tired.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        850,
+        71,
+        1108,
+        289
+      ],
+      "anchor": [
+        987,
+        275
+      ],
+      "sha256": "ccbb0cb3eba86a8bc490b3e8e2ca4ac2179dc096e32f5cc050a868358a72b991"
+    },
+    {
+      "class_id": "priester",
+      "pose": "wave",
+      "file": "priester/wave.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        18,
+        332,
+        276,
+        545
+      ],
+      "anchor": [
+        137,
+        531
+      ],
+      "sha256": "ecbea88896a9c789f8210fc79deb4f3bdcefb069346b81e1d5030c3be76ddf40"
+    },
+    {
+      "class_id": "priester",
+      "pose": "balance",
+      "file": "priester/balance.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        296,
+        332,
+        554,
+        545
+      ],
+      "anchor": [
+        421,
+        531
+      ],
+      "sha256": "d6dc3f448e0112819783161f87705c986a903fa1e0b10641616ad7c802473982"
+    },
+    {
+      "class_id": "priester",
+      "pose": "creation",
+      "file": "priester/creation.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        573,
+        332,
+        831,
+        545
+      ],
+      "anchor": [
+        696,
+        531
+      ],
+      "sha256": "f36108c5cc5642fac3fe5e429e674e1e316af2873a83c08437546681f8d03f5b"
+    },
+    {
+      "class_id": "priester",
+      "pose": "connection",
+      "file": "priester/connection.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        850,
+        332,
+        1108,
+        545
+      ],
+      "anchor": [
+        975,
+        531
+      ],
+      "sha256": "9716736a4124f915bfc5ff5da9dc38acebee6fcfdeb3f8b6b35d4e6d023a3524"
+    },
+    {
+      "class_id": "priester",
+      "pose": "respect",
+      "file": "priester/respect.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        18,
+        588,
+        276,
+        797
+      ],
+      "anchor": [
+        133,
+        783
+      ],
+      "sha256": "916a84e50d98200a3c3fdd65b92a680a71cf071c8ec3d997e91051f98dfa73a7"
+    },
+    {
+      "class_id": "priester",
+      "pose": "slash",
+      "file": "priester/slash.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        296,
+        588,
+        554,
+        797
+      ],
+      "anchor": [
+        415,
+        783
+      ],
+      "sha256": "6cfc661fe886e4394877cc1657981b3b148108218c3284a90fe3add3315138cd"
+    },
+    {
+      "class_id": "priester",
+      "pose": "claw",
+      "file": "priester/claw.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        573,
+        588,
+        831,
+        797
+      ],
+      "anchor": [
+        685,
+        783
+      ],
+      "sha256": "a358377c33a52157c9e93e634be61c7fb58a0c2d33e00bd282866725d114750c"
+    },
+    {
+      "class_id": "priester",
+      "pose": "sand",
+      "file": "priester/sand.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        850,
+        588,
+        1108,
+        797
+      ],
+      "anchor": [
+        970,
+        783
+      ],
+      "sha256": "c227df67db854fe47c774468eb2276704369e6d6aa434bb5b9ee1b0c7ccd7b21"
+    },
+    {
+      "class_id": "priester",
+      "pose": "spark",
+      "file": "priester/spark.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        18,
+        845,
+        276,
+        1057
+      ],
+      "anchor": [
+        137,
+        1043
+      ],
+      "sha256": "1a9380429c06ba96959cbe5972ad7b4e505e757cfe2dfa21a3601716bafd7ca1"
+    },
+    {
+      "class_id": "priester",
+      "pose": "impulse",
+      "file": "priester/impulse.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        296,
+        845,
+        554,
+        1057
+      ],
+      "anchor": [
+        418,
+        1043
+      ],
+      "sha256": "a3e7e20a95d6b9ef8029d3b2cd837f0a95ec7171e4680ac6a728e954e26fa5d2"
+    },
+    {
+      "class_id": "priester",
+      "pose": "focus",
+      "file": "priester/focus.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        573,
+        845,
+        831,
+        1057
+      ],
+      "anchor": [
+        695,
+        1043
+      ],
+      "sha256": "e844aec9a9009333ac39f58ad20b99984fad1d4df9b541847af6a1ffda314342"
+    },
+    {
+      "class_id": "priester",
+      "pose": "heal",
+      "file": "priester/heal.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        850,
+        845,
+        1108,
+        1057
+      ],
+      "anchor": [
+        974,
+        1043
+      ],
+      "sha256": "cfde88e68a374f13fd14f1d64a4dde4873f67a27ba6740517421efed931546ad"
+    },
+    {
+      "class_id": "priester",
+      "pose": "hurt",
+      "file": "priester/hurt.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        18,
+        1098,
+        276,
+        1311
+      ],
+      "anchor": [
+        141,
+        1297
+      ],
+      "sha256": "fb8efe459ca06ae60b637bd9a10d51c74a2c4af2682279ddd2a0167a84bc1c94"
+    },
+    {
+      "class_id": "priester",
+      "pose": "guard",
+      "file": "priester/guard.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        296,
+        1098,
+        554,
+        1311
+      ],
+      "anchor": [
+        416,
+        1297
+      ],
+      "sha256": "f244ebda1d63669caf943be1660265d404315425c5c16edb808d531e7725c04b"
+    },
+    {
+      "class_id": "priester",
+      "pose": "victory",
+      "file": "priester/victory.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        573,
+        1098,
+        831,
+        1311
+      ],
+      "anchor": [
+        700,
+        1297
+      ],
+      "sha256": "06993b5c44b747d828c0ef1f99c505ec4b8fffbd1238d3a287a9c0628e0a3a11"
+    },
+    {
+      "class_id": "priester",
+      "pose": "charged",
+      "file": "priester/charged.png",
+      "source": "maatis-priester-set.png",
+      "source_sha256": "cb9855ee2fae94bb1a4069ae79fcf43a863f5dfb9795439b82f71b204416ad4b",
+      "crop": [
+        850,
+        1098,
+        1108,
+        1311
+      ],
+      "anchor": [
+        978,
+        1297
+      ],
+      "sha256": "58b99e42a61b75fef508b2391c29c178a61df69128da8d71faca6b3f525c3ce4"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "standard",
+      "file": "puppy/standard.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        19,
+        72,
+        277,
+        285
+      ],
+      "anchor": [
+        146,
+        271
+      ],
+      "sha256": "e1dad1836d8b0891253fbf1c74a4e6852b0001bda20e68483a6115234d696bba"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "ready",
+      "file": "puppy/ready.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        296,
+        72,
+        554,
+        285
+      ],
+      "anchor": [
+        417,
+        271
+      ],
+      "sha256": "69493dfc56774e46ecf53462aeac19ef57cec1965e00d99c1fa47426cd0c3c11"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "blink",
+      "file": "puppy/blink.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        572,
+        72,
+        830,
+        285
+      ],
+      "anchor": [
+        696,
+        271
+      ],
+      "sha256": "e6cc3f5d61502669ca36fcca26a192c4297c81cf0ae6d58d8c92021ac27f324b"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "tired",
+      "file": "puppy/tired.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        849,
+        72,
+        1107,
+        285
+      ],
+      "anchor": [
+        984,
+        271
+      ],
+      "sha256": "d606e529b4f694fc9c5ad3f4a73c6b915a8dbc1baaa117cb7b13d86f39b8c99c"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "wave",
+      "file": "puppy/wave.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        19,
+        325,
+        277,
+        535
+      ],
+      "anchor": [
+        128,
+        521
+      ],
+      "sha256": "f4f6b7d12142c18223219e59acdd4e8f8236e3756a082deadee850cba75b886d"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "balance",
+      "file": "puppy/balance.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        296,
+        325,
+        554,
+        535
+      ],
+      "anchor": [
+        409,
+        521
+      ],
+      "sha256": "7a50dfbe1d2ad9f5951767f0ddf1a4c89e36e6bc712d5c01e488259ec4ffc75d"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "creation",
+      "file": "puppy/creation.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        572,
+        325,
+        830,
+        535
+      ],
+      "anchor": [
+        679,
+        521
+      ],
+      "sha256": "8206c2cb6d64d557c7a05280c57091b1ca11f419baf56be69c5eea99371ca9db"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "connection",
+      "file": "puppy/connection.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        849,
+        325,
+        1107,
+        535
+      ],
+      "anchor": [
+        964,
+        521
+      ],
+      "sha256": "117f10840f0cf4b4f29d9a8a34795ba8a170f71c8b25902fcb90f7a20d89b054"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "respect",
+      "file": "puppy/respect.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        19,
+        578,
+        277,
+        788
+      ],
+      "anchor": [
+        126,
+        774
+      ],
+      "sha256": "4f08349443cb527550088546c7f42b9b3e453223a61d93d4645ea24e9a0cddd5"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "slash",
+      "file": "puppy/slash.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        296,
+        578,
+        554,
+        788
+      ],
+      "anchor": [
+        403,
+        774
+      ],
+      "sha256": "ed5bba7d342ae56f06b409145d56710028cb9976116b25ff823e0ae6f55cfe5a"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "claw",
+      "file": "puppy/claw.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        572,
+        578,
+        830,
+        788
+      ],
+      "anchor": [
+        686,
+        774
+      ],
+      "sha256": "d85dde2841735111ce3522a6b5af054df2bf87cec9561d7d2d0ed22970bb3972"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "sand",
+      "file": "puppy/sand.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        849,
+        578,
+        1107,
+        788
+      ],
+      "anchor": [
+        962,
+        774
+      ],
+      "sha256": "4357f4de3a60f7df624c4d8301e4b9ae352fbdba0e6b634a2392166c2f67c805"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "spark",
+      "file": "puppy/spark.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        19,
+        831,
+        277,
+        1043
+      ],
+      "anchor": [
+        130,
+        1029
+      ],
+      "sha256": "f305db9c6c3de1feaa54fa1fd235bf53e02b8953d244a57060100a981f80eb27"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "impulse",
+      "file": "puppy/impulse.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        296,
+        831,
+        554,
+        1043
+      ],
+      "anchor": [
+        409,
+        1029
+      ],
+      "sha256": "1d88df2d97380309621f10f5eaae23ba624fa55ca609c4229d54fb882ca06b12"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "focus",
+      "file": "puppy/focus.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        572,
+        831,
+        830,
+        1043
+      ],
+      "anchor": [
+        696,
+        1029
+      ],
+      "sha256": "496d35ee755961111036b9349b048797ffd0ae61f8273faeb546f1b9bcb08f63"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "heal",
+      "file": "puppy/heal.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        849,
+        831,
+        1107,
+        1043
+      ],
+      "anchor": [
+        977,
+        1029
+      ],
+      "sha256": "02c4987838c3340ffc51c48e234cb4590ec493ad69ed559f82cddab457169275"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "hurt",
+      "file": "puppy/hurt.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        19,
+        1087,
+        277,
+        1300
+      ],
+      "anchor": [
+        128,
+        1286
+      ],
+      "sha256": "0034a7f1449d41fe968e9c51afd1b32785669c006331d960c031f367280ba428"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "guard",
+      "file": "puppy/guard.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        296,
+        1087,
+        554,
+        1300
+      ],
+      "anchor": [
+        409,
+        1286
+      ],
+      "sha256": "43538a508a2e0efa600237e6a9ca1b1ecf4023327b9d71aa4d3294d33ae13091"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "victory",
+      "file": "puppy/victory.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        572,
+        1087,
+        830,
+        1300
+      ],
+      "anchor": [
+        694,
+        1286
+      ],
+      "sha256": "6355a34ea6eba59bb704bab32ecaed5644458256e4a2d5680af353c588f7f116"
+    },
+    {
+      "class_id": "puppy",
+      "pose": "charged",
+      "file": "puppy/charged.png",
+      "source": "maatis-puppy-set.png",
+      "source_sha256": "f206d2ebf2312de432372bdde5fd17f3e64cc3a0f6ed659ce438b3ba3bbf6aac",
+      "crop": [
+        849,
+        1087,
+        1107,
+        1300
+      ],
+      "anchor": [
+        977,
+        1286
+      ],
+      "sha256": "315e5e5da61801b1f7fa43575684ab1beb9de9b8b72b523d3f70863729ace42c"
+    }
+  ]
+}
