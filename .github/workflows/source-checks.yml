@@ -5,7 +5,7 @@ permissions:
 jobs:
   source:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -13,9 +13,16 @@ jobs:
           python-version: '3.11'
       - name: Source inventory, syntax and links
         run: python tools/check_repository.py
-      - name: Qt system libraries
-        run: sudo apt-get update && sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3 libpulse0
-      - name: GUI test dependencies (no model backend)
+      - name: Qt libraries and CPU build tools
+        run: sudo apt-get update && sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3 libpulse0 build-essential cmake ninja-build
+      - name: GUI test dependencies
         run: python -m pip install -r requirements-gui.txt
+      - name: GGUF test backend (CPU only, no model weights)
+        env:
+          CMAKE_ARGS: "-DGGML_NATIVE=ON -DGGML_METAL=OFF -DGGML_CUDA=OFF -DGGML_VULKAN=OFF -DLLAMA_CURL=OFF"
+          CMAKE_BUILD_PARALLEL_LEVEL: '2'
+        run: python -m pip install --no-binary=llama-cpp-python llama-cpp-python==0.3.34
+      - name: Verify backend import before running tests
+        run: python -c "import llama_cpp; from llama_cpp.llama_chat_format import Jinja2ChatFormatter; print('llama-cpp-python', llama_cpp.__version__)"
       - name: Isolated source checks
         run: python tools/run_source_checks.py

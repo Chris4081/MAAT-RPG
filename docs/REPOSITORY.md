@@ -47,7 +47,10 @@ python tools/run_source_checks.py
 Der erste Befehl prüft Syntax, Dateigrößen, lokale Markdown-Links und ausgeschlossene
 Dateien. Der zweite führt ausgewählte Tests in getrennten Prozessen mit temporären
 Spielständen und Qt ohne sichtbares Fenster aus. Dafür werden die Abhängigkeiten
-aus `requirements-gui.txt`, aber kein KI-Modell benötigt.
+aus `requirements-gui.txt` und für die GGUF-/Adaptertests zusätzlich
+`llama-cpp-python==0.3.34` benötigt. Nutze dafür das bereits gemäß
+[Startanleitung](../GUI-START.md#deutsch) eingerichtete Backend.
+Die Tests laden keine KI-Modellgewichte.
 
 Einzelne Testmodule lassen sich gezielt auswählen:
 
@@ -61,7 +64,9 @@ Ohne ZIM werden diese Fälle übersprungen. Die ausgewählten Tests ergänzen
 Spieltests und Prüfungen auf der jeweiligen Zielhardware.
 
 Der [GitHub-Workflow](../.github/workflows/source-checks.yml) ist für dieselben
-Quellcodeprüfungen bei Pushes und Pull Requests eingerichtet. Zusätzliche Werkzeuge
+Quellcodeprüfungen bei Pushes und Pull Requests eingerichtet. Er baut dafür ein
+CPU-Backend auf dem Runner und prüft dessen Import vor dem Testlauf; ein Modell
+wird nicht heruntergeladen. Zusätzliche Werkzeuge
 zur Grafikbearbeitung sind in `requirements-dev.txt` aufgeführt.
 
 ### Mitmachen und weiterlesen
@@ -110,7 +115,9 @@ python tools/run_source_checks.py
 
 The first command checks syntax, file sizes, local Markdown links and excluded
 files. The second runs selected tests in isolated processes with temporary game
-data and Qt offscreen. It requires `requirements-gui.txt`, but no AI model.
+data and Qt offscreen. It requires `requirements-gui.txt` plus
+`llama-cpp-python==0.3.34` for the GGUF/adapter tests. Reuse the backend installed
+with the [setup guide](../GUI-START.md#english). No AI model weights are loaded.
 Pass test-module names to run a smaller selection, as shown in the German section.
 
 Set `MAAT_TEST_ZIM` to your own archive for wiki integration tests; the existing
@@ -118,7 +125,8 @@ cases expect particular German articles. Those cases are skipped without an arch
 These checks complement manual playtesting and target-device testing.
 
 The [GitHub workflow](../.github/workflows/source-checks.yml) is configured to run
-the same source checks on pushes and pull requests. Optional asset-development
+the same source checks on pushes and pull requests. It builds a CPU backend on
+the runner and checks its import before testing; no model is downloaded. Optional asset-development
 dependencies are listed in `requirements-dev.txt`.
 
 ### Contribute and explore
