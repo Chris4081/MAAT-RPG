@@ -30,9 +30,12 @@ class BackendRouteTests(unittest.TestCase):
                 write_gguf(model)
                 intel = machine == 'x86_64'
                 target = 'shared.core.intel_binding.IntelLlama' if intel else 'shared.core.llama_backend.Llama'
+                # Match the simulated Mac's topology too; otherwise Linux reads
+                # the runner's real CPU affinity instead of these four cores.
                 with guarded_test_memory(folder), \
                      patch('shared.core.gguf_adapters.platform.machine', return_value=machine), \
                      patch('shared.core.hardware_profile.detect_hardware', return_value=hardware), \
+                     patch('shared.core.intel_gguf_backend.physical_threads', return_value=hardware['physical']), \
                      patch(target, return_value=Mock(intel_repacking=False)) as native, \
                      patch('shared.core.gguf_chat.configure_template' if intel else 'shared.core.llama_backend.configure_template', return_value={}), \
                      patch('shared.core.llm_loader.save_last_model_choice'), \
