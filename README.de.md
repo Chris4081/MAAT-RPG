@@ -123,14 +123,25 @@ Wähle eine lokale **GGUF-Datei** über das KI-Menü. Das Spiel bietet Hardware-
 | **Llama** | Lokaler Chat über llama.cpp, beispielsweise mit Llama 3.1 8B Instruct. |
 | **Qwen** | Unterstützung der eingebetteten Chatvorlagen, unter anderem für Qwen2.5 und Qwen3. |
 | **Mistral / Ministral** | Eigene Modellerkennung und angepasste Verarbeitung der System- und Chatvorlagen, auch für Ministral 3. |
-| **GPT-OSS** | Unterstützung des Harmony-Formats; Denk- und Antwortkanäle werden getrennt verarbeitet. Im Projekt mit GPT-OSS 20B ausprobiert. |
+| **GPT-OSS** | Unterstützung des Harmony-Formats; Denk- und Antwortkanäle werden getrennt verarbeitet. |
 | **Gemma** | Angepasste Verarbeitung von Systemnachrichten und modellabhängigen Chatvorlagen. |
 | **TinyLlama** | Unterstützung für Chat-Varianten; für TinyLlama Chat v1.0 ist eine passende Ersatzvorlage vorhanden. |
 
 Die Integration umfasst **gestreamte Antworten** über die Intel-/AMD- und ARM-GGUF-Adapter.
-Aus bisherigen Tests und Spielrückmeldungen stammen unter anderem **Llama 3.1 8B Instruct,
-Qwen2.5-Coder 7B, Ministral 3 3B und GPT-OSS 20B**. Das bedeutet nicht, dass jede
-Modellversion oder Quantisierung auf jeder Hardware getestet wurde.
+
+### In unseren Spielrunden getestete Modelle
+
+Diese Modelle kamen bei der Entwicklung und beim Spielen von MAAT RPG zum Einsatz:
+
+| Modellfamilie | Getestete Modelle |
+| --- | --- |
+| **Qwen** | **Qwen 3.6**, **Qwen 3.8** und Qwen2.5-Coder 7B. |
+| **Llama** | **Llama 8B 120k** und Llama 3.1 8B Instruct. |
+| **GPT-OSS** | **GPT-OSS 20B**. |
+| **Mistral / Ministral** | **Ministral 3 3B**, darunter die Q4_K_M-GGUF auf einem Intel-MacBook. |
+
+Die Liste beruht auf unseren Praxistests und Spielrückmeldungen; nicht jede
+Modellversion oder Quantisierung wurde auf jeder Hardware getestet.
 
 Nutze eine **Chat-/Instruct-GGUF** mit passender Chatvorlage. Die konkrete Datei,
 das installierte llama.cpp-Backend, verfügbarer RAM und Kontextgröße bestimmen,

@@ -122,14 +122,25 @@ Choose a local **GGUF file** in the AI menu. The game offers automatic hardware 
 | **Llama** | Local chat through llama.cpp, for example with Llama 3.1 8B Instruct. |
 | **Qwen** | Embedded chat-template support, including Qwen2.5 and Qwen3. |
 | **Mistral / Ministral** | Dedicated family detection and handling of system/chat templates, including Ministral 3. |
-| **GPT-OSS** | Harmony format support, with separate handling of reasoning and answer channels. Tried in the project with GPT-OSS 20B. |
+| **GPT-OSS** | Harmony format support, with separate handling of reasoning and answer channels. |
 | **Gemma** | Adapted handling of system messages and model-specific chat templates. |
 | **TinyLlama** | Support for chat variants, including a fallback template for TinyLlama Chat v1.0. |
 
 The integration includes **streamed replies** through the Intel/AMD and ARM GGUF adapters.
-Previous tests and playtesting reports include **Llama 3.1 8B Instruct,
-Qwen2.5-Coder 7B, Ministral 3 3B and GPT-OSS 20B**. This does not mean that every
-model version or quantization has been tested on every device.
+
+### Models tested in our playthroughs
+
+These models have been used during development and playtesting of MAAT RPG:
+
+| Model family | Tested models |
+| --- | --- |
+| **Qwen** | **Qwen 3.6**, **Qwen 3.8** and Qwen2.5-Coder 7B. |
+| **Llama** | **Llama 8B 120k** and Llama 3.1 8B Instruct. |
+| **GPT-OSS** | **GPT-OSS 20B**. |
+| **Mistral / Ministral** | **Ministral 3 3B**, including the Q4_K_M GGUF on an Intel MacBook. |
+
+The list reflects our hands-on tests and player feedback; not every model
+version or quantization has been tested on every device.
 
 Use a **Chat/Instruct GGUF** with a suitable chat template. Compatibility depends
 on the file, installed llama.cpp backend, available RAM and context size.
