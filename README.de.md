@@ -90,9 +90,16 @@ Animierte Aktionsbilder, Trefferfeedback, Schadenszahlen und eigene Soundeffekte
 
 Ab 15 Nachrichten können Minispiele im Chat auftauchen. Ein entdecktes Spiel bleibt für dein Profil in der **Spielhalle** freigeschaltet — direkt im RPG-Fenster.
 
-![MAAT-Snake mit den fünf Prinzipien als Runen auf dem Spielfeld.](docs/images/maat-snake.png)
+![MAAT-Snake · Sternenbund: fünf Prinzipien-Schreine um einen goldenen Mittelpunkt und eine leuchtende Lichtspur.](gui-preview/minigame-review-v1/maat-coil-de.png)
 
-*Entwicklungsaufnahme von MAAT-Snake: Sammle die nächste Rune und weiche den anderen aus.*
+*MAAT-Snake · Sternenbund, gezeigt mit einem synthetischen Spielstand.*
+
+In **MAAT-Snake · Sternenbund** steuerst du eine Lichtspur über eine Sternenkarte.
+Aktiviere die fünf Schreine H, B, S, V und R in beliebiger Reihenfolge und kehre
+zum goldenen Mittelpunkt zurück. Deine Spur bleibt auf dieselbe Länge begrenzt
+und darf sich kreuzen. Weiche Dissonanzwellen aus und schließe jeden Rundweg vor
+Ablauf der Zeit ab: Drei Bünde gewinnen die Chat-Herausforderung; in der Spielhalle
+geht es endlos auf Highscore weiter.
 
 Entdecke **23 Spiele**: MAAT-Snake · Sternenbund, Tempelmauer-Snake, MAAT-Snake, Siegelbrecher, MAAT · Tempelkreise, Glücksrad, Runenpaare, Wüstenlabyrinth, Türme von Terra und weitere Rätsel aus der MAAT-Welt.
 
@@ -101,6 +108,11 @@ Chat-Herausforderungen bieten **zwei Versuche** und bei einem Sieg EP und Gold. 
 [Alle 23 Minispiele: Ziele, Steuerung und Spielhallenmodus →](docs/MINIGAMES.md#deutsch)
 
 ## Deine KI. Deine Erinnerungen.
+
+![Deutsche MAAT-KI-Chatoberfläche mit Beispieldialog, Levelleiste, Navigation und Maatis' Status neben der Weltkarte.](docs/images/ai-chat-de.png)
+
+*Die Chatoberfläche der Desktop-Version: euer Gespräch in der Mitte, Maatis und
+Terra rechts daneben. Vorschau mit Beispieldialog und simuliertem Modellstatus.*
 
 Wähle eine lokale **GGUF-Datei** über das KI-Menü. Das Spiel bietet Hardware-Automatik und manuelle Ladeeinstellungen für Intel/AMD und ARM sowie Metal auf Apple Silicon.
 
@@ -197,6 +209,29 @@ Deine Spieletests und Rückmeldungen helfen, die nächste Version zu gestalten.
 | **Windows · experimentell** | Python-Einstieg vorhanden; [Setup-Schritte](GUI-START.md#english) und weitere Tests erforderlich. |
 
 Dies ist die **Desktop-Beta als Quellcode** mit PySide6-Oberfläche und modularem Terminal-Grundgerüst. Zur Einrichtung brauchst du eine Python-Umgebung und ein geeignetes lokales Modell; folge der Anleitung für dein System. Fertige Installer, Python-Laufzeiten, Modelle und private Spielstände sind nicht Bestandteil dieses Repositorys.
+
+### Im Terminal spielen
+
+Die klassische Textoberfläche ist ebenfalls enthalten und startet **ohne Hintergrundmusik**.
+
+![Der deutsche Terminal-Startbildschirm mit ASCII-Pyramide und der Aufforderung, Enter zu drücken.](docs/images/terminal-pyramid-de.png)
+
+*Die originale Terminal-Titelausgabe, für die Lesbarkeit als Bild gerendert:
+Die Pyramide begrüßt dich vor dem Hauptmenü. [Terminal einrichten →](TERMINAL-START.md#deutsch)*
+
+Nach der oben beschriebenen Einrichtung von Python-Umgebung und GGUF-Backend
+startest du sie im Repository-Ordner unter macOS (oder Linux mit lokaler `.venv`):
+
+```bash
+source .venv/bin/activate
+python maatos/maatki.py
+```
+
+Wähle eine Sprache, **maat rpg** und ein Profil. Drücke bei der Pyramide Enter
+und wähle **Erwachen und Spiel starten**. Für den Chat brauchst du ein lokales
+Modell; die Anleitung erklärt, wohin deine GGUF-Datei gehört.
+
+[Terminal-Anleitung: macOS, Linux, Modelle und Befehle →](TERMINAL-START.md#deutsch)
 
 ## Vom Terminal zur gemeinsamen Welt
 

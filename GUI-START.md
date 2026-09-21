@@ -106,8 +106,9 @@ startet `python start_gui.py` wieder mit dem normalen Datenordner.
 Unter Linux `MAAT_GUI_DATA_ROOT` bereits **vor Installation und Start** auf
 denselben absoluten Testordner setzen: Auch `linux-env` liegt in diesem Ordner.
 Für automatisierte Checks siehe [Entwicklerleitfaden](docs/REPOSITORY.md#deutsch).
-Die bisherigen `setup.sh`/`start.sh` und PowerShell-Pendants bleiben als
-Terminal-Einstiege erhalten; auf Linux leitet `setup.sh` zum GUI-Setup weiter.
+Für die klassische Textoberfläche siehe [Terminal-Start](TERMINAL-START.md#deutsch).
+Die Anleitung verwendet dieselbe aktuelle Python-Umgebung; die älteren
+`start.sh`/PowerShell-Starter erwarten eine separate `mos-env`-Installation.
 
 ## English
 
@@ -237,3 +238,7 @@ For automated checks, run `python tools/check_repository.py` and
 `python tools/run_source_checks.py` in the activated environment. The test runner
 uses temporary profiles and does not load a real AI model. Test your chosen model
 and normal gameplay separately in the GUI.
+
+For the classic text interface, see [Terminal startup](TERMINAL-START.md#english).
+That guide reuses the current Python environment; the older `start.sh`/PowerShell
+launchers expect a separate `mos-env` installation.

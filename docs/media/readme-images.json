@@ -1,6 +1,6 @@
 {
   "description": "Images used in the German and English GitHub READMEs. Existing project artwork and development views; no private player saves or chats. Captions identify test views. This manifest does not grant new media rights.",
-  "prepared": "2026-09-20",
+  "prepared": "2026-09-21",
   "images": [
     {
       "file": "docs/images/classes-overview.png",
@@ -14,13 +14,6 @@
       "source": "MAAT-RPG/gui-preview/maat-rpg-website/assets/terra-journey.png",
       "kind": "development UI capture with test data",
       "sha256": "475bf8078ed3d0aca9de0db5af773ff4036e910de6161dd590d455bab431fab9",
-      "pixel_changes": false
-    },
-    {
-      "file": "docs/images/maat-snake.png",
-      "source": "MAAT-RPG/gui-preview/maat-rpg-website/assets/maat-snake.png",
-      "kind": "development UI capture with test data",
-      "sha256": "bff81feb4a5d81640be99e610f4efd2e206f3372c8ff6ea8c7d56ef387ec4b2c",
       "pixel_changes": false
     },
     {
@@ -54,14 +47,16 @@
     {
       "file": "gui-preview/minigame-review-v1/maat-coil-de.png",
       "source": "tools/render_minigame_review.py (seed 7, no profile data)",
-      "kind": "linked synthetic Qt minigame preview",
+      "kind": "embedded synthetic Qt minigame preview",
+      "used_in": "README.de.md",
       "sha256": "ce4cb5aff45b87da11e4799e2ba6bfbd16871941ffb55b609dcfae334aa5fa55",
       "pixel_changes": false
     },
     {
       "file": "gui-preview/minigame-review-v1/maat-coil-en.png",
       "source": "tools/render_minigame_review.py (seed 7, no profile data)",
-      "kind": "linked synthetic Qt minigame preview",
+      "kind": "embedded synthetic Qt minigame preview",
+      "used_in": "README.md",
       "sha256": "58dfe559d979c715456dd5609e9b310687b569cf54180674b94c3595134f8dd4",
       "pixel_changes": false
     },
@@ -77,6 +72,46 @@
       "source": "tools/render_minigame_review.py (seed 7, no profile data)",
       "kind": "linked synthetic Qt minigame preview",
       "sha256": "e6399e6ab1f82205c89c514ba371241a42bdfac56a2c0c2c3be04dde6b952d6b",
+      "pixel_changes": false
+    },
+    {
+      "file": "docs/images/ai-chat-de.png",
+      "source": "tools/render_readme_interfaces.py",
+      "kind": "real Qt GUI capture with synthetic dialogue and simulated model status; no AI model loaded",
+      "language": "de",
+      "profile_data": false,
+      "created": "2026-09-21",
+      "sha256": "a3b5b64e145ff68cc23e164f821f45307c8aba6e9087cae763db8c3a8d251010",
+      "pixel_changes": false
+    },
+    {
+      "file": "docs/images/terminal-pyramid-de.png",
+      "source": "tools/render_readme_interfaces.py",
+      "kind": "original terminal title text rendered with ANSI colours; not an OS terminal screenshot",
+      "language": "de",
+      "profile_data": false,
+      "created": "2026-09-21",
+      "sha256": "55030167b31d0c0646592d05da54648c35a4201d4e1a9eab2a2460cb83c59859",
+      "pixel_changes": false
+    },
+    {
+      "file": "docs/images/ai-chat-en.png",
+      "source": "tools/render_readme_interfaces.py",
+      "kind": "real Qt GUI capture with synthetic dialogue and simulated model status; no AI model loaded",
+      "language": "en",
+      "profile_data": false,
+      "created": "2026-09-21",
+      "sha256": "b0df67fe0d1fd9e9c92ac3d7a235df6d1e8ac8a567d03151d0edf28b0690f5be",
+      "pixel_changes": false
+    },
+    {
+      "file": "docs/images/terminal-pyramid-en.png",
+      "source": "tools/render_readme_interfaces.py",
+      "kind": "original terminal title text rendered with ANSI colours; not an OS terminal screenshot",
+      "language": "en",
+      "profile_data": false,
+      "created": "2026-09-21",
+      "sha256": "6903213888a10ab443b74c0a105dbdbfeb0a3aa5d4bcbd3b1086b5b7a2048c4c",
       "pixel_changes": false
     }
   ]

@@ -90,9 +90,15 @@ Animated action artwork, hit feedback, damage numbers and original sound effects
 
 After 15 messages, minigames can appear in chat. Each game you discover stays unlocked for that profile in the **arcade**, directly inside the RPG window.
 
-![MAAT-Snake with the five principles represented by runes on the board.](docs/images/maat-snake.png)
+![MAAT-Snake · Star Covenant: five principle shrines around a golden center and a glowing light trail.](gui-preview/minigame-review-v1/maat-coil-en.png)
 
-*Development capture of MAAT-Snake, shown in German: collect the next rune and avoid the others.*
+*MAAT-Snake · Star Covenant, shown in English with a synthetic game state.*
+
+In **MAAT-Snake · Star Covenant**, guide a light trail across a star map. Activate
+the five shrines H, B, S, V and R in any order, then return to the golden center.
+Your trail stays the same maximum length and is safe to cross. Avoid dissonance
+waves and complete each circuit before time runs out: three covenants win the
+chat challenge; in the arcade, keep playing for a high score.
 
 Discover **23 games**: MAAT-Snake · Star Covenant, Temple Wall Snake, MAAT-Snake, Seal Breaker, MAAT · Temple Circles, a wheel of fortune, Rune Pairs, Desert Maze, Towers of Terra and more puzzles from the world of MAAT.
 
@@ -101,6 +107,11 @@ Chat challenges give you **two attempts**, with XP and gold for a win. In the ar
 [All 23 minigames: goals, controls and arcade modes →](docs/MINIGAMES.md#english)
 
 ## Your AI. Your memories.
+
+![English MAAT-AI chat interface with a sample conversation, level bar, navigation and Maatis' status beside the world map.](docs/images/ai-chat-en.png)
+
+*The desktop chat interface: your conversation in the center, Maatis and Terra
+on the right. Preview with an example dialogue and simulated model status.*
 
 Choose a local **GGUF file** in the AI menu. The game offers automatic hardware settings and manual loading controls for Intel/AMD and ARM, including Metal on Apple Silicon.
 
@@ -197,6 +208,29 @@ help shape the next version.
 | **Windows · experimental** | A Python entry point is provided; follow the [setup steps](GUI-START.md#english). Further testing is needed. |
 
 This is the **desktop beta, distributed as source code**, with a PySide6 interface and modular terminal foundation. Setup requires a Python environment and a suitable local model; follow the guide for your system. Ready-made installers, Python runtimes, models and private saves are not part of this repository.
+
+### Play in the terminal
+
+The classic text interface is also included and starts **without background music**.
+
+![The English terminal title screen with the ASCII pyramid and the prompt to press Enter.](docs/images/terminal-pyramid-en.png)
+
+*The original terminal title output, rendered for readability: the pyramid welcomes
+you before the main menu. [Terminal setup guide →](TERMINAL-START.md#english)*
+
+After setting up the Python environment and GGUF backend above, run from the
+repository folder on macOS (or Linux with a local `.venv`):
+
+```bash
+source .venv/bin/activate
+python maatos/maatki.py
+```
+
+Choose a language, select **maat rpg**, choose a profile and press Enter at the
+pyramid. Select **Awaken and start the game** to continue. A local model is needed
+for chat; the guide explains where to put your GGUF file.
+
+[Terminal guide: macOS, Linux, models and commands →](TERMINAL-START.md#english)
 
 ## From a terminal to a shared world
 
