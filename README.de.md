@@ -207,6 +207,17 @@ MAAT RPG wird aktiv weiterentwickelt. In der Beta können noch Fehler,
 unvollständige Übersetzungen und Änderungen an der Spielbalance vorkommen.
 Deine Spieletests und Rückmeldungen helfen, die nächste Version zu gestalten.
 
+## Einfach einrichten unter macOS und Linux
+
+Entpacke den Spielordner und **doppelklicke unter macOS auf `Install.command`**.
+Unter **Linux genügt `bash setup.sh`** im Spielordner. Das Setup installiert die
+benötigten Komponenten, wählt das native Backend für deine CPU und startet das
+Spiel. Bestätige Systempasswörter oder Apples Installationsdialog, falls nötig.
+[Automatische Einrichtung und Optionen →](SETUP.md#deutsch)
+
+Später startest du über **Start GUI.command** auf dem Mac oder **Start Linux.sh** /
+den Menüeintrag **MAAT RPG** unter Linux. Dein GGUF-Modell wählst du im Spiel aus.
+
 ## Deine erste Reise
 
 1. **Ausgabe wählen und einrichten:** Lade die [offizielle Version mit Musik](https://maat-research.com/data/downloads/maat-rpg.zip) herunter und folge der [ZIP-Anleitung](docs/ZIP_INSTALL.de.md) oder lade dieses Repository über **Code → Download ZIP** herunter (alternativ klonen) und nutze die [GUI-Startanleitung](GUI-START.md#deutsch). Entpacke die gewählte ZIP-Datei vor dem Start.
@@ -215,11 +226,11 @@ Deine Spieletests und Rückmeldungen helfen, die nächste Version zu gestalten.
 
 | System | Einstieg aus diesem Repository |
 | --- | --- |
-| **Linux** | Zuerst die Systempakete aus der [Linux-Anleitung](docs/INSTALL_LINUX.md#deutsch) installieren, dann `bash "Install Linux.sh"` und `bash "Start Linux.sh"`. |
-| **macOS · Intel & Apple Silicon** | Ab macOS 13.3: Python-Umgebung und natives Backend gemäß [GUI-Startanleitung](GUI-START.md#deutsch) einrichten, dann `python start_gui.py`. |
+| **Linux** | `bash setup.sh` ausführen; Systempakete und natives Backend werden automatisch eingerichtet. [Details](SETUP.md#deutsch). |
+| **macOS · Intel & Apple Silicon** | Ab macOS 13.3: **Install.command** doppelklicken, später **Start GUI.command** verwenden. [Details](SETUP.md#deutsch). |
 | **Windows · experimentell** | Python-Einstieg vorhanden; [Setup-Schritte](GUI-START.md#english) und weitere Tests erforderlich. |
 
-Dies ist die **Desktop-Beta als Quellcode** mit PySide6-Oberfläche und modularem Terminal-Grundgerüst. Zur Einrichtung brauchst du eine Python-Umgebung und ein geeignetes lokales Modell; folge der Anleitung für dein System. Fertige Installer, Python-Laufzeiten, Modelle und private Spielstände sind nicht Bestandteil dieses Repositorys.
+Dies ist die **Desktop-Beta als Quellcode** mit PySide6-Oberfläche und modularem Terminal-Grundgerüst. Das macOS-/Linux-Setup richtet die Python-Umgebung ein; dein lokales Modell wählst du selbst. Fertige Installer, Python-Laufzeiten, Modelle und private Spielstände sind nicht Bestandteil dieses Repositorys.
 
 ### Im Terminal spielen
 

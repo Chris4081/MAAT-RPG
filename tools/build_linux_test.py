@@ -25,12 +25,17 @@ def sources():
             if source.is_symlink():raise ValueError(f'Unexpected symlink: {source}')
             if source.is_file() and source.suffix in ALLOWED:
                 yield source,Path('maatos')/rel
-    for name in ('Install Linux.sh','Start Linux.sh'):
+    for name in ('Install Linux.sh','Start Linux.sh','setup.sh','Install.command',
+                 'Start GUI.command','SETUP.md','requirements-gui.txt','requirements-wiki.txt'):
         yield ROOT/name,Path(name)
     for source in sorted((ROOT/'packaging/linux').iterdir()):
         if source.is_file() and source.suffix in {'.py','.txt','.md'}:
             yield source,Path('packaging/linux')/source.name
-    yield ROOT/'docs/INSTALL_LINUX.md',Path('README-LINUX.md')
+    for source in sorted((ROOT/'packaging/setup').iterdir()):
+        if source.is_file() and source.suffix in {'.py','.sh'}:
+            yield source,Path('packaging/setup')/source.name
+    yield ROOT/'packaging/linux/ARCHIVE-README.md',Path('README-LINUX.md')
+    yield ROOT/'docs/INSTALL_LINUX.md',Path('docs/INSTALL_LINUX.md')
     yield ROOT/'docs/WIKI_HINWEISE.md',Path('WIKI_HINWEISE.md')
     yield ROOT/'docs/SOFTWARE_LICENSES.md',Path('SOFTWARE_LICENSES.md')
     yield ROOT/'packaging/linux/THIRD-PARTY.md',Path('THIRD-PARTY.md')
@@ -64,7 +69,7 @@ def build(output):
         for source,rel in entries:
             info=tar.gettarinfo(str(source),arcname=f'{NAME}/{rel.as_posix()}')
             info.uid=info.gid=0;info.uname=info.gname='';info.pax_headers={}
-            info.mode=0o755 if source.suffix=='.sh' else 0o644
+            info.mode=0o755 if source.suffix in {'.sh','.command'} else 0o644
             with source.open('rb') as stream:tar.addfile(info,stream)
         raw=(json.dumps(manifest,indent=2)+'\n').encode()
         info=tarfile.TarInfo(f'{NAME}/manifest.json');info.size=len(raw);info.mode=0o644

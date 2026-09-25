@@ -25,33 +25,26 @@ Das Repository über **Code → Download ZIP** herunterladen und entpacken oder
 mit Git klonen. Ein Terminal im Ordner mit `Install Linux.sh` und `Start Linux.sh`
 öffnen. Den Ordner danach behalten: der Menüeintrag zeigt auf diesen Speicherort.
 
-Einmalig die Systempakete installieren:
+Ein Befehl genügt; das Setup selbst **ohne sudo** starten:
 
 ```bash
-sudo apt update
-sudo apt install python3 python3-venv python3-dev build-essential cmake pkg-config \
-  libopenblas-dev libgl1 libegl1 libxkbcommon-x11-0 libxcb-cursor0 \
-  libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 \
-  libxcb-xinerama0 libxcb-xkb1 libx11-xcb1 libdbus-1-3 libpulse0 \
-  ffmpeg speech-dispatcher espeak-ng fonts-dejavu-core fonts-noto-color-emoji
+bash setup.sh
 ```
 
-Danach **ohne sudo**:
+Systempakete werden über die Paketverwaltung eingerichtet; falls nötig, gib dein
+Administratorpasswort ein. Danach werden die Python-Umgebung, das native KI-Backend
+und ein Menüeintrag **MAAT RPG** angelegt. Zum Abschluss startet das Spiel.
+`bash "Install Linux.sh"` ist ein gleichwertiger Einstieg.
+
+Bei älteren CPUs kann der erste Backend-Build mehrere Minuten dauern. Später
+**MAAT RPG** im Anwendungsmenü oder `bash "Start Linux.sh"` verwenden.
+Mit `--no-start` richtest du nur ein, mit `--skip-system-deps` überspringst du bereits
+vorhandene Systempakete. [Alle Setup-Optionen](../SETUP.md#deutsch).
+
+Paketbefehle nur anzeigen, ohne etwas zu installieren:
 
 ```bash
-bash "Install Linux.sh"
-bash "Start Linux.sh"
-```
-
-Das Setup legt eine eigene Python-Umgebung und einen Menüeintrag **MAAT RPG**
-an. Es startet das Spiel nicht ungefragt. Bei alten CPUs dauert der erste
-Backend-Build möglicherweise mehrere Minuten; weitere Spielstarts bauen nichts
-neu. Der Menüeintrag öffnet auch ein Terminal, damit Fehler sichtbar bleiben.
-
-Andere Distributionen: passende Paketbefehle anzeigen lassen:
-
-```bash
-bash "Install Linux.sh" --system-deps
+bash setup.sh --system-deps
 ```
 
 Wenn die Distribution bereits Python 3.14 verwendet, zusätzlich Python 3.12
@@ -121,10 +114,12 @@ installer does not support Alpine/musl or 32-bit systems.
 1. Download the repository with **Code → Download ZIP** and extract it, or clone
    it with Git. Keep the folder: the desktop shortcut will point to it.
 2. Open a terminal in the folder containing `Install Linux.sh` and `Start Linux.sh`.
-   Run `bash "Install Linux.sh" --system-deps` and install the displayed system
-   packages for your distribution.
-3. Run `bash "Install Linux.sh"` **without sudo**.
-4. Run `bash "Start Linux.sh"`, or use the new **MAAT RPG** menu entry.
+   Run **`bash setup.sh` without sudo**. It installs system packages, the GUI and
+   native backend, creates a menu entry and starts the game. Enter your system
+   password when requested.
+3. Use `--no-start` to install only, or `--skip-system-deps` for manually prepared
+   systems. [All setup options](../SETUP.md#english).
+4. For later launches, run `bash "Start Linux.sh"` or use the **MAAT RPG** menu entry.
 5. Select German/English and your own GGUF model in the game.
 
 The first setup needs internet and builds llama.cpp for the actual CPU, using

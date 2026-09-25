@@ -157,6 +157,7 @@ def main(argv=None):
     parser.add_argument('--system-deps',action='store_true',help='Show system package commands; do not install')
     parser.add_argument('--rebuild-backend',action='store_true',help='Rebuild after changing CPU or repairing the backend')
     parser.add_argument('--no-shortcut',action='store_true')
+    parser.add_argument('--no-wiki',action='store_true')
     args=parser.parse_args(argv)
     commands=system_commands(distro_family())
     if args.system_deps:
@@ -210,7 +211,7 @@ def main(argv=None):
                 # Import in a subprocess catches native loader failures/illegal CPU instructions.
                 run([python,'-c','import llama_cpp; print(llama_cpp.llama_print_system_info().decode())'],log,env=env)
                 marker.write_text(json.dumps(signature,indent=2)+'\n')
-            if not run([*pip,'install','--only-binary=:all:','libzim==3.10.0'],log,env=env,required=False):
+            if not args.no_wiki and not run([*pip,'install','--only-binary=:all:','libzim==3.10.0'],log,env=env,required=False):
                 print('Offline-Wiki vorerst nicht verfügbar; Spiel läuft weiter.\n'
                       'Offline Wiki unavailable for now; the rest of the game can run.')
             run([python,CONFIG/'launcher.py','--check'],log,env=env)

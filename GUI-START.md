@@ -2,6 +2,12 @@
 
 ## Deutsch
 
+**Einfachster Einstieg:** Unter macOS **Install.command** doppelklicken;
+unter Linux im Spielordner **`bash setup.sh`** ausführen. Python (falls nötig),
+Systemabhängigkeiten, GUI und natives GGUF-Backend werden eingerichtet; danach
+startet das Spiel. [Automatisches Setup und Optionen](SETUP.md#deutsch).
+Die folgenden manuellen Schritte sind nur für eine Einrichtung ohne Automatik nötig.
+
 Diese Quellcode-Version enthält keine Hintergrundmusik und startet mit Musik aus.
 Eigene Soundeffekte bleiben aktiv. [Musik und Soundeffekte](docs/MUSIC.md#deutsch).
 
@@ -21,7 +27,7 @@ Im Repository-Ordner:
 ```bash
 bash "Install Linux.sh" --system-deps
 # Die angezeigten Systempakete installieren, danach ohne sudo:
-bash "Install Linux.sh"
+bash "Install Linux.sh" --skip-system-deps --no-start
 bash "Start Linux.sh"
 ```
 
@@ -112,6 +118,12 @@ Die Anleitung verwendet dieselbe aktuelle Python-Umgebung; die älteren
 
 ## English
 
+**Easiest start:** Double-click **Install.command** on macOS, or run
+**`bash setup.sh`** in the game folder on Linux. Setup installs Python if needed,
+system dependencies, the GUI and the native GGUF backend, then starts the game.
+[Automatic setup and options](SETUP.md#english).
+The manual steps below are an alternative for users who prefer to manage setup themselves.
+
 This source edition contains no background music and starts with music off.
 Original sound effects remain enabled. [Music and sound effects](docs/MUSIC.md#english).
 
@@ -127,7 +139,7 @@ contains spaces.
 ```bash
 bash "Install Linux.sh" --system-deps
 # Install the displayed system packages first, then continue without sudo:
-bash "Install Linux.sh"
+bash "Install Linux.sh" --skip-system-deps --no-start
 bash "Start Linux.sh"
 ```
 

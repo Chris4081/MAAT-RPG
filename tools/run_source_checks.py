@@ -12,7 +12,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULTS = (
-    'test_linux_distribution', 'test_qt_runtime', 'test_desktop', 'test_backend_route',
+    'test_automatic_setup', 'test_linux_distribution', 'test_qt_runtime', 'test_desktop', 'test_backend_route',
     'test_intel_adapter', 'test_gguf_chat', 'test_mistral_compatibility',
     'test_gpt_oss', 'test_class_actions', 'test_boss_art', 'test_monster_variety',
     'test_prompt_prefix', 'test_history_settings', 'test_offline_wiki',

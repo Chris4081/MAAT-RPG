@@ -206,6 +206,16 @@ MAAT RPG is in active development. During the beta, you may encounter bugs,
 unfinished translations and changes to game balance. Your playtesting and feedback
 help shape the next version.
 
+## Quick setup on macOS and Linux
+
+Extract the game folder, then **double-click `Install.command` on macOS** or run
+**`bash setup.sh` on Linux**. Setup installs the required components, selects the
+native backend for your CPU and starts the game. Complete any system password or
+Apple installation prompts. [Automatic setup and options →](SETUP.md#english)
+
+For later launches, use **Start GUI.command** on macOS or **Start Linux.sh** / the
+**MAAT RPG** applications-menu entry on Linux. Choose your own GGUF model in-game.
+
 ## Your first journey
 
 1. **Choose your edition and set it up:** Get the [official version with music](https://maat-research.com/data/downloads/maat-rpg.zip) and follow the [ZIP setup guide](docs/ZIP_INSTALL.en.md), or download this repository via **Code → Download ZIP** (or clone it) and follow the [GUI setup guide](GUI-START.md#english). Extract your chosen ZIP before starting.
@@ -214,11 +224,11 @@ help shape the next version.
 
 | System | Starting from this repository |
 | --- | --- |
-| **Linux** | Install the system packages listed in [Linux setup](docs/INSTALL_LINUX.md#english), then run `bash "Install Linux.sh"` and `bash "Start Linux.sh"`. |
-| **macOS · Intel & Apple Silicon** | macOS 13.3+: set up Python and a native backend using the [GUI guide](GUI-START.md#english), then run `python start_gui.py`. |
+| **Linux** | Run `bash setup.sh`; system packages and the native backend are installed automatically. [Details](SETUP.md#english). |
+| **macOS · Intel & Apple Silicon** | macOS 13.3+: double-click **Install.command**. Later use **Start GUI.command**. [Details](SETUP.md#english). |
 | **Windows · experimental** | A Python entry point is provided; follow the [setup steps](GUI-START.md#english). Further testing is needed. |
 
-This is the **desktop beta, distributed as source code**, with a PySide6 interface and modular terminal foundation. Setup requires a Python environment and a suitable local model; follow the guide for your system. Ready-made installers, Python runtimes, models and private saves are not part of this repository.
+This is the **desktop beta, distributed as source code**, with a PySide6 interface and modular terminal foundation. The macOS/Linux setup prepares the Python environment; choose a suitable local model yourself. Ready-made installers, Python runtimes, models and private saves are not part of this repository.
 
 ### Play in the terminal
 

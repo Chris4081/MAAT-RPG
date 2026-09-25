@@ -12,6 +12,11 @@ anschließend selbst; im Download ist kein KI-Modell enthalten.
 **Ablauf:** herunterladen → entpacken → einmalig einrichten → Modell wählen → spielen.
 Für spätere Spielstarts brauchst du die Installation nicht zu wiederholen.
 
+
+> Diese automatische Einrichtung gilt für die aktualisierte ZIP mit `Install.command`
+> und `SETUP.md`. Fehlen diese Dateien noch im Server-Download, verwende vorerst
+> die manuellen Schritte in [GUI-START.md](../GUI-START.md#deutsch).
+
 ## 1. Herunterladen und vollständig entpacken
 
 1. Lade die ZIP über den Link oben herunter und warte, bis der Download fertig ist.
@@ -22,6 +27,9 @@ Für spätere Spielstarts brauchst du die Installation nicht zu wiederholen.
 
 ```text
 MAAT-RPG/
+├── Install.command
+├── setup.sh
+├── SETUP.md
 ├── start_gui.py
 ├── requirements-gui.txt
 ├── Start GUI.command
@@ -45,139 +53,39 @@ Weiter mit deinem System: [macOS](#2-macos--intel-und-apple-silicon) ·
 
 ## 2. macOS – Intel und Apple Silicon
 
-### Voraussetzungen und Prozessortyp
+Benötigt wird macOS **13.3 oder neuer**. Doppelklicke im entpackten Spielordner
+auf **Install.command**. Das Setup richtet natives Python (falls nötig), die GUI,
+Build-Werkzeuge und das passende GGUF-Backend automatisch ein.
 
-- macOS **13.3 oder neuer** für die hier verwendete GUI.
-- Natives **Python 3.11 oder 3.12, 64 Bit**. Die Beispiele verwenden Python 3.12;
-  bei vorhandener Version 3.11 ersetze `python3.12` durch `python3.11`.
-- Internet für die Einrichtung und Apples Command Line Tools für den Backend-Build.
+Bestätige bei Bedarf dein Administratorpasswort und Apples Dialog für die
+Command Line Tools. Lass das Terminal offen: Nach erfolgreicher Einrichtung
+startet das Spiel automatisch. Wähle dann dein eigenes GGUF-Modell aus.
 
-Unter **Apple-Menü → Über diesen Mac** steht entweder ein Intel-Prozessor oder
-ein Apple-Chip wie M1, M2, M3 oder M4. Apple-Chips verwenden die ARM-Variante.
-Python sollte auf Apple Silicon nativ laufen, damit Metal genutzt werden kann.
+Spätere Starts: **Start GUI.command** doppelklicken. Falls der Finder die Datei
+nicht startet, im Spielordner `bash Install.command` beziehungsweise
+`bash "Start GUI.command"` ausführen.
 
-Falls die Command Line Tools noch fehlen, installiere sie und warte den Abschluss ab:
-
-```bash
-xcode-select --install
-```
-
-Sind sie bereits installiert, kannst du fortfahren.
-[Apple-Anleitung](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools).
-
-Prüfe Python:
-
-```bash
-python3.12 --version
-```
-
-Falls du Homebrew verwendest, kannst du Python 3.12 mit
-`brew install python@3.12` einrichten; anschließend ein neues Terminal öffnen.
-Siehe die [Homebrew-Paketbeschreibung](https://formulae.brew.sh/formula/python@3.12).
-Homebrew selbst wird nach der [offiziellen Anleitung](https://brew.sh/) eingerichtet
-und muss deine macOS-Version unterstützen. Eine passende bestehende
-Python-Installation kannst du ebenfalls verwenden.
-
-### Einmalig die Spielumgebung einrichten
-
-Führe diese Befehle nacheinander im entpackten Spielordner aus:
-
-```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements-gui.txt
-python -m pip install cmake ninja
-```
-
-Die Umgebung `.venv` gehört zu dieser Spielkopie. Lass dieses Terminal für den
-nächsten Schritt geöffnet. Führe nun **genau einen** passenden Backend-Befehl aus:
-
-**Apple Silicon – ARM und Metal:**
-
-```bash
-CMAKE_ARGS="-DGGML_NATIVE=ON -DGGML_METAL=ON -DGGML_ACCELERATE=ON -DGGML_BLAS=ON -DGGML_BLAS_VENDOR=Apple -DGGML_OPENMP=OFF -DLLAMA_CURL=OFF" CMAKE_BUILD_PARALLEL_LEVEL=4 python -m pip install --no-binary=llama-cpp-python llama-cpp-python==0.3.34
-```
-
-**Intel-Mac – CPU und Apple Accelerate:**
-
-```bash
-CMAKE_ARGS="-DGGML_NATIVE=ON -DGGML_METAL=OFF -DGGML_ACCELERATE=ON -DGGML_BLAS=ON -DGGML_BLAS_VENDOR=Apple -DGGML_OPENMP=OFF -DLLAMA_CURL=OFF" CMAKE_BUILD_PARALLEL_LEVEL=4 python -m pip install --no-binary=llama-cpp-python llama-cpp-python==0.3.34
-```
-
-Das KI-Backend wird für deinen Rechner gebaut. Das kann mehrere Minuten dauern;
-warte, bis der Befehl erfolgreich beendet ist. Übertrage die erstellte `.venv`
-nicht auf einen anderen Rechner – richte sie dort erneut ein.
-
-### Starten
-
-Im selben Terminal:
-
-```bash
-python start_gui.py
-```
-
-Bei späteren Starts öffnest du wieder ein Terminal im Spielordner und nutzt:
-
-```bash
-source .venv/bin/activate
-python start_gui.py
-```
-
-Nach erfolgreicher Einrichtung erkennt auch **Start GUI.command** die `.venv`.
-Falls die Datei per Doppelklick nicht startet, kannst du sie im Terminal ausführen:
-
-```bash
-bash "Start GUI.command"
-```
+Apple Silicon erhält Metal; Intel verwendet CPU-Beschleunigung mit Apple Accelerate.
+[Setup-Optionen, Voraussetzungen und Hilfe](../SETUP.md#deutsch).
 
 ## 3. Linux – Ubuntu, Mint und Debian
 
-Benötigt werden ein grafischer Desktop und ein 64-Bit-System. Ubuntu 22.04/24.04
-sind passende Ausgangspunkte für Intel/AMD; ARM64 benötigt für die verwendeten
-Qt-Pakete glibc 2.39, etwa Ubuntu 24.04. Empfohlen ist Python 3.11/3.12; das
-Linux-Setup unterstützt Python 3.10–3.13.
-
-Installiere einmalig die Systempakete:
+Öffne im entpackten Spielordner ein Terminal und starte **ohne sudo**:
 
 ```bash
-sudo apt update
-sudo apt install python3 python3-venv python3-dev build-essential cmake pkg-config \
-  libopenblas-dev libgl1 libegl1 libxkbcommon-x11-0 libxcb-cursor0 \
-  libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 \
-  libxcb-xinerama0 libxcb-xkb1 libx11-xcb1 libdbus-1-3 libpulse0 \
-  ffmpeg speech-dispatcher espeak-ng fonts-dejavu-core fonts-noto-color-emoji
+bash setup.sh
 ```
 
-Danach im entpackten Spielordner **ohne sudo**:
+Die Automatik installiert Systempakete über deine Paketverwaltung und fragt
+gegebenenfalls nach dem Administratorpasswort. Anschließend richtet sie die GUI
+und das native CPU-Backend ein, legt einen Menüeintrag an und startet das Spiel.
+Fedora, Arch und openSUSE werden ebenfalls erkannt. Voraussetzung sind ein
+64-Bit-Desktop-System und die in der [Linux-Anleitung](INSTALL_LINUX.md#deutsch)
+genannten Python-/glibc-Versionen.
 
-```bash
-bash "Install Linux.sh"
-```
-
-Das Setup legt eine Python-Umgebung an, installiert die GUI-Bibliotheken, baut
-das CPU-Backend für dein Gerät und erstellt den Menüeintrag **MAAT RPG**.
-Warte den erfolgreichen Abschluss ab; auf älteren Geräten kann der Build dauern.
-
-Starte anschließend mit:
-
-```bash
-bash "Start Linux.sh"
-```
-
-Für spätere Starts reicht derselbe Startbefehl oder der Menüeintrag **MAAT RPG**.
-Die Installation muss nicht erneut laufen. Der Menüeintrag verweist auf deinen
-entpackten Spielordner; behalte diesen deshalb an seinem Speicherort.
-
-Andere Distributionen können sich die passenden Paketbefehle anzeigen lassen:
-
-```bash
-bash "Install Linux.sh" --system-deps
-```
-
-Weitere Varianten, Python-Auswahl und Reparatur des Backends beschreibt die
-[Linux-Anleitung](INSTALL_LINUX.md#deutsch). Für diese Linux-Ausgabe erfolgt die
-KI-Berechnung über die CPU; eine beliebige Grafikkarte wird nicht automatisch genutzt.
+Später: **MAAT RPG** im Anwendungsmenü oder `bash "Start Linux.sh"`.
+Für eine Installation ohne anschließenden Spielstart: `bash setup.sh --no-start`.
+Bei alten CPUs kann der erste Backend-Build mehrere Minuten dauern.
 
 ## 4. Windows – experimentell
 

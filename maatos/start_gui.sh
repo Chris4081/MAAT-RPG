@@ -14,6 +14,13 @@ fi
 if [ -n "${MAAT_GUI_PYTHON:-}" ]; then
     exec "$MAAT_GUI_PYTHON" -m gui.desktop "$@"
 fi
+# Source/ZIP installs use the automatic GUI environment. Packaged apps without
+# an outer setup keep the existing bundled/legacy interpreter lookup below.
+for launch in "$BASE_DIR/../packaging/setup/start.sh" "$BASE_DIR/../../../../packaging/setup/start.sh"; do
+    if [[ -f "$launch" ]]; then
+        exec bash "$launch" "$@"
+    fi
+done
 # Finder does not necessarily inherit the interactive shell's PATH.
 for candidate in \
     "$BASE_DIR/../.venv/bin/python" \
