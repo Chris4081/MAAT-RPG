@@ -7,7 +7,9 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'maatos'))
+ROOT = Path(__file__).resolve().parents[1]
+GAME = ROOT/'maatos' if (ROOT/'maatos').is_dir() else ROOT/'MAAT RPG.app/Contents/Resources/maatos'
+sys.path.insert(0, str(GAME))
 from gui import qt_runtime
 
 

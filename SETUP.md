@@ -69,6 +69,11 @@ Python explicitly. Python 3.14 and free-threaded builds are not supported here.
 If an existing `.venv` is broken or belongs to another architecture, close the
 game, rename **only `.venv`**, and rerun setup. Keep your profiles and models.
 
+On macOS, `bash "Start GUI.command" --check` tests the actual Cocoa window system
+without loading a model. `--check-offscreen` is available for automated headless
+checks only. The starter repairs hidden Qt plugin flags before checking and
+launching; other file attributes are preserved.
+
 Errors remain visible in the terminal; setup logs are in the data folder's
 `logs/` directory. A failed setup does not launch the game. Running it again
 reuses an already verified backend unless a rebuild is necessary.
@@ -144,6 +149,11 @@ Ein bestimmtes natives Python wählst du mit
 werden hier nicht unterstützt. Ist `.venv` beschädigt oder für eine andere
 Architektur erstellt, schließe das Spiel, benenne **nur `.venv`** um und starte
 das Setup erneut. Profile und Modelle behalten.
+
+Unter macOS prüft `bash "Start GUI.command" --check` das echte Cocoa-Fenstersystem,
+ohne ein Modell zu laden. `--check-offscreen` ist ausschließlich für automatisierte
+Tests ohne Fenster gedacht. Der Starter korrigiert versteckte Qt-Plugin-Dateien
+vor Prüfung und Spielstart; andere Dateiattribute bleiben erhalten.
 
 Fehler bleiben im Terminal sichtbar; Setup-Protokolle liegen unter `logs/` im
 Datenordner. Bei einem Fehler startet das Spiel nicht. Ein erneuter Versuch
